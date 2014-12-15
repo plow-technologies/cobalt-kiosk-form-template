@@ -1,4 +1,4 @@
-# cobalt-kiosk-form
+# cobalt-kiosk-form-template
 
 TODO: Write description here
 
