@@ -14,8 +14,17 @@ Library
   HS-Source-Dirs:       src
   GHC-Options:          -Wall
   Exposed-Modules:      Kiosk.Backend.Form
-  Other-Modules:        Kiosk.Backend.Form.Internal
-  Build-Depends:        base >= 4 && < 5
+  Other-Modules:        Kiosk.Backend.Form.Attribute
+                        Kiosk.Backend.Form.Element
+                        Kiosk.Backend.Form.Rendering
+                        Kiosk.Backend.Form.Parsers
+  Build-Depends:        base            >= 4 && < 5
+                      , aeson           >= 0.7.0.6
+                      , either          >= 4.3.2
+                      , text            >= 1.1.1.3 && < 1.2
+                      , bytestring      >= 0.10.4.0
+                      , trifecta        >= 1.5.1
+
 
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
