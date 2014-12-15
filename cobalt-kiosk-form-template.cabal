@@ -6,6 +6,7 @@ License:                BSD3
 License-File:           LICENSE
 Synopsis:               Form Types for Cobalt Kiosk Application Backend
 Description:            Form Types for Cobalt Kiosk Application Backend
+Category:               Apple
 Cabal-Version:          >= 1.10
 Build-Type:             Simple
 
