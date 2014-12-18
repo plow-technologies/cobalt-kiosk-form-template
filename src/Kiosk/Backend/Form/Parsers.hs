@@ -81,7 +81,9 @@ buttonAttrFromAtt attr = do
 
 parseInputType :: [InputAttribute] -> String -> InputType
 parseInputType ((InputType (InputTypeAttr (InputTypeText _) )):[]) elemVal =  InputTypeText . InputText . pack $ elemVal
-parseInputType ((InputType (InputTypeAttr (InputTypeSignature _))):[]) elemVal = InputTypeSignature. Signature $ elemVal
+parseInputType ((InputType (InputTypeAttr (InputTypeSignature _))):[]) elemVal = InputTypeSignature. Signature . pack $ elemVal
+parseInputType ((InputType (InputTypeAttr (InputTypeInt _))):[]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
+parseInputType ((InputType (InputTypeAttr (InputTypeDouble _))):[]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
 parseInputType [] _ = InputTypeText. InputText . pack $ ""
 parseInputType _  _ = InputTypeText. InputText . pack $ ""
 

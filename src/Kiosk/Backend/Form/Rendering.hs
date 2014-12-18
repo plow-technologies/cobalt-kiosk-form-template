@@ -50,8 +50,10 @@ renderInput (Input inputType attrs) = "<input " <> renderAttrList attrs
 
 -- Rendering Different Input Type
 renderInputType :: InputType -> Text
-renderInputType (InputTypeText (InputText i)) = i
-renderInputType (InputTypeSignature (Signature s)) = pack s
+renderInputType (InputTypeText (InputText t)) = t
+renderInputType (InputTypeSignature (Signature s)) = s
+renderInputType (InputTypeInt (InputInt i)) = pack . show $ i
+renderInputType (InputTypeDouble (InputDouble d)) = pack .show $ d
 
 -- Rendering Button Tag
 renderButton :: Button -> Text

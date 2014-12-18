@@ -64,7 +64,9 @@ instance AttributeClass InputTypeAttr where
    toAttribute (InputTypeAttr a) = toAttribute a
    fromAttribute (Attribute "type" v) = case v of
                                          "text" -> Success . InputTypeAttr . InputTypeText . InputText $  v
-                                         "signature" -> Success . InputTypeAttr . InputTypeSignature . Signature $ unpack v
+                                         "signature" -> Success . InputTypeAttr . InputTypeSignature . Signature $ v
+                                         "int" -> Success . InputTypeAttr . InputTypeInt . InputInt $ 0
+                                         "double" -> Success. InputTypeAttr . InputTypeDouble . InputDouble $ 0.0
                                          _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
    fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
@@ -189,20 +191,22 @@ instance FromJSON Input where
 
 -- Input type canbe Text input or Signature input
 data InputType = InputTypeText InputText
-                |InputTypeSignature Signature deriving (Generic, Show, Ord, Eq)
+                |InputTypeSignature Signature
+                |InputTypeInt InputInt
+                |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON InputType where
 instance FromJSON InputType where
 
--- Text Input
+-- Text Type Input
 newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON InputText where
 instance FromJSON InputText where
 
--- Signature store as filePath <-?
+-- Signature Type Input store as base64 encode Bytestring
 newtype Signature = Signature {
-_signature :: FilePath
+_signature :: Text
  } deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON Signature where
@@ -211,6 +215,20 @@ instance FromJSON Signature where
 instance AttributeClass InputType where
   toAttribute (InputTypeText _) = Attribute "type" "'text'"
   toAttribute (InputTypeSignature _) = Attribute "type" "'signature'"
+  toAttribute (InputTypeInt _) = Attribute "type" "int"
+  toAttribute (InputTypeDouble _) = Attribute "type" "double"
+
+-- Number Type Input
+newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq)
+
+instance ToJSON InputInt where
+instance FromJSON InputInt where
+
+-- Number Type Double
+newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic, Show, Ord, Eq)
+
+instance ToJSON InputDouble where
+instance FromJSON InputDouble where
 
 -- | Utility Function
 wrongAttrResponse :: Text -> Text -> Validation Text a
