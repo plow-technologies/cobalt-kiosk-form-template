@@ -9,17 +9,18 @@ Portability :  portable
 <Haskell Types for the form sending from the SWIF Application>
 -}
 
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 module Kiosk.Backend.Form.Element (  module Kiosk.Backend.Form.Element
                                    , module Kiosk.Backend.Form.Attribute) where
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           Data.Text                    (Text)
+import           Data.Typeable                (Typeable)
 import           GHC.Generics                 (Generic)
 import           Kiosk.Backend.Form.Attribute
-
 -- A form is a list of Rows
 data Form = Form {
   _getCompany :: Company,
@@ -34,7 +35,7 @@ instance FromJSON Form where
 data Company = Company {
                _getCompanyText :: Text,
                _companyAttrib  :: [CompanyAttributes]
-                       } deriving (Generic, Show)
+                       } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Company where
 instance FromJSON Company where
@@ -43,7 +44,7 @@ instance FromJSON Company where
 data Address = Address {
                _getAddressText :: Text,
                _addressAttrib  :: [AddressAttributes]
-                       } deriving (Generic, Show)
+                       } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Address where
 instance FromJSON Address where

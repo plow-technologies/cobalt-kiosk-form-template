@@ -9,8 +9,9 @@ Portability :  portable
 <Different Types of Attributes that are contain in the element>
 -}
 
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 module Kiosk.Backend.Form.Attribute where
 
@@ -19,6 +20,7 @@ import           Data.Aeson             (FromJSON, ToJSON)
 import           Data.Either.Validation
 import           Data.Monoid            ((<>))
 import           Data.Text              (Text, pack, unpack)
+import           Data.Typeable          (Typeable)
 import           GHC.Generics           (Generic)
 import           Text.Read              (readMaybe)
 
@@ -87,7 +89,7 @@ instance AttributeClass ActionAttr where
 
 -- Company Attributes
 data CompanyAttributes = CompanyWidth WidthAttr
-                           deriving (Generic, Show)
+                           deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON CompanyAttributes where
 instance FromJSON CompanyAttributes where
@@ -100,7 +102,7 @@ instance AttributeClass CompanyAttributes where
 
 -- Address Attributes
 data AddressAttributes = AddressWidth WidthAttr
-                           deriving (Generic, Show)
+                           deriving (Generic, Show, Ord, Eq)
 
 
 instance ToJSON AddressAttributes where
@@ -184,7 +186,7 @@ data Input = Input {
               _getInput    :: InputType,
               _inputAttrib :: [InputAttribute]
 
-} deriving (Generic, Show, Ord, Eq)
+} deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Input where
 instance FromJSON Input where
@@ -193,13 +195,13 @@ instance FromJSON Input where
 data InputType = InputTypeText InputText
                 |InputTypeSignature Signature
                 |InputTypeInt InputInt
-                |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq)
+                |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputType where
 instance FromJSON InputType where
 
 -- Text Type Input
-newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, Ord, Eq)
+newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputText where
 instance FromJSON InputText where
@@ -207,7 +209,7 @@ instance FromJSON InputText where
 -- Signature Type Input store as base64 encode Bytestring
 newtype Signature = Signature {
 _signature :: Text
- } deriving (Generic, Show, Ord, Eq)
+ } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Signature where
 instance FromJSON Signature where
@@ -219,13 +221,13 @@ instance AttributeClass InputType where
   toAttribute (InputTypeDouble _) = Attribute "type" "double"
 
 -- Number Type Input
-newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq)
+newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputInt where
 instance FromJSON InputInt where
 
 -- Number Type Double
-newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic, Show, Ord, Eq)
+newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputDouble where
 instance FromJSON InputDouble where

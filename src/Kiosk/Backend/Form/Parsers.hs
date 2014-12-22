@@ -60,7 +60,7 @@ parseElement nameString = innerElementParser
              elemValue <- textOrNullParser
              _ <- angles $ many (noneOf ">")
              return $ Element elemName attrList elemValue
-   parseElement' = do symbol nameString
+   parseElement' = do _ <- symbol nameString
                       attrList <- many parseAttributes
                       return (nameString, attrList)
 
