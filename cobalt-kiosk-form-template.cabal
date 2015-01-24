@@ -1,5 +1,5 @@
 Name:                   cobalt-kiosk-form-template
-Version:                1.0.4
+Version:                1.0.5
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
@@ -24,7 +24,8 @@ Library
                       , either         
                       , text           
                       , bytestring      
-                      , trifecta        
+                      , trifecta       
+                      , blaze-markup == 0.6.2.0 
 
 
 Test-Suite spec
@@ -36,6 +37,14 @@ Test-Suite spec
   Main-Is:              Spec.hs
   Build-Depends:        base
                       , hspec
+                      , aeson          
+                      , either         
+                      , text           
+                      , bytestring      
+                      , trifecta       
+                      , blaze-markup
+
+
 
 Source-Repository head
   Type:                 git

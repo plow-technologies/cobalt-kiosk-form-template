@@ -62,8 +62,13 @@ data InputTypeAttr = InputTypeAttr {
 instance ToJSON InputTypeAttr where
 instance FromJSON InputTypeAttr where
 
+-- instance AttributeClass InputType where
+
 instance AttributeClass InputTypeAttr where
-   toAttribute (InputTypeAttr a) = toAttribute a
+   toAttribute (InputTypeAttr (InputTypeText _)) = Attribute "type" "'text'"
+   toAttribute (InputTypeAttr (InputTypeSignature _)) = Attribute "type" "'signature'"
+   toAttribute (InputTypeAttr (InputTypeInt _)) = Attribute "type" "int"
+   toAttribute (InputTypeAttr (InputTypeDouble _)) = Attribute "type" "double"                                               
    fromAttribute (Attribute "type" v) = case v of
                                          "text" -> Success . InputTypeAttr . InputTypeText . InputText $  v
                                          "signature" -> Success . InputTypeAttr . InputTypeSignature . Signature $ v
@@ -213,12 +218,6 @@ _signature :: Text
 
 instance ToJSON Signature where
 instance FromJSON Signature where
-
-instance AttributeClass InputType where
-  toAttribute (InputTypeText _) = Attribute "type" "'text'"
-  toAttribute (InputTypeSignature _) = Attribute "type" "'signature'"
-  toAttribute (InputTypeInt _) = Attribute "type" "int"
-  toAttribute (InputTypeDouble _) = Attribute "type" "double"
 
 -- Number Type Input
 newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq, Typeable)
