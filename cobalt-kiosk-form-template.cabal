@@ -25,6 +25,7 @@ Library
                         Kiosk.Backend.Form.Element.Address
                         Kiosk.Backend.Form.Element.Row                  
                         Kiosk.Backend.Form.Element.Item
+                        Kiosk.Backend.Form.Element.Item.Radio
                         Kiosk.Backend.Form.Element.Item.TableLeftHeader      
                         Kiosk.Backend.Form.Element.Item.TableTopHeader
                         Kiosk.Backend.Form.Element.Item.EmptyBlock
