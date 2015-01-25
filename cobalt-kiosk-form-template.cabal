@@ -16,6 +16,7 @@ Library
   GHC-Options:          -Wall
   Exposed-Modules:      Kiosk.Backend.Form
   Other-Modules:        Kiosk.Backend.Form.Attribute
+                        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Element
                         Kiosk.Backend.Form.Element.Company
                         Kiosk.Backend.Form.Rendering

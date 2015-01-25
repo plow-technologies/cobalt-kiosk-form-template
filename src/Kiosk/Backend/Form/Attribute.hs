@@ -84,20 +84,6 @@ instance AttributeClass ActionAttr where
 
 -- | Attributes warpper type
 
--- Address Attributes
-data AddressAttributes = AddressWidth WidthAttr
-                           deriving (Generic, Show, Ord, Eq)
-
-
-instance ToJSON AddressAttributes where
-instance FromJSON AddressAttributes where
-
-instance AttributeClass AddressAttributes where
-   toAttribute (AddressWidth a) = toAttribute a
-   fromAttribute  = tryAllAddressAttributes
-     where
-       tryAllAddressAttributes a' = AddressWidth <$> fromAttribute a' <|> Failure "Not a valid Address Attirbute"
-
 -- Row Attributes
 data RowAttributes = RowWidth WidthAttr
                            deriving (Generic, Show)

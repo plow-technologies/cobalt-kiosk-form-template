@@ -15,7 +15,7 @@ Portability :  portable
 -}
 
 
-module Kiosk.Backend.Form.Attribute.Width () where
+module Kiosk.Backend.Form.Attribute.Width (WidthAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
 import           Data.Aeson             (FromJSON, ToJSON)
@@ -26,16 +26,16 @@ import           Text.Read              (readMaybe)
 import           GHC.Generics           (Generic)
 import Data.Either.Validation (Validation(..))
 -- Width Attribute
-data WidthAttr = WidthAttr {
-                    _getWidth::Int
+data WidthAttribute = WidthAttribute {
+                         _getWidth::Int
 } deriving (Generic, Show, Ord, Eq)
 
-instance ToJSON WidthAttr where
-instance FromJSON WidthAttr where
+instance ToJSON WidthAttribute where
+instance FromJSON WidthAttribute where
 
-instance AttributeClass WidthAttr where
-   toAttribute (WidthAttr a) = Attribute "width" (pack ("'" ++ show a ++"'"))
+instance AttributeClass WidthAttribute where
+   toAttribute (WidthAttribute a) = Attribute "width" (pack ("'" ++ show a ++"'"))
    fromAttribute (Attribute "width" w) = case readMaybe (unpack w) of
-                                    (Just w') -> Success . WidthAttr $ w'
+                                    (Just w') -> Success . WidthAttribute $ w'
                                     Nothing -> Failure $ pack "WidthAttribute value not parsing -->" <> w
    fromAttribute (Attribute other _) = wrongAttrResponse "width" other

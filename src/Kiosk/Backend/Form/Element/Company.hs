@@ -21,6 +21,7 @@ import           GHC.Generics                 (Generic)
 import           Control.Applicative    ((<$>), (<|>))
 import           Data.Either.Validation (Validation(..))
 import           Data.Text                    (Text)  
+import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Attribute
 -- A Company mainly is the Name of the Company
 data Company = Company {
@@ -33,7 +34,7 @@ instance FromJSON Company where
 
 
 -- Company Attributes
-data CompanyAttributes = CompanyWidth WidthAttr
+data CompanyAttributes = CompanyWidth WidthAttribute
                            deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON CompanyAttributes where

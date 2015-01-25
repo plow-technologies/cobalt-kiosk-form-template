@@ -41,15 +41,9 @@ instance ToJSON Form where
 instance FromJSON Form where
 
 
--- A Address contain address information of the Company
-data Address = Address {
-               _getAddressText :: Text,
-               _addressAttrib  :: [AddressAttributes]
-                       } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Address where
 instance FromJSON Address where
-
 -- A row containing a list of items and its attributes
 data Row = Row {
  _rowItem   :: [Item],
