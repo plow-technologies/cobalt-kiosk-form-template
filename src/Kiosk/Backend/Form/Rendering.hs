@@ -39,6 +39,34 @@ renderLabel (Label txt attrs) = "<label " <> renderAttrList attrs
                                           <> ">"
                                           <> txt
                                           <> "</label>"
+-- Render Radio Tag
+renderRadio :: Radio -> Text
+renderRadio (Radio opts qualifiers) = "<radio>" <> renderOptionList opts
+                                                <> renderOptionQualifierList qualifiers
+                                                <> "</radio>"
+-- Render Option Tag
+renderOptionList :: [Option] -> Text
+renderOptionList = renderList renderOption 
+
+renderOption:: Option -> Text
+renderOption(Option txt attrs) = "<option " <> renderAttrList attrs
+                                                 <> ">"
+                                                 <> txt
+                                                 <> "</option>"
+-- Render OptionQualifier Tag
+renderOptionQualifierList :: [OptionQualifier] -> Text
+renderOptionQualifierList = renderList renderOptionQualifier
+
+renderOptionQualifier :: OptionQualifier -> Text
+renderOptionQualifier (OptionQualifier qualifierChoices qualifierAttributes) = decodeQualifierParts
+  where 
+   decodeQualifierParts = "<option-qualifier " <> renderAttrList qualifierAttributes <> ">"
+                          <> renderQualifierChoicesList qualifierChoices
+                          <> "</option-qualifier>"
+   renderQualifierChoicesList = renderList renderQualifierChoices                       
+   renderQualifierChoices (QualifierLabel l ) = renderLabel l
+   renderQualifierChoices (QualifierInput i) = renderInput i
+
 
 -- Rendering Input Tag
 renderInput :: Input -> Text
@@ -108,6 +136,7 @@ renderItemType it =
        (ItemInput i) -> renderInput i
        (ItemButton b) -> renderButton b
        (ItemEmptyBlock e) -> renderEmptyBlock e
+       (ItemRadio r)  -> renderRadio r
        (ItemTableLeftHeader lh) -> renderTableLeftHeader lh
        (ItemTableTopHeader th) -> renderTableTopHeader th
 
@@ -148,3 +177,10 @@ renderOnpingForm (Form company address constants rows) = "<form>" <> renderCompa
 -- Convert The XML Text into ByteString
 renderByteString :: Text -> ByteString
 renderByteString = encodeUtf8
+
+
+-- Utility
+-- Render List
+renderList :: (a -> Text) ->
+              [a] -> Text
+renderList renderFunction lst  = Data.Text.unwords $ renderFunction <$> lst

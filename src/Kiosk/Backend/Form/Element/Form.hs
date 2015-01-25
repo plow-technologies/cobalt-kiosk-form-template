@@ -43,4 +43,4 @@ instance FromJSON Form where
 
 
 defaultForm :: Form
-defaultForm = Form defaultCompany defaultAddress [defaultConstant] [defaultRow]       
+defaultForm = Form defaultCompany defaultAddress [defaultConstant] defaultRows       

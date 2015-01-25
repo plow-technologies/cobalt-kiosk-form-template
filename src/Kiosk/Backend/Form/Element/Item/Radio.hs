@@ -21,6 +21,7 @@ Portability :  portable
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
                                               , Option(..)
                                               , OptionQualifier(..)
+                                              , QualifierChoices (..)
                                               , defaultRadio) where
 
 
@@ -99,7 +100,6 @@ instance AttributeClass OptionQualifierAttributes where
 
 data QualifierChoices = QualifierInput Input | QualifierLabel Label
   deriving (Show,Generic)                                                              
-
 
 instance ToJSON QualifierChoices where 
 instance FromJSON QualifierChoices where 

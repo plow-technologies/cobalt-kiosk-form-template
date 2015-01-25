@@ -33,6 +33,7 @@ import           Kiosk.Backend.Form.Element.Item                 as Kiosk.Backen
 import           Kiosk.Backend.Form.Element.Item.Button          as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock      as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item.Input           as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.Radio           as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item.Label           as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader  as Kiosk.Backend.Form.Element

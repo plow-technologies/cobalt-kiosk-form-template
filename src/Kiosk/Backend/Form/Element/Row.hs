@@ -15,7 +15,7 @@ Portability :  portable
 
 module Kiosk.Backend.Form.Element.Row (Row(..)
                                       ,RowAttributes
-                                      ,defaultRow) where 
+                                      ,defaultRows) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           GHC.Generics                 (Generic)
@@ -48,5 +48,6 @@ instance AttributeClass RowAttributes where
        tryAllRowAttributes a' = RowWidth <$> fromAttribute a' <|> Failure "Not a valid Row Attirbute"
 
 
-defaultRow :: Row
-defaultRow = Row [defaultItem] [RowWidth $ WidthAttribute (12::Int)]
+defaultRows :: [Row]
+defaultRows = [Row [defaultItem] [RowWidth $ WidthAttribute (12::Int)]
+              ,Row [defaultRadioItem] [RowWidth $ WidthAttribute (12::Int)] ]

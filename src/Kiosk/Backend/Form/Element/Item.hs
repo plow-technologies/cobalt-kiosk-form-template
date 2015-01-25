@@ -15,7 +15,8 @@ Portability :  portable
 
 module Kiosk.Backend.Form.Element.Item ( Item(..)
                                        , ItemType (..)
-                                       , defaultItem) where 
+                                       , defaultItem
+                                       , defaultRadioItem) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 
@@ -25,6 +26,7 @@ import           Data.Either.Validation (Validation(..))
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader 
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock
+import           Kiosk.Backend.Form.Element.Item.Radio
 import           Kiosk.Backend.Form.Element.Item.Button
 import           Kiosk.Backend.Form.Element.Item.Label
 import           Kiosk.Backend.Form.Element.Item.Input
@@ -59,6 +61,7 @@ instance AttributeClass ItemAttributes where
 data ItemType = ItemLabel Label
                |ItemInput Input
                |ItemButton Button
+               |ItemRadio Radio 
                |ItemEmptyBlock EmptyBlock
                |ItemTableTopHeader TableTopHeader
                |ItemTableLeftHeader TableLeftHeader                
@@ -72,3 +75,6 @@ defaultItem = defaultInputItem
 
 defaultInputItem :: Item
 defaultInputItem = Item [ItemLabel defaultLabel, ItemInput defaultInput] [ItemWidth $ WidthAttribute (12::Int)]
+
+defaultRadioItem :: Item
+defaultRadioItem = Item [ItemRadio defaultRadio] []
