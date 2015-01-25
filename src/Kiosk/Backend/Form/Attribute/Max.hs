@@ -1,6 +1,7 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE RankNTypes #-}
+
 
 
 {- |
@@ -18,40 +19,44 @@ Portability :  portable
 -}
 
         
-module Kiosk.Backend.Form.Attribute.Max ( MaxAttribute
-                                        , makeMaxAttribute) where
+module Kiosk.Backend.Form.Attribute.Max ( MaxAttributeDouble(..)
+                                         ) where
 
 import Kiosk.Backend.Form.Attribute
+
 import Data.Text (pack
                  ,Text
                  ,unpack)
+                 
 import Control.Applicative ((<$>))                                            
+
 import           GHC.Generics           (Generic)
+
 import           Data.Aeson             (FromJSON, ToJSON)
+
 import Text.Read (readMaybe)
+
 import Data.Either.Validation (Validation(..))
 
-data GenericMaxAttribute a = MaxAttribute { _getGenericMaxAmt :: a }
-    deriving (Generic,Show)
-instance (ToJSON a) =>  ToJSON (GenericMaxAttribute a) where 
-instance (FromJSON a) =>  FromJSON (GenericMaxAttribute a) where 
 
+data MaxAttributeDouble = MaxAttributeDouble { _getGenericMaxAmt :: Double }
+    deriving (Generic,Show,Eq,Ord)
 
-type MaxAttribute a = (Num a) => GenericMaxAttribute a
-
-makeMaxAttribute :: (Num a) => a -> MaxAttribute a
-makeMaxAttribute = MaxAttribute
+instance   ToJSON MaxAttributeDouble where 
+instance    FromJSON MaxAttributeDouble where 
 
 
 
-instance (Show a,Num a,Read a) =>  AttributeClass (GenericMaxAttribute a) where
-  toAttribute (MaxAttribute a) = Attribute "max" (pack.show $ a)
-  fromAttribute (Attribute "max" txtInteger) = convertToValidation $  
-                                                    makeMaxAttribute <$> 
-                                                                 (readMaybe.unpack $ txtInteger)
 
 
-  fromAttribute (Attribute other _) = wrongAttrResponse "max" other                                                            
+instance AttributeClass MaxAttributeDouble where
+  toAttribute (MaxAttributeDouble d) = Attribute "maxd" (pack.show $ d)
+  fromAttribute (Attribute "maxd" txtInteger) = convertToValidation $  
+                                                     MaxAttributeDouble <$> 
+                                                                      (readMaybe.unpack $ txtInteger)
+
+
+  fromAttribute (Attribute other _) = wrongAttrResponse "maxd" other                                                            
 -- convertToValidation :: (Num a)=>  (Maybe (MaxAttribute a) ) -> (Validation Text (MaxAttribute a))
 
 convertToValidation :: Maybe a -> Validation Text a

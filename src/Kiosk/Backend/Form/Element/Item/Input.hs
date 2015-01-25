@@ -39,7 +39,7 @@ import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          wrongAttrResponse)
 import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Width
-
+import           Kiosk.Backend.Form.Attribute.Max 
 import           Control.Applicative                    ((<$>), (<|>))
 import           Data.Either.Validation                 (Validation (..))
 -- Input Type
@@ -87,11 +87,11 @@ newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic,
 instance ToJSON InputDouble where
 instance FromJSON InputDouble where
 
-
 -- Input Attributes
 data InputAttribute = InputWidth WidthAttribute
                     | InputType InputTypeAttribute
                     | InputIndexable IndexableAttribute
+                    | InputMaxDouble MaxAttributeDouble
 
   deriving (Generic, Show, Ord, Eq)
 
@@ -101,6 +101,7 @@ instance FromJSON InputAttribute where
 instance AttributeClass InputAttribute where
    toAttribute (InputWidth a) = toAttribute a
    toAttribute (InputIndexable a) = toAttribute a
+   toAttribute (InputMaxDouble d) = toAttribute d
    toAttribute (InputType i) = toAttribute i
    fromAttribute = tryAllTypeAttributes
      where
@@ -108,9 +109,14 @@ instance AttributeClass InputAttribute where
                                  fromAttribute a' <|> 
                                  InputType <$> 
                                  fromAttribute a' <|> 
+                                 InputMaxDouble <$> 
+                                 fromAttribute a' <|>
                                  InputIndexable <$> 
                                  fromAttribute a' <|>
                                  Failure "Not a valid input Attribute"
+
+
+-- InputConstraintAttribute 
 
 
 -- Type Attribute

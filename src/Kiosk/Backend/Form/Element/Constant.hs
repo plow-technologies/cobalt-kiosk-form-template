@@ -55,4 +55,4 @@ instance AttributeClass ConstantAttributes where
 
 
 defaultConstant :: Constant
-defaultConstant = Constant "Black Watch" [ConstantAttributeType "Company"]
+defaultConstant = Constant "Black Watch" [ConstantAttributeType "'Company'"]
