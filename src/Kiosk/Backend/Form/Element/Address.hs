@@ -13,7 +13,8 @@ Portability :  portable
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Element.Address() where 
+module Kiosk.Backend.Form.Element.Address( Address(..)
+                                         , defaultAddress) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           Data.Typeable                (Typeable)
@@ -43,3 +44,7 @@ instance AttributeClass AddressAttributes where
    fromAttribute  = tryAllAddressAttributes
      where
        tryAllAddressAttributes a' = AddressWidth <$> fromAttribute a' <|> Failure "Not a valid Address Attirbute"
+
+
+defaultAddress :: Address
+defaultAddress = Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936" [AddressWidth $ WidthAttribute (12::Int)]

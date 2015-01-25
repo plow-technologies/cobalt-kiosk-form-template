@@ -15,17 +15,22 @@ Library
   HS-Source-Dirs:       src
   GHC-Options:          -Wall
   Exposed-Modules:      Kiosk.Backend.Form
-  Other-Modules:        Kiosk.Backend.Form.Attribute
-                        Kiosk.Backend.Form.Attribute.Width
-                        Kiosk.Backend.Form.Attribute.Action
                         Kiosk.Backend.Form.Element
+                        Kiosk.Backend.Form.Attribute
+  Other-Modules:        Kiosk.Backend.Form.Attribute.Width
+                        Kiosk.Backend.Form.Attribute.Action
+                        Kiosk.Backend.Form.Element.Form
                         Kiosk.Backend.Form.Element.Company
                         Kiosk.Backend.Form.Element.Address
-                        Kiosk.Backend.Form.Element.Row
+                        Kiosk.Backend.Form.Element.Row                  
+                        Kiosk.Backend.Form.Element.Item
                         Kiosk.Backend.Form.Element.Item.TableLeftHeader      
                         Kiosk.Backend.Form.Element.Item.TableTopHeader
                         Kiosk.Backend.Form.Element.Item.EmptyBlock
                         Kiosk.Backend.Form.Element.Item.Button
+                        Kiosk.Backend.Form.Element.Item.Input
+                        Kiosk.Backend.Form.Element.Item.Label
+                 
                         Kiosk.Backend.Form.Rendering
                         Kiosk.Backend.Form.Parsers
   Build-Depends:        base            >= 4 && < 5

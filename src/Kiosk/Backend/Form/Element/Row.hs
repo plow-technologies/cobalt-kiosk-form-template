@@ -13,7 +13,9 @@ Portability :  portable
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Element.Row () where 
+module Kiosk.Backend.Form.Element.Row (Row(..)
+                                      ,RowAttributes
+                                      ,defaultRow) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           Data.Typeable                (Typeable)
@@ -23,7 +25,7 @@ import           Data.Either.Validation (Validation(..))
 import           Data.Text                    (Text)  
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Attribute
-
+import Kiosk.Backend.Form.Element.Item
 
 -- A row containing a list of items and its attributes
 data Row = Row {
@@ -46,3 +48,7 @@ instance AttributeClass RowAttributes where
    fromAttribute  = tryAllRowAttributes
      where
        tryAllRowAttributes a' = RowWidth <$> fromAttribute a' <|> Failure "Not a valid Row Attirbute"
+
+
+defaultRow :: Row
+defaultRow = Row [defaultItem] [RowWidth $ WidthAttribute (12::Int)]

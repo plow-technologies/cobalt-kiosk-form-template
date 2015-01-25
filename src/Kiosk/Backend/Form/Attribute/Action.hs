@@ -19,10 +19,10 @@ module Kiosk.Backend.Form.Attribute.Action (ActionAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
 import           Data.Aeson             (FromJSON, ToJSON)
-import Data.Monoid ((<>))
+
 import Data.Text (pack
                  ,unpack)
-import           Text.Read              (readMaybe)                 
+
 import           GHC.Generics           (Generic)
 import Data.Either.Validation (Validation(..))
 

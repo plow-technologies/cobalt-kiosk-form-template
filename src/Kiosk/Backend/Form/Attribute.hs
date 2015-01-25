@@ -17,15 +17,14 @@ module Kiosk.Backend.Form.Attribute ( AttributeClass(..)
                                     , Attribute(..)
                                     , wrongAttrResponse) where
 
-import           Control.Applicative    ((<$>), (<|>))
-import           Data.Aeson             (FromJSON, ToJSON)
-import           Data.Either.Validation (Validation(..))
-import           Data.Monoid            ((<>))
-import           Data.Text              (Text, pack, unpack)
-import           Data.Typeable          (Typeable)
-import           GHC.Generics           (Generic)
-import           Text.Read              (readMaybe)
 
+import           Data.Aeson             (FromJSON, ToJSON)
+import           Data.Either.Validation (Validation (..))
+import           Data.Monoid            ((<>))
+
+import           GHC.Generics           (Generic)
+
+import           Data.Text              (Text)
 -- Attributes
 data Attribute = Attribute {
       name :: Text,
@@ -44,103 +43,3 @@ class AttributeClass a where
 wrongAttrResponse :: Text -> Text -> Validation Text a
 wrongAttrResponse correct other = Failure $ "Not " <> correct <> "attribute, recieved --> "  <> other
 
-
-{-
--- Type Attribute
-data InputTypeAttr = InputTypeAttr {
-   _getTypeName :: InputType
-} deriving (Generic, Show, Ord, Eq)
-
-instance ToJSON InputTypeAttr where
-instance FromJSON InputTypeAttr where
-
--- instance AttributeClass InputType where
-
-instance AttributeClass InputTypeAttr where
-   toAttribute (InputTypeAttr (InputTypeText _)) = Attribute "type" "'text'"
-   toAttribute (InputTypeAttr (InputTypeSignature _)) = Attribute "type" "'signature'"
-   toAttribute (InputTypeAttr (InputTypeInt _)) = Attribute "type" "int"
-   toAttribute (InputTypeAttr (InputTypeDouble _)) = Attribute "type" "double"                                               
-   fromAttribute (Attribute "type" v) = case v of
-                                         "text" -> Success . InputTypeAttr . InputTypeText . InputText $  v
-                                         "signature" -> Success . InputTypeAttr . InputTypeSignature . Signature $ v
-                                         "int" -> Success . InputTypeAttr . InputTypeInt . InputInt $ 0
-                                         "double" -> Success. InputTypeAttr . InputTypeDouble . InputDouble $ 0.0
-                                         _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
-   fromAttribute (Attribute other _) = wrongAttrResponse "type" other
-
--- | Attributes warpper type
-
--- Label Attributes
-data LabelAttributes = LabelWidth WidthAttr
-                            deriving (Generic, Show)
-
-instance ToJSON LabelAttributes where
-instance FromJSON LabelAttributes where
-
-instance AttributeClass LabelAttributes where
-   toAttribute (LabelWidth a) = toAttribute a
-   fromAttribute  = tryAllLabelAttributes
-     where
-       tryAllLabelAttributes a' = LabelWidth <$> fromAttribute a' <|> Failure "Not a valid Row Attirbute"
-
--- Input Attributes
-data InputAttribute = InputWidth WidthAttr | InputType InputTypeAttr deriving (Generic, Show, Ord, Eq)
-
-instance ToJSON InputAttribute where
-instance FromJSON InputAttribute where
-
-instance AttributeClass InputAttribute where
-   toAttribute (InputWidth a) = toAttribute a
-   toAttribute (InputType i) = toAttribute i
-   fromAttribute = tryAllTypeAttributes
-     where
-       tryAllTypeAttributes a' = InputWidth <$> fromAttribute a' <|> InputType <$> fromAttribute a' <|> Failure "Not a valid input Attribute"
-
-
--- Input Type
-data Input = Input {
-              _getInput    :: InputType,
-              _inputAttrib :: [InputAttribute]
-
-} deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON Input where
-instance FromJSON Input where
-
--- Input type canbe Text input or Signature input
-data InputType = InputTypeText InputText
-                |InputTypeSignature Signature
-                |InputTypeInt InputInt
-                |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputType where
-instance FromJSON InputType where
-
--- Text Type Input
-newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputText where
-instance FromJSON InputText where
-
--- Signature Type Input store as base64 encode Bytestring
-newtype Signature = Signature {
-_signature :: Text
- } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON Signature where
-instance FromJSON Signature where
-
--- Number Type Input
-newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputInt where
-instance FromJSON InputInt where
-
--- Number Type Double
-newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputDouble where
-instance FromJSON InputDouble where
-
--}

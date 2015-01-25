@@ -19,7 +19,6 @@ module Kiosk.Backend.Form.Element.Item.EmptyBlock (EmptyBlock(..)) where
 import Data.Aeson (ToJSON
                   ,FromJSON)
 import GHC.Generics (Generic)
-import Data.Text (Text)
         
 -- Empty Block
 data EmptyBlock = Null deriving (Generic, Show)

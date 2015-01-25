@@ -7,78 +7,31 @@ Maintainer  :  <lingpo.huang@plowtech.net>
 Stability   :  unstable
 Portability :  portable
 <Haskell Types for the form sending from the SWIF Application>
-         
+
 It can be confusing looking for Elements and Attributes,
-   
-The rule is Every element has a list of attributes defined along side it that 
-define what attributes can be used with that element but the primitive types 
+
+The rule is Every element has a list of attributes defined along side it that
+define what attributes can be used with that element but the primitive types
 of these attribute definitions come from the Attribute type.
-   
-For example, 'Company' has 'CompanyAttribute', one of which is a 'WidthAttr'   
+
+For example, 'Company' has 'CompanyAttribute', one of which is a 'WidthAttr'
 -}
 
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Element (  module Kiosk.Backend.Form.Element
-                                   , module Kiosk.Backend.Form.Attribute) where
-                                   
-
-import           Data.Aeson                   (FromJSON, ToJSON)
-import           Data.Text                    (Text)
-import           Data.Typeable                (Typeable)
-import           GHC.Generics                 (Generic)
-import           Kiosk.Backend.Form.Attribute
--- import           Kiosk.Backend.Form.Element.Company (Company)
--- A form is a list of Rows
-data Form = Form {
-  _getCompany :: Company,
-  _getAddress :: Address,
-  _row        :: [Row]
- } deriving (Generic, Show)
-
-instance ToJSON Form where
-instance FromJSON Form where
+module Kiosk.Backend.Form.Element (module Kiosk.Backend.Form.Element) where
 
 
-
--- A label is a text with set of attributes
-data Label = Label {
-                    _getLabelText :: Text,
-                    _labelAttrib  :: [LabelAttributes]
-                    } deriving (Generic, Show)
-
-instance ToJSON Label where
-instance FromJSON Label where
-
-
-
-defaultCompany :: Company
-defaultCompany = Company "Hull's Oilfield LLC" [CompanyWidth $ WidthAttr (12::Int) ]
-
-defaultAddress :: Address
-defaultAddress = Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936" [AddressWidth $ WidthAttr (12::Int)]
-
-defaultInput :: Input
-defaultInput = Input defaultInputType defaultInputAttributesList
-
-defaultInputType :: InputType
-defaultInputType = InputTypeText $ InputText (""::Text)
-
-defaultInputAttributesList :: [InputAttribute]
-defaultInputAttributesList = [wAttr, tAttr]
-              where wAttr = InputWidth $ WidthAttr (12::Int)
-                    tAttr = InputType $ InputTypeAttr defaultInputType
-
-defaultLabel :: Label
-defaultLabel = Label "Legal Dest" [LabelWidth $ WidthAttr (12::Int)]
-
-defaultItem :: Item
-defaultItem = Item [ItemLabel defaultLabel, ItemInput defaultInput] [ItemWidth $ WidthAttr (12::Int)]
-
-defaultRow :: Row
-defaultRow = Row [defaultItem] [RowWidth $ WidthAttr (12::Int)]
-
-defaultForm :: Form
-defaultForm = Form defaultCompany defaultAddress [defaultRow]
+import           Kiosk.Backend.Form.Element.Address              as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Company              as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Form                 as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item                 as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.Button          as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.EmptyBlock      as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.Input           as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.Label           as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.TableLeftHeader as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Item.TableTopHeader  as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Row                  as Kiosk.Backend.Form.Element

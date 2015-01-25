@@ -13,7 +13,8 @@ Portability :  portable
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Element.Company () where 
+module Kiosk.Backend.Form.Element.Company ( Company(..)
+                                          , defaultCompany) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           Data.Typeable                (Typeable)
@@ -45,3 +46,7 @@ instance AttributeClass CompanyAttributes where
    fromAttribute  = tryAllCompanyAttributes
      where
        tryAllCompanyAttributes a' = CompanyWidth <$> fromAttribute a' <|> Failure "Not a valid Company Attirbute"
+
+
+defaultCompany :: Company
+defaultCompany = Company "Hull's Oilfield LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
