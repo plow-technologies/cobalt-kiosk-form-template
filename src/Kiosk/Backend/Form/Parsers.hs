@@ -32,6 +32,7 @@ data Element = Element { element    :: String
 
 
 -- Generic Element Parser
+
 parseElement :: (TokenParsing m, Monad m) => String -> m Element
 parseElement nameString = innerElementParser
  where
