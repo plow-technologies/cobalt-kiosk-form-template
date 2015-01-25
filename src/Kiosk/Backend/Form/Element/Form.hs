@@ -9,7 +9,7 @@ Portability :  portable
 <Haskell Types for the form sending from the SWIF Application>
 -}
 
-{-# LANGUAGE DeriveDataTypeable #-}
+
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 

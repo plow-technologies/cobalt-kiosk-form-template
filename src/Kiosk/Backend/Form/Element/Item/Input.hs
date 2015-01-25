@@ -144,6 +144,7 @@ defaultInputType :: InputType
 defaultInputType = InputTypeText $ InputText (""::Text)
 
 defaultInputAttributesList :: [InputAttribute]
-defaultInputAttributesList = [wAttr, tAttr]
+defaultInputAttributesList = [wAttr, tAttr, ixAttr]
               where wAttr = InputWidth $ WidthAttribute (12::Int)
+                    ixAttr = InputIndexable $ IndexableAttribute True
                     tAttr = InputType $ InputTypeAttribute defaultInputType

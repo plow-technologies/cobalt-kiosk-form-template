@@ -54,11 +54,13 @@ Test-Suite spec
   Build-Depends:        base
                       , hspec
                       , aeson          
+                      , template-haskell
                       , either         
                       , text           
                       , bytestring      
                       , trifecta       
                       , blaze-markup
+ 
 
 
 

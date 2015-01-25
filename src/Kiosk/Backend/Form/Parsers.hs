@@ -30,26 +30,6 @@ data Element = Element { element    :: String
 
   deriving (Show)
 
-        -- do
-        -- let eAttrList = validationToEither. fromAttribute <$> attr
-        -- case rights eAttrList of
-        --   [] -> if null.lefts $ eAttrList  -- If there are no good, but still bad we want fail
-        --         then return []
-        --         else fail "Invalid Button Attribute"
-        --   attrs -> return attrs
-
-testText :: String
-testText = "<element attr1='3' attr2='Cat'> Some Text </element>"
-
-testButton :: String
-testButton = "<button action='sendJson'>Send JSON </button>"
-
-testLabel :: String
-testLabel = "<label>Time Loaded</label>"
-
-testInput :: String
-testInput = "<input type='text'>Send JSON</input>"
-
 
 -- Generic Element Parser
 parseElement :: (TokenParsing m, Monad m) => String -> m Element
