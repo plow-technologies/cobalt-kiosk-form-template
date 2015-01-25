@@ -1,0 +1,16 @@
+
+
+{- |
+Module      :  Kiosk.Backend.Form.Attribute.Width
+Description :  Width Attribute, determines width of an element
+Copyright   :  Plow Technologies LLC 
+License     :  MIT License
+
+Maintainer  :  Scott Murphy
+Stability   :  experimental
+Portability :  portable
+
+-}
+
+
+module Kiosk.Backend.Form.Attribute.Width () where

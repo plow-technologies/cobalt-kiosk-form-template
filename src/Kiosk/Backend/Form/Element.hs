@@ -7,6 +7,14 @@ Maintainer  :  <lingpo.huang@plowtech.net>
 Stability   :  unstable
 Portability :  portable
 <Haskell Types for the form sending from the SWIF Application>
+         
+It can be confusing looking for Elements and Attributes,
+   
+The rule is Every element has a list of attributes defined along side it that 
+define what attributes can be used with that element but the primitive types 
+of these attribute definitions come from the Attribute type.
+   
+For example, 'Company' has 'CompanyAttribute', one of which is a 'WidthAttr'   
 -}
 
 {-# LANGUAGE DeriveDataTypeable #-}
@@ -21,6 +29,7 @@ import           Data.Text                    (Text)
 import           Data.Typeable                (Typeable)
 import           GHC.Generics                 (Generic)
 import           Kiosk.Backend.Form.Attribute
+-- import           Kiosk.Backend.Form.Element.Company (Company)
 -- A form is a list of Rows
 data Form = Form {
   _getCompany :: Company,
@@ -31,14 +40,6 @@ data Form = Form {
 instance ToJSON Form where
 instance FromJSON Form where
 
--- A Company mainly is the Name of the Company
-data Company = Company {
-               _getCompanyText :: Text,
-               _companyAttrib  :: [CompanyAttributes]
-                       } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON Company where
-instance FromJSON Company where
 
 -- A Address contain address information of the Company
 data Address = Address {

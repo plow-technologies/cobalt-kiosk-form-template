@@ -17,6 +17,7 @@ Library
   Exposed-Modules:      Kiosk.Backend.Form
   Other-Modules:        Kiosk.Backend.Form.Attribute
                         Kiosk.Backend.Form.Element
+                        Kiosk.Backend.Form.Element.Company
                         Kiosk.Backend.Form.Rendering
                         Kiosk.Backend.Form.Parsers
   Build-Depends:        base            >= 4 && < 5

@@ -13,11 +13,13 @@ Portability :  portable
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Attribute where
+module Kiosk.Backend.Form.Attribute ( AttributeClass(..)
+                                    , Attribute(..)
+                                    , wrongAttrResponse) where
 
 import           Control.Applicative    ((<$>), (<|>))
 import           Data.Aeson             (FromJSON, ToJSON)
-import           Data.Either.Validation
+import           Data.Either.Validation (Validation(..))
 import           Data.Monoid            ((<>))
 import           Data.Text              (Text, pack, unpack)
 import           Data.Typeable          (Typeable)
@@ -38,22 +40,12 @@ class AttributeClass a where
   toAttribute :: a -> Attribute
   fromAttribute :: Attribute -> Validation Text a
 
+-- | Utility Function
+wrongAttrResponse :: Text -> Text -> Validation Text a
+wrongAttrResponse correct other = Failure $ "Not " <> correct <> "attribute, recieved --> "  <> other
 
--- Width Attribute
-data WidthAttr = WidthAttr {
-                    _getWidth::Int
-} deriving (Generic, Show, Ord, Eq)
 
-instance ToJSON WidthAttr where
-instance FromJSON WidthAttr where
-
-instance AttributeClass WidthAttr where
-   toAttribute (WidthAttr a) = Attribute "width" (pack ("'" ++ show a ++"'"))
-   fromAttribute (Attribute "width" w) = case readMaybe (unpack w) of
-                                    (Just w') -> Success . WidthAttr $ w'
-                                    Nothing -> Failure $ pack "WidthAttribute value not parsing -->" <> w
-   fromAttribute (Attribute other _) = wrongAttrResponse "width" other
-
+{-
 -- Type Attribute
 data InputTypeAttr = InputTypeAttr {
    _getTypeName :: InputType
@@ -91,19 +83,6 @@ instance AttributeClass ActionAttr where
    fromAttribute (Attribute other _) = wrongAttrResponse "action" other
 
 -- | Attributes warpper type
-
--- Company Attributes
-data CompanyAttributes = CompanyWidth WidthAttr
-                           deriving (Generic, Show, Ord, Eq)
-
-instance ToJSON CompanyAttributes where
-instance FromJSON CompanyAttributes where
-
-instance AttributeClass CompanyAttributes where
-   toAttribute (CompanyWidth a) = toAttribute a
-   fromAttribute  = tryAllCompanyAttributes
-     where
-       tryAllCompanyAttributes a' = CompanyWidth <$> fromAttribute a' <|> Failure "Not a valid Company Attirbute"
 
 -- Address Attributes
 data AddressAttributes = AddressWidth WidthAttr
@@ -231,6 +210,4 @@ newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic,
 instance ToJSON InputDouble where
 instance FromJSON InputDouble where
 
--- | Utility Function
-wrongAttrResponse :: Text -> Text -> Validation Text a
-wrongAttrResponse correct other = Failure $ "Not " <> correct <> "attribute, recieved --> "  <> other
+-}
