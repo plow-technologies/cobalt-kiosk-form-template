@@ -14,14 +14,14 @@ Portability :  portable
 
 module Kiosk.Backend.Form.Parsers where
 
-import           Data.Either                (rights)
-import           Data.Either.Validation     (validationToEither)
-import           Data.Text                  (pack)
+import           Data.Either                  (rights)
+import           Data.Either.Validation       (validationToEither)
+import           Data.Text                    (pack)
+import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Element
-import Kiosk.Backend.Form.Attribute
 import           Text.Trifecta
 
-import           Control.Applicative        ((<$>), (<|>))
+import           Control.Applicative          ((<$>), (<|>))
 
 data Element = Element { element    :: String
                         ,attributes :: [Attribute]
@@ -81,10 +81,10 @@ buttonAttrFromAtt attr = do
                            attrs -> attrs
 
 parseInputType :: [InputAttribute] -> String -> InputType
-parseInputType ((InputType (InputTypeAttribute (InputTypeText _) )):[]) elemVal =  InputTypeText . InputText . pack $ elemVal
-parseInputType ((InputType (InputTypeAttribute (InputTypeSignature _))):[]) elemVal = InputTypeSignature. Signature . pack $ elemVal
-parseInputType ((InputType (InputTypeAttribute (InputTypeInt _))):[]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
-parseInputType ((InputType (InputTypeAttribute (InputTypeDouble _))):[]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
+parseInputType ([InputType (InputTypeAttribute (InputTypeText _) )]) elemVal =  InputTypeText . InputText . pack $ elemVal
+parseInputType ([InputType (InputTypeAttribute (InputTypeSignature _))]) elemVal = InputTypeSignature. Signature . pack $ elemVal
+parseInputType ([InputType (InputTypeAttribute (InputTypeInt _))]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
+parseInputType ([InputType (InputTypeAttribute (InputTypeDouble _))]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
 parseInputType [] _ = InputTypeText. InputText . pack $ ""
 parseInputType _  _ = InputTypeText. InputText . pack $ ""
 
