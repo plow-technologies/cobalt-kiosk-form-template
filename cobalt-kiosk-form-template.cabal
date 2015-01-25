@@ -17,8 +17,15 @@ Library
   Exposed-Modules:      Kiosk.Backend.Form
   Other-Modules:        Kiosk.Backend.Form.Attribute
                         Kiosk.Backend.Form.Attribute.Width
+                        Kiosk.Backend.Form.Attribute.Action
                         Kiosk.Backend.Form.Element
                         Kiosk.Backend.Form.Element.Company
+                        Kiosk.Backend.Form.Element.Address
+                        Kiosk.Backend.Form.Element.Row
+                        Kiosk.Backend.Form.Element.Item.TableLeftHeader      
+                        Kiosk.Backend.Form.Element.Item.TableTopHeader
+                        Kiosk.Backend.Form.Element.Item.EmptyBlock
+                        Kiosk.Backend.Form.Element.Item.Button
                         Kiosk.Backend.Form.Rendering
                         Kiosk.Backend.Form.Parsers
   Build-Depends:        base            >= 4 && < 5

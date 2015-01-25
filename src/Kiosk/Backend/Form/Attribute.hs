@@ -69,46 +69,7 @@ instance AttributeClass InputTypeAttr where
                                          _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
    fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
--- Action Attribute
-data ActionAttr = ActionAttr {
-   _getFunctionName :: String
-} deriving (Generic, Show)
-
-instance ToJSON ActionAttr where
-instance FromJSON ActionAttr where
-
-instance AttributeClass ActionAttr where
-   toAttribute (ActionAttr a) = Attribute "action" (pack.show $ a)
-   fromAttribute (Attribute "action" v) = Success. ActionAttr . unpack $ v
-   fromAttribute (Attribute other _) = wrongAttrResponse "action" other
-
 -- | Attributes warpper type
-
--- Row Attributes
-data RowAttributes = RowWidth WidthAttr
-                           deriving (Generic, Show)
-
-instance ToJSON RowAttributes where
-instance FromJSON RowAttributes where
-
-instance AttributeClass RowAttributes where
-   toAttribute (RowWidth a) = toAttribute a
-   fromAttribute  = tryAllRowAttributes
-     where
-       tryAllRowAttributes a' = RowWidth <$> fromAttribute a' <|> Failure "Not a valid Row Attirbute"
-
--- Item Attributes
-data ItemAttributes = ItemWidth WidthAttr
-                           deriving (Generic, Show)
-
-instance ToJSON ItemAttributes where
-instance FromJSON ItemAttributes where
-
-instance AttributeClass ItemAttributes where
-   toAttribute (ItemWidth a) = toAttribute a
-   fromAttribute  = tryAllItemAttributes
-     where
-       tryAllItemAttributes a' = ItemWidth <$> fromAttribute a' <|> Failure "Not a valid Row Attirbute"
 
 -- Label Attributes
 data LabelAttributes = LabelWidth WidthAttr
@@ -136,20 +97,6 @@ instance AttributeClass InputAttribute where
      where
        tryAllTypeAttributes a' = InputWidth <$> fromAttribute a' <|> InputType <$> fromAttribute a' <|> Failure "Not a valid input Attribute"
 
--- Button Atrributes
-data ButtonAttributes = ButtonWidth WidthAttr | ButtonAction ActionAttr deriving (Generic, Show)
-
-instance ToJSON ButtonAttributes where
-instance FromJSON ButtonAttributes where
-
-instance AttributeClass ButtonAttributes where
-   toAttribute (ButtonWidth w) = toAttribute w
-   toAttribute (ButtonAction a) = toAttribute a
-   fromAttribute  = tryAllButtonAttributes
-     where
-       tryAllButtonAttributes a' = ButtonWidth <$> fromAttribute a'  <|>
-                                   ButtonAction <$> fromAttribute a' <|>
-                                   Failure "Not a valid button Attirbute"
 
 -- Input Type
 data Input = Input {

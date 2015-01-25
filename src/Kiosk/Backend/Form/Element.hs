@@ -23,6 +23,7 @@ For example, 'Company' has 'CompanyAttribute', one of which is a 'WidthAttr'
 
 module Kiosk.Backend.Form.Element (  module Kiosk.Backend.Form.Element
                                    , module Kiosk.Backend.Form.Attribute) where
+                                   
 
 import           Data.Aeson                   (FromJSON, ToJSON)
 import           Data.Text                    (Text)
@@ -42,37 +43,6 @@ instance FromJSON Form where
 
 
 
-instance ToJSON Address where
-instance FromJSON Address where
--- A row containing a list of items and its attributes
-data Row = Row {
- _rowItem   :: [Item],
- _rowAttrib :: [RowAttributes]
-} deriving (Generic, Show)
-
-instance ToJSON Row where
-instance FromJSON Row where
-
--- A Item containing different item type and its attirbutes
-data Item = Item {
-  _item       :: [ItemType],
-  _itemAttrib :: [ItemAttributes]
-} deriving (Generic, Show)
-
-instance ToJSON Item where
-instance FromJSON Item where
-
--- A Item type can be a label, input, emptyBlock, tableTopHeader, tableLeftHeader
-data ItemType = ItemLabel Label
-               |ItemInput Input
-               |ItemButton Button
-               |ItemEmptyBlock EmptyBlock
-               |ItemTableTopHeader TableTopHeader
-               |ItemTableLeftHeader TableLeftHeader deriving (Generic, Show)
-
-instance ToJSON ItemType where
-instance FromJSON ItemType where
-
 -- A label is a text with set of attributes
 data Label = Label {
                     _getLabelText :: Text,
@@ -82,36 +52,6 @@ data Label = Label {
 instance ToJSON Label where
 instance FromJSON Label where
 
--- Empty Block
-data EmptyBlock = Null deriving (Generic, Show)
-
-instance ToJSON EmptyBlock where
-instance FromJSON EmptyBlock where
-
--- Header of table on top
-data TableTopHeader = TableTopHeader {
-                    _getTableTopHeader :: Text
-                                     } deriving (Generic, Show)
-
-instance ToJSON TableTopHeader where
-instance FromJSON TableTopHeader where
-
--- Header of table on Left
-data TableLeftHeader = TableLeftHeader {
-                    _getTableLeftHeader :: Text
-                                     } deriving (Generic, Show)
-
-instance ToJSON TableLeftHeader where
-instance FromJSON TableLeftHeader where
-
--- Button is Text with set of attributes
-data Button = Button {
-   _getButtonText :: Text,
-   _buttonAttrib  :: [ButtonAttributes]
-} deriving (Generic, Show)
-
-instance ToJSON Button where
-instance FromJSON Button where
 
 
 defaultCompany :: Company

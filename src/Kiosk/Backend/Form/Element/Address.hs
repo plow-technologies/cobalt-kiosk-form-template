@@ -28,7 +28,8 @@ data Address = Address {
                _getAddressText :: Text,
                _addressAttrib  :: [AddressAttributes]
                        } deriving (Generic, Show, Ord, Eq, Typeable)
-
+instance ToJSON Address where
+instance FromJSON Address where
 -- Address Attributes
 data AddressAttributes = AddressWidth WidthAttribute
                            deriving (Generic, Show, Ord, Eq)
