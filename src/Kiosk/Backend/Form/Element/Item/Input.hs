@@ -1,12 +1,12 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 
 {- |
 Module      :  Kiosk.Backend.Form.Element.Item.Input
 Description :  Input Element, this is where json is created
-Copyright   :  Plow Technologies LLC 
+Copyright   :  Plow Technologies LLC
 License     :  MIT License
 
 Maintainer  :  Scott Murphy
@@ -29,20 +29,18 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , defaultInput) where
 
 
-import Data.Aeson (ToJSON
-                  ,FromJSON)
-import GHC.Generics (Generic)
-import Data.Text (Text
-                 ,pack)
-import Data.Monoid ((<>))
-import Kiosk.Backend.Form.Attribute (AttributeClass(..)
-                                    ,Attribute(..)
-                                    ,wrongAttrResponse)
-import Data.Typeable (Typeable)
-import Kiosk.Backend.Form.Attribute.Width 
+import           Data.Aeson                         (FromJSON, ToJSON)
+import           Data.Monoid                        ((<>))
+import           Data.Text                          (Text, pack)
+import           Data.Typeable                      (Typeable)
+import           GHC.Generics                       (Generic)
+import           Kiosk.Backend.Form.Attribute       (Attribute (..),
+                                                     AttributeClass (..),
+                                                     wrongAttrResponse)
+import           Kiosk.Backend.Form.Attribute.Width
 
-import           Data.Either.Validation (Validation(..))
-import           Control.Applicative    ((<$>), (<|>))
+import           Control.Applicative                ((<$>), (<|>))
+import           Data.Either.Validation             (Validation (..))
 -- Input Type
 data Input = Input {
               _getInput    :: InputType,
@@ -53,7 +51,7 @@ data Input = Input {
 instance ToJSON Input where
 instance FromJSON Input where
 
--- Input type canbe Text input or Signature input
+-- Input type can be Text input or Signature input
 data InputType = InputTypeText InputText
                 |InputTypeSignature Signature
                 |InputTypeInt InputInt
@@ -90,7 +88,11 @@ instance FromJSON InputDouble where
 
 
 -- Input Attributes
-data InputAttribute = InputWidth WidthAttribute | InputType InputTypeAttribute deriving (Generic, Show, Ord, Eq)
+data InputAttribute = InputWidth WidthAttribute 
+                    | InputType InputTypeAttribute
+                    | InputIndexable IndexableAttribute            
+
+  deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON InputAttribute where
 instance FromJSON InputAttribute where
@@ -117,7 +119,7 @@ instance AttributeClass InputTypeAttribute where
    toAttribute (InputTypeAttribute (InputTypeText _)) = Attribute "type" "'text'"
    toAttribute (InputTypeAttribute (InputTypeSignature _)) = Attribute "type" "'signature'"
    toAttribute (InputTypeAttribute (InputTypeInt _)) = Attribute "type" "int"
-   toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "double"                                               
+   toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "double"
    fromAttribute (Attribute "type" v) = case v of
                                          "text" -> Success . InputTypeAttribute . InputTypeText . InputText $  v
                                          "signature" -> Success . InputTypeAttribute . InputTypeSignature . Signature $ v
