@@ -18,8 +18,15 @@ Portability :  portable
 -}
 
 
-module Kiosk.Backend.Form.Element.Item.Input (Input(..)
-                                             ,defaultInput) where
+module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
+                                             , InputType(..)
+                                             , InputDouble (..)
+                                             , InputInt (..)
+                                             , Signature (..)
+                                             , InputText(..)
+                                             , InputAttribute(..)
+                                             , InputTypeAttribute(..)
+                                             , defaultInput) where
 
 
 import Data.Aeson (ToJSON

@@ -19,7 +19,7 @@ import           Data.Monoid                ((<>))
 import           Data.Text                  (Text, pack, unwords)
 import           Data.Text.Encoding         (encodeUtf8)
 import           Kiosk.Backend.Form.Element
-
+import Kiosk.Backend.Form.Attribute
 -- | Render Generator
 
 -- Rendering a Attribute

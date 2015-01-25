@@ -13,24 +13,24 @@ Portability :  portable
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
-module Kiosk.Backend.Form.Element.Item (Item(..)
-                                       ,defaultItem) where
+module Kiosk.Backend.Form.Element.Item ( Item(..)
+                                       , ItemType (..)
+                                       , defaultItem) where 
 
-import           Control.Applicative                             ((<$>), (<|>))
-import           Data.Aeson                                      (FromJSON,
-                                                                  ToJSON)
-import           Data.Either.Validation                          (Validation (..))
-import           Data.Text                                       (Text)
-import           Data.Typeable                                   (Typeable)
-import           GHC.Generics                                    (Generic)
-import           Kiosk.Backend.Form.Attribute
-import           Kiosk.Backend.Form.Attribute.Width
-import           Kiosk.Backend.Form.Element.Item.Button
-import           Kiosk.Backend.Form.Element.Item.EmptyBlock
-import           Kiosk.Backend.Form.Element.Item.Input
-import           Kiosk.Backend.Form.Element.Item.Label
-import           Kiosk.Backend.Form.Element.Item.TableLeftHeader
+import           Data.Aeson                   (FromJSON, ToJSON)
+import           Data.Typeable                (Typeable)
+import           GHC.Generics                 (Generic)
+import           Control.Applicative    ((<$>), (<|>))
+import           Data.Either.Validation (Validation(..))
+import           Data.Text                    (Text)  
+import           Kiosk.Backend.Form.Element.Item.TableLeftHeader 
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
+import           Kiosk.Backend.Form.Element.Item.EmptyBlock
+import           Kiosk.Backend.Form.Element.Item.Button
+import           Kiosk.Backend.Form.Element.Item.Label
+import           Kiosk.Backend.Form.Element.Item.Input
+import           Kiosk.Backend.Form.Attribute.Width
+import           Kiosk.Backend.Form.Attribute
 
 -- A Item containing different item type and its attirbutes
 data Item = Item {
