@@ -34,6 +34,8 @@ data Attribute = Attribute {
 instance ToJSON Attribute where
 instance FromJSON Attribute where
 
+
+
 -- Type Class for Attributes
 class AttributeClass a where
   toAttribute :: a -> Attribute

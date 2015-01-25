@@ -61,13 +61,14 @@ data ItemType = ItemLabel Label
                |ItemButton Button
                |ItemEmptyBlock EmptyBlock
                |ItemTableTopHeader TableTopHeader
-               |ItemTableLeftHeader TableLeftHeader deriving (Generic, Show)
+               |ItemTableLeftHeader TableLeftHeader                
+           deriving (Generic, Show)
 
 instance ToJSON ItemType where
 instance FromJSON ItemType where
 
-
 defaultItem :: Item
-defaultItem = Item [ItemLabel defaultLabel, ItemInput defaultInput] [ItemWidth $ WidthAttribute (12::Int)]
+defaultItem = defaultInputItem
 
-
+defaultInputItem :: Item
+defaultInputItem = Item [ItemLabel defaultLabel, ItemInput defaultInput] [ItemWidth $ WidthAttribute (12::Int)]

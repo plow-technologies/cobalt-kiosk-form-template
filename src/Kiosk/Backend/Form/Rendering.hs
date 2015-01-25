@@ -88,6 +88,18 @@ renderAddress (Address txt attrs) = "<address " <> renderAttrList attrs
                                                 <> txt
                                                 <> "</address>"
 
+-- Rendering Constant Tag
+  
+renderConstant :: Constant -> Text 
+renderConstant (Constant txt attrs)  = "<constant " <> renderAttrList attrs
+                                                    <> ">"
+                                                    <> txt
+                                                    <> "</constant>"
+
+-- Rendering a list of Constants
+renderConstantList :: [Constant] -> Text
+renderConstantList constants = Data.Text.unwords $ renderConstant <$> constants
+
 -- Rendering ItemType
 renderItemType :: ItemType -> Text
 renderItemType it =
@@ -127,10 +139,11 @@ renderRowList rows = Data.Text.unwords $ renderRow <$> rows
 
 -- Rendering Onping Form
 renderOnpingForm :: Form -> Text
-renderOnpingForm (Form company address rows) = "<form>" <> renderCompany company
-                                                              <> renderAddress address
-                                                              <> renderRowList rows
-                                                              <> "</form>"
+renderOnpingForm (Form company address constants rows) = "<form>" <> renderCompany company
+                                                                  <> renderAddress address              
+                                                                  <> renderConstantList constants                                                          
+                                                                  <> renderRowList rows                 
+                                                                  <> "</form>"
 
 -- Convert The XML Text into ByteString
 renderByteString :: Text -> ByteString

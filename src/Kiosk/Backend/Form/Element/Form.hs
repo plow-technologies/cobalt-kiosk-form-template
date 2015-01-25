@@ -24,13 +24,16 @@ import           Kiosk.Backend.Form.Element.Company ( Company
 import           Kiosk.Backend.Form.Element.Address (Address
                                                     , defaultAddress)
 
+import Kiosk.Backend.Form.Element.Constant (Constant
+                                           ,defaultConstant)
 import Kiosk.Backend.Form.Element.Row 
 
 -- A form is a list of Rows
 data Form = Form {
-  _getCompany :: Company,
-  _getAddress :: Address,
-  _row        :: [Row]
+    _getCompany :: Company
+  , _getAddress :: Address
+  , _getConstants :: [Constant]              
+  , _row        :: [Row]
  } deriving (Generic, Show)
 
 instance ToJSON Form where
@@ -40,4 +43,4 @@ instance FromJSON Form where
 
 
 defaultForm :: Form
-defaultForm = Form defaultCompany defaultAddress [defaultRow]       
+defaultForm = Form defaultCompany defaultAddress [defaultConstant] [defaultRow]       
