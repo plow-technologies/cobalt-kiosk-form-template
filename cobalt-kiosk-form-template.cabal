@@ -19,6 +19,8 @@ Library
                         Kiosk.Backend.Form.Attribute
   Other-Modules:        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Attribute.Action
+                        Kiosk.Backend.Form.Attribute.Max
+                        Kiosk.Backend.Form.Attribute.Min
                         Kiosk.Backend.Form.Attribute.Indexable
                         Kiosk.Backend.Form.Element.Form
                         Kiosk.Backend.Form.Element.Company

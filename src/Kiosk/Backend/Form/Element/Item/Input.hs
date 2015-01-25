@@ -40,6 +40,7 @@ import           Kiosk.Backend.Form.Attribute           (Attribute (..),
 import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Attribute.Max 
+import           Kiosk.Backend.Form.Attribute.Min
 import           Control.Applicative                    ((<$>), (<|>))
 import           Data.Either.Validation                 (Validation (..))
 -- Input Type
@@ -92,8 +93,8 @@ data InputAttribute = InputWidth WidthAttribute
                     | InputType InputTypeAttribute
                     | InputIndexable IndexableAttribute
                     | InputMaxDouble MaxAttributeDouble
-
-  deriving (Generic, Show, Ord, Eq)
+                    | InputMinDouble MinAttributeDouble
+                   deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON InputAttribute where
 instance FromJSON InputAttribute where
@@ -102,6 +103,7 @@ instance AttributeClass InputAttribute where
    toAttribute (InputWidth a) = toAttribute a
    toAttribute (InputIndexable a) = toAttribute a
    toAttribute (InputMaxDouble d) = toAttribute d
+   toAttribute (InputMinDouble d) = toAttribute d
    toAttribute (InputType i) = toAttribute i
    fromAttribute = tryAllTypeAttributes
      where
@@ -111,6 +113,8 @@ instance AttributeClass InputAttribute where
                                  fromAttribute a' <|> 
                                  InputMaxDouble <$> 
                                  fromAttribute a' <|>
+                                 InputMinDouble <$> 
+                                 fromAttribute a' <|>                                 
                                  InputIndexable <$> 
                                  fromAttribute a' <|>
                                  Failure "Not a valid input Attribute"
@@ -150,7 +154,9 @@ defaultInputType :: InputType
 defaultInputType = InputTypeText $ InputText (""::Text)
 
 defaultInputAttributesList :: [InputAttribute]
-defaultInputAttributesList = [wAttr, tAttr, ixAttr]
+defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
               where wAttr = InputWidth $ WidthAttribute (12::Int)
                     ixAttr = InputIndexable $ IndexableAttribute True
+                    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
+                    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
                     tAttr = InputType $ InputTypeAttribute defaultInputType
