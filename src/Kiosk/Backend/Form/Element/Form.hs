@@ -17,15 +17,12 @@ module Kiosk.Backend.Form.Element.Form ( Form (..)
                                        , defaultForm) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
-import           Data.Typeable                (Typeable)
+
 import           GHC.Generics                 (Generic)
-import           Control.Applicative    ((<$>), (<|>))
-import           Data.Either.Validation (Validation(..))
-import           Data.Text                    (Text)  
-import           Kiosk.Backend.Form.Attribute.Width
-import           Kiosk.Backend.Form.Attribute
-import           Kiosk.Backend.Form.Element.Company 
-import           Kiosk.Backend.Form.Element.Address 
+import           Kiosk.Backend.Form.Element.Company ( Company
+                                                    , defaultCompany)
+import           Kiosk.Backend.Form.Element.Address (Address
+                                                    , defaultAddress)
 
 import Kiosk.Backend.Form.Element.Row 
 

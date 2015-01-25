@@ -1,5 +1,5 @@
 Name:                   cobalt-kiosk-form-template
-Version:                1.0.5
+Version:                1.1.0
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
@@ -19,6 +19,7 @@ Library
                         Kiosk.Backend.Form.Attribute
   Other-Modules:        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Attribute.Action
+                        Kiosk.Backend.Form.Attribute.Indexable
                         Kiosk.Backend.Form.Element.Form
                         Kiosk.Backend.Form.Element.Company
                         Kiosk.Backend.Form.Element.Address
@@ -37,6 +38,7 @@ Library
                       , aeson          
                       , either         
                       , text           
+                      , template-haskell
                       , bytestring      
                       , trifecta       
                       , blaze-markup == 0.6.2.0 

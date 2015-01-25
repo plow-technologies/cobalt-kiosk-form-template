@@ -18,11 +18,10 @@ module Kiosk.Backend.Form.Element.Item ( Item(..)
                                        , defaultItem) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
-import           Data.Typeable                (Typeable)
+
 import           GHC.Generics                 (Generic)
 import           Control.Applicative    ((<$>), (<|>))
 import           Data.Either.Validation (Validation(..))
-import           Data.Text                    (Text)  
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader 
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock

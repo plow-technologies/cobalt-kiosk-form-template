@@ -24,8 +24,6 @@ import Data.Aeson (ToJSON
 import GHC.Generics (Generic)
 import Data.Text (Text)
 import Kiosk.Backend.Form.Attribute (AttributeClass(..))
-import Kiosk.Backend.Form.Attribute.Width 
-import Kiosk.Backend.Form.Attribute.Action       
 import           Data.Either.Validation (Validation(..))
 import           Control.Applicative    ((<$>), (<|>))
 import Kiosk.Backend.Form.Attribute.Width 

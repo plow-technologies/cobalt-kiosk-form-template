@@ -29,18 +29,19 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , defaultInput) where
 
 
-import           Data.Aeson                         (FromJSON, ToJSON)
-import           Data.Monoid                        ((<>))
-import           Data.Text                          (Text, pack)
-import           Data.Typeable                      (Typeable)
-import           GHC.Generics                       (Generic)
-import           Kiosk.Backend.Form.Attribute       (Attribute (..),
-                                                     AttributeClass (..),
-                                                     wrongAttrResponse)
+import           Data.Aeson                             (FromJSON, ToJSON)
+import           Data.Monoid                            ((<>))
+import           Data.Text                              (Text, pack)
+import           Data.Typeable                          (Typeable)
+import           GHC.Generics                           (Generic)
+import           Kiosk.Backend.Form.Attribute           (Attribute (..),
+                                                         AttributeClass (..),
+                                                         wrongAttrResponse)
+import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Width
 
-import           Control.Applicative                ((<$>), (<|>))
-import           Data.Either.Validation             (Validation (..))
+import           Control.Applicative                    ((<$>), (<|>))
+import           Data.Either.Validation                 (Validation (..))
 -- Input Type
 data Input = Input {
               _getInput    :: InputType,
@@ -88,9 +89,9 @@ instance FromJSON InputDouble where
 
 
 -- Input Attributes
-data InputAttribute = InputWidth WidthAttribute 
+data InputAttribute = InputWidth WidthAttribute
                     | InputType InputTypeAttribute
-                    | InputIndexable IndexableAttribute            
+                    | InputIndexable IndexableAttribute
 
   deriving (Generic, Show, Ord, Eq)
 
@@ -99,10 +100,17 @@ instance FromJSON InputAttribute where
 
 instance AttributeClass InputAttribute where
    toAttribute (InputWidth a) = toAttribute a
+   toAttribute (InputIndexable a) = toAttribute a
    toAttribute (InputType i) = toAttribute i
    fromAttribute = tryAllTypeAttributes
      where
-       tryAllTypeAttributes a' = InputWidth <$> fromAttribute a' <|> InputType <$> fromAttribute a' <|> Failure "Not a valid input Attribute"
+       tryAllTypeAttributes a' = InputWidth <$> 
+                                 fromAttribute a' <|> 
+                                 InputType <$> 
+                                 fromAttribute a' <|> 
+                                 InputIndexable <$> 
+                                 fromAttribute a' <|>
+                                 Failure "Not a valid input Attribute"
 
 
 -- Type Attribute
