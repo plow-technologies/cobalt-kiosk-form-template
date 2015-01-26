@@ -1,11 +1,11 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 
 {- |
 Module      :  Kiosk.Backend.Form.Element.Item.Button
 Description :  Button Element
-Copyright   :  Plow Technologies LLC 
+Copyright   :  Plow Technologies LLC
 License     :  MIT License
 
 Maintainer  :  Scott Murphy
@@ -15,18 +15,17 @@ Portability :  portable
 -}
 
 
-module Kiosk.Backend.Form.Element.Item.Button (Button (..)) where
+module Kiosk.Backend.Form.Element.Item.Button (Button (..), defaultButton, defaultButtonAttributeList) where
 
 
-import Data.Aeson (ToJSON
-                  ,FromJSON)
-import GHC.Generics (Generic)
-import Data.Text (Text)
-import Kiosk.Backend.Form.Attribute (AttributeClass(..))
-import Kiosk.Backend.Form.Attribute.Width 
-import Kiosk.Backend.Form.Attribute.Action       
-import           Data.Either.Validation (Validation(..))
-import           Control.Applicative    ((<$>), (<|>))
+import           Control.Applicative                 ((<$>), (<|>))
+import           Data.Aeson                          (FromJSON, ToJSON)
+import           Data.Either.Validation              (Validation (..))
+import           Data.Text                           (Text)
+import           GHC.Generics                        (Generic)
+import           Kiosk.Backend.Form.Attribute        (AttributeClass (..))
+import           Kiosk.Backend.Form.Attribute.Action
+import           Kiosk.Backend.Form.Attribute.Width
 -- Button is Text with set of attributes
 data Button = Button {
    _getButtonText :: Text,
@@ -51,3 +50,11 @@ instance AttributeClass ButtonAttributes where
        tryAllButtonAttributes a' = ButtonWidth <$> fromAttribute a'  <|>
                                    ButtonAction <$> fromAttribute a' <|>
                                    Failure "Not a valid button Attirbute"
+
+
+
+defaultButton :: Button
+defaultButton = Button "Submit Button" defaultButtonAttributeList
+
+defaultButtonAttributeList :: [ButtonAttributes]
+defaultButtonAttributeList = [ButtonWidth $ WidthAttribute (12::Int), ButtonAction $ ActionAttribute "sendjson"]

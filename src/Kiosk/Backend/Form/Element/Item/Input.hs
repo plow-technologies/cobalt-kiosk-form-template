@@ -26,9 +26,13 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputText(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
-                                             , defaultInput) where
+                                             , defaultInput
+                                             , defaultInputType
+                                             , defaultInputAttributesList) where
 
+import           Control.Applicative                    ((<$>), (<|>))
 import           Data.Aeson                             (FromJSON, ToJSON)
+import           Data.Either.Validation                 (Validation (..))
 import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text, pack)
 import           Data.Typeable                          (Typeable)
@@ -37,11 +41,9 @@ import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          AttributeClass (..),
                                                          wrongAttrResponse)
 import           Kiosk.Backend.Form.Attribute.Indexable
-import           Kiosk.Backend.Form.Attribute.Width
-import           Kiosk.Backend.Form.Attribute.Max 
+import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
-import           Control.Applicative                    ((<$>), (<|>))
-import           Data.Either.Validation                 (Validation (..))
+import           Kiosk.Backend.Form.Attribute.Width
 
 -- Input Type
 data Input = Input {
@@ -107,20 +109,20 @@ instance AttributeClass InputAttribute where
    toAttribute (InputType i) = toAttribute i
    fromAttribute = tryAllTypeAttributes
      where
-       tryAllTypeAttributes a' = InputWidth <$> 
-                                 fromAttribute a' <|> 
-                                 InputType <$> 
-                                 fromAttribute a' <|> 
-                                 InputMaxDouble <$> 
+       tryAllTypeAttributes a' = InputWidth <$>
                                  fromAttribute a' <|>
-                                 InputMinDouble <$> 
-                                 fromAttribute a' <|>                                 
-                                 InputIndexable <$> 
+                                 InputType <$>
+                                 fromAttribute a' <|>
+                                 InputMaxDouble <$>
+                                 fromAttribute a' <|>
+                                 InputMinDouble <$>
+                                 fromAttribute a' <|>
+                                 InputIndexable <$>
                                  fromAttribute a' <|>
                                  Failure "Not a valid input Attribute"
 
 
--- InputConstraintAttribute 
+-- InputConstraintAttribute
 
 
 -- Type Attribute
