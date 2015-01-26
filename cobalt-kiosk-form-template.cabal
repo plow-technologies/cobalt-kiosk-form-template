@@ -1,5 +1,5 @@
 Name:                   cobalt-kiosk-form-template
-Version:                1.2.0
+Version:                1.2.1
 Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
 Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
 License:                BSD3
@@ -26,6 +26,7 @@ Library
                         Kiosk.Backend.Form.Element.Company
                         Kiosk.Backend.Form.Element.Address
                         Kiosk.Backend.Form.Element.Row                  
+                        Kiosk.Backend.Form.Element.Constant
                         Kiosk.Backend.Form.Element.Item
                         Kiosk.Backend.Form.Element.Item.Radio
                         Kiosk.Backend.Form.Element.Item.TableLeftHeader      

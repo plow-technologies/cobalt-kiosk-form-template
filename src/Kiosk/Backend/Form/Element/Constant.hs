@@ -27,7 +27,7 @@ import Kiosk.Backend.Form.Attribute (AttributeClass(..)
                                     ,Attribute(..))
 
 import           Data.Either.Validation (Validation(..))
-
+import Kiosk.Backend.Form.Attribute.Indexable
 
 -- Button is Text with set of attributes
 data Constant = Constant {
@@ -40,7 +40,7 @@ instance FromJSON Constant where
 
 
 -- Button Atrributes
-data ConstantAttributes = ConstantAttributeType Text
+data ConstantAttributes = ConstantAttributeType Text |ConstantAttributeIndexable IndexableAttribute
   deriving (Generic, Show)
 
 instance ToJSON ConstantAttributes where
@@ -48,6 +48,7 @@ instance FromJSON ConstantAttributes where
 
 instance AttributeClass ConstantAttributes where
    toAttribute (ConstantAttributeType t) = Attribute "type" t
+   toAttribute (ConstantAttributeIndexable i) = toAttribute i
    fromAttribute  = tryAllCompanyAttributes
      where
        tryAllCompanyAttributes (Attribute "type" i) =  Success . ConstantAttributeType $ i 
@@ -55,4 +56,5 @@ instance AttributeClass ConstantAttributes where
 
 
 defaultConstant :: Constant
-defaultConstant = Constant "Black Watch" [ConstantAttributeType "'Company'"]
+defaultConstant = Constant "Black Watch" [ ConstantAttributeType "'Company'"
+                                         , ConstantAttributeIndexable $ IndexableAttribute True ]

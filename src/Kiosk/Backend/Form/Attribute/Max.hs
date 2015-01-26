@@ -27,7 +27,7 @@ import Kiosk.Backend.Form.Attribute
 import Data.Text (pack
                  ,Text
                  ,unpack)
-                 
+import Data.Monoid ((<>) )
 import Control.Applicative ((<$>))                                            
 
 import           GHC.Generics           (Generic)
@@ -50,7 +50,8 @@ instance    FromJSON MaxAttributeDouble where
 
 
 instance AttributeClass MaxAttributeDouble where
-  toAttribute (MaxAttributeDouble d) = Attribute "maxd" (pack.show $ d)
+  toAttribute (MaxAttributeDouble d) = Attribute "maxd" toVal
+   where toVal = "'" <> (pack.show $ d) <> "'"
   fromAttribute (Attribute "maxd" txtInteger) = convertToValidation $  
                                                      MaxAttributeDouble <$> 
                                                                       (readMaybe.unpack $ txtInteger)

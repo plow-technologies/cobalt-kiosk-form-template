@@ -83,7 +83,7 @@ labelParser :: (TokenParsing f, Monad f) => f Label
 labelParser = buttonFromElement <$> parseElement "label"
     where
       buttonFromElement (Element _ attr elemVal) = Label (pack elemVal) (buttonAttrFromAtt attr)
-
+-- Input Parser
 inputParser :: (TokenParsing f, Monad f) => f Input
 inputParser = buttonFromElement <$> parseElement "input"
     where

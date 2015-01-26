@@ -14,3 +14,5 @@ testLabelString = "<label>Time Loaded</label>"
 
 testInputString :: String
 testInputString = "<input type='text'>Send JSON</input>"
+
+
