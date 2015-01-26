@@ -28,7 +28,6 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputTypeAttribute(..)
                                              , defaultInput) where
 
-
 import           Data.Aeson                             (FromJSON, ToJSON)
 import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text, pack)
@@ -43,15 +42,16 @@ import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
 import           Control.Applicative                    ((<$>), (<|>))
 import           Data.Either.Validation                 (Validation (..))
+
 -- Input Type
 data Input = Input {
               _getInput    :: InputType,
               _inputAttrib :: [InputAttribute]
-
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON Input where
 instance FromJSON Input where
+
 
 -- Input type can be Text input or Signature input
 data InputType = InputTypeText InputText

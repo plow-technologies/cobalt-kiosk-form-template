@@ -27,7 +27,6 @@ data Element = Element { element    :: String
                         ,attributes :: [Attribute]
                         ,value      :: String
                         }
-
   deriving (Show)
 
 
@@ -54,12 +53,12 @@ parseAttributes = do spaces
                      literal <- stringLiteral <|> stringLiteral'
                      return $ Attribute (pack $ firstletter:rest) (pack literal)
 
-buttonAttrFromAtt :: AttributeClass t => [Attribute] -> [t]
-buttonAttrFromAtt attr = do
-                      let eAttrList = validationToEither. fromAttribute <$> attr
-                      case rights eAttrList of
-                           [] -> []
-                           attrs -> attrs
+genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
+genericAttributeDecoder  attr = do
+                       let eAttrList = validationToEither. fromAttribute <$> attr
+                       case rights eAttrList of
+                            [] -> []
+                            attrs -> attrs
 
 parseInputType :: [InputAttribute] -> String -> InputType
 parseInputType ([InputType (InputTypeAttribute (InputTypeText _) )]) elemVal =  InputTypeText . InputText . pack $ elemVal
@@ -76,17 +75,22 @@ parseInputType _  _ = InputTypeText. InputText . pack $ ""
 buttonParser :: (TokenParsing f, Monad f) => f Button
 buttonParser = buttonFromElement <$> parseElement "button"
     where
-      buttonFromElement (Element _ attr elemVal) = Button (pack elemVal) (buttonAttrFromAtt attr)
+      buttonFromElement (Element _ attr elemVal) = Button (pack elemVal) (genericAttributeDecoder attr)
 
 -- Label Parser
 labelParser :: (TokenParsing f, Monad f) => f Label
-labelParser = buttonFromElement <$> parseElement "label"
+labelParser = labelFromElement <$> parseElement "label"
     where
-      buttonFromElement (Element _ attr elemVal) = Label (pack elemVal) (buttonAttrFromAtt attr)
+      labelFromElement (Element _ attr elemVal) = Label (pack elemVal) (genericAttributeDecoder attr)
 -- Input Parser
 inputParser :: (TokenParsing f, Monad f) => f Input
-inputParser = buttonFromElement <$> parseElement "input"
+inputParser = inputFromElement <$> parseElement "input"
     where
-      buttonFromElement (Element _ attr elemVal) = Input (parseInputType (buttonAttrFromAtt attr) elemVal) (buttonAttrFromAtt attr)
+      inputFromElement (Element _ attr elemVal) = Input (parseInputType (genericAttributeDecoder attr) elemVal) (genericAttributeDecoder attr)
+
+      
+
+
+
 
 
