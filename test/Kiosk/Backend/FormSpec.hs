@@ -15,12 +15,12 @@ spec :: Spec
 spec = do
   describe (nameBase 'renderOnpingForm) $ do
     it "should render a form as described below" $ do
-      (renderOnpingForm defaultForm) `shouldBe` expectedString
+      (renderOnpingForm . cobaltKioskForm $ "Black Watch") `shouldBe` expectedString
    where
-    expectedString = "<form><company width='12'>Hull's Oilfield LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><constant type='Company' indexable='True'>Black Watch</constant><row width='12'><item width='12'><label width='12'>Legal Dest</label> <input width='12' type='text' indexable='True' maxd='150.0' mind='0.0'></input></item></row> <row width='12'><item ><radio><option >Pit Water</option><option-qualifier ><label >Amount</label> <input width='12' type='text' indexable='True'></input></option-qualifier></radio></item></row></form>"
+    expectedString = "<form><company width='12'>Cobalt Environmental Solutions LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><logo path='Cobalt.png'></logo><phone width='12'>580-229-0067</phone><constant type='Company' indexable='True'>Black Watch</constant><row ><item ><label width='12'>Truck #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Water Hauling Permit #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Lease Information</label></item></row> <row ><item ><label width='12'>Name of Lease Operator</label> <input type='text' indexable='True'></input></item></row> <row ><item ><radio><option >Produced Water</option><option-qualifier ><label >Amount</label> <input type='double' indexable='True' mind='0.0' maxd='150.0'>0.0</input></option-qualifier></radio></item></row> <row ><item ><label width='12'>Date</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Time In</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Driver Signature</label> <input type='text' indexable='True'></input></item></row></form>"
 
-cobaltKioskForm :: String -> Form
-cobaltKioskForm waterHaulingName = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler "Black Watch"] cobaltFormBody
+cobaltKioskForm :: Text -> Form
+cobaltKioskForm waterHaulingName = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody
 
 cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -33,7 +33,7 @@ cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnsweri
 createWaterHauler :: Text -> Constant
 createWaterHauler hauler = Constant hauler  [ ConstantAttributeType "'Company'"
                                             , ConstantAttributeIndexable $ IndexableAttribute True ]                   
-
+cobaltFormBody :: [Row]
 cobaltFormBody = [ truckNumberRow
                  , permitNumberRow
                  , leaseInfoRow
@@ -50,7 +50,7 @@ cobaltFormBody = [ truckNumberRow
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
-    signatureRow  = generateInputRowText "Driver Signature"
+    signatureRow  = generateInputRowSignature "Driver Signature"
 
 
 
@@ -63,20 +63,24 @@ cobaltFormBody = [ truckNumberRow
 waterTypeRadioRow :: Row 
 waterTypeRadioRow = Row [waterTypeRadio] []            
 
--- waterTypeRadio  :: Item
 
+waterTypeRadio :: Item
 waterTypeRadio  = Item [ItemRadio . generateRadio $ options ] []                     
    where
      options = [generateOption "Produced Water" ]
 
-
+generateLabelRow :: Text -> Row
 generateLabelRow labelText = Row [generateLabelItem labelText] []                   
+
+generateLabelItem :: Text -> Item
 generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] []
 
 
 -- Input Text
+generateInputRowText :: Text -> Row
 generateInputRowText labelText = Row [generateInputItemText labelText] []
 
+generateInputItemText :: Text -> Item
 generateInputItemText  labelText = Item [ItemLabel . generateLabel $ labelText
                                                     , ItemInput fullDefaultInputText] []
 
@@ -87,8 +91,10 @@ fullDefaultInputTypeText :: InputType
 fullDefaultInputTypeText = InputTypeText $ InputText (""::Text)
 
 -- Input Date
+generateInputRowDate :: Text -> Row
 generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
 
+generateInputItemDate :: Text -> Item
 generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
                                                     , ItemInput fullDefaultInputDate] []
 
@@ -99,8 +105,10 @@ fullDefaultInputTypeDate :: InputType
 fullDefaultInputTypeDate = InputTypeDate $ (InputDate "")
 
 -- Input Time
+generateInputRowTime :: Text -> Row
 generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
 
+generateInputItemTime :: Text -> Item
 generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
                                                     , ItemInput fullDefaultInputTime] []
 
@@ -111,8 +119,11 @@ fullDefaultInputTypeTime :: InputType
 fullDefaultInputTypeTime = InputTypeTime $ (InputTime "")
 
 -- Input Signature
+
+generateInputRowSignature :: Text -> Row
 generateInputRowSignature labelText = Row [generateInputItemSignature labelText] []
 
+generateInputItemSignature :: Text -> Item
 generateInputItemSignature  labelText = Item [ItemLabel . generateLabel $ labelText
                                                     , ItemInput fullDefaultInputSignature] []
 
@@ -147,8 +158,10 @@ fullDefaultQualifierInput = Input dit dia
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttribute dit
 
+generateLabel :: Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]
 
+generateRadio :: [Option] -> Radio
 generateRadio options = Radio options [fullDefaultOptionQualifier]
 
 generateOption :: Text -> Option 
