@@ -142,9 +142,13 @@ instance AttributeClass InputAttribute where
 
 
 -- Type Attribute
-data InputTypeAttribute = InputTypeAttribute {
-   _getTypeName :: InputType
-} deriving (Generic, Show, Ord, Eq)
+data InputTypeAttribute = InputTypeAttributeDouble
+                        | InputTypeAttributeInt
+                        | InputTypeAttributeText
+                        | InputTypeAttributeSignature
+                        | InputTypeAttributeDate
+                        | InputTypeAttributeTime
+   deriving (Generic, Show, Ord, Eq)
 
 instance ToJSON InputTypeAttribute where
 instance FromJSON InputTypeAttribute where
@@ -152,19 +156,19 @@ instance FromJSON InputTypeAttribute where
 -- instance AttributeClass InputType where
 
 instance AttributeClass InputTypeAttribute where
-   toAttribute (InputTypeAttribute (InputTypeText _)) = Attribute "type" "'text'"
-   toAttribute (InputTypeAttribute (InputTypeSignature _)) = Attribute "type" "'signature'"
-   toAttribute (InputTypeAttribute (InputTypeInt _)) = Attribute "type" "'int'"
-   toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "'double'"
-   toAttribute (InputTypeAttribute (InputTypeDate _)) = Attribute "type" "'date'"
-   toAttribute (InputTypeAttribute (InputTypeTime _)) = Attribute "type" "'time'"
+   toAttribute InputTypeAttributeText  = Attribute "type" "'text'"
+   toAttribute InputTypeAttributeSignature  = Attribute "type" "'signature'"
+   toAttribute InputTypeAttributeInt  = Attribute "type" "'int'"
+   toAttribute InputTypeAttributeDouble  = Attribute "type" "'double'"
+   toAttribute InputTypeAttributeDate  = Attribute "type" "'date'"
+   toAttribute InputTypeAttributeTime = Attribute "type" "'time'"
    fromAttribute (Attribute "type" v) = case v of
-                                         "text" -> Success . InputTypeAttribute . InputTypeText . InputText $  v
-                                         "signature" -> Success . InputTypeAttribute . InputTypeSignature . Signature $ v
-                                         "int" -> Success . InputTypeAttribute . InputTypeInt . InputInt $ 0
-                                         "double" -> Success. InputTypeAttribute . InputTypeDouble . InputDouble $ 0.0
-                                         "date" -> Success. InputTypeAttribute . InputTypeDate . InputDate $ v
-                                         "time" -> Success. InputTypeAttribute . InputTypeTime . InputTime $ v
+                                         "text" -> Success $ InputTypeAttributeText
+                                         "signature" -> Success $ InputTypeAttributeSignature
+                                         "int" -> Success $ InputTypeAttributeInt
+                                         "double" -> Success$ InputTypeAttributeDouble
+                                         "date" -> Success$ InputTypeAttributeDate
+                                         "time" -> Success$ InputTypeAttributeTime
                                          _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
    fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
@@ -181,4 +185,4 @@ defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
                     ixAttr = InputIndexable $ IndexableAttribute True
                     minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
                     maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
-                    tAttr = InputType $ InputTypeAttribute defaultInputType
+                    tAttr = InputType $ InputTypeAttributeText 

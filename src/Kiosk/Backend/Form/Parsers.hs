@@ -61,10 +61,10 @@ genericAttributeDecoder  attr = do
                             attrs -> attrs
 
 parseInputType :: [InputAttribute] -> String -> InputType
-parseInputType ([InputType (InputTypeAttribute (InputTypeText _) )]) elemVal =  InputTypeText . InputText . pack $ elemVal
-parseInputType ([InputType (InputTypeAttribute (InputTypeSignature _))]) elemVal = InputTypeSignature. Signature . pack $ elemVal
-parseInputType ([InputType (InputTypeAttribute (InputTypeInt _))]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
-parseInputType ([InputType (InputTypeAttribute (InputTypeDouble _))]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
+parseInputType ([InputType (InputTypeAttributeText )]) elemVal =  InputTypeText . InputText . pack $ elemVal
+parseInputType ([InputType (InputTypeAttributeSignature )]) elemVal = InputTypeSignature. Signature . pack $ elemVal
+parseInputType ([InputType (InputTypeAttributeInt )]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
+parseInputType ([InputType (InputTypeAttributeDouble )]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
 parseInputType [] _ = InputTypeText. InputText . pack $ ""
 parseInputType _  _ = InputTypeText. InputText . pack $ ""
 

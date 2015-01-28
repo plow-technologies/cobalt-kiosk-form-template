@@ -99,7 +99,7 @@ generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
                                                     , ItemInput fullDefaultInputDate] []
 
 fullDefaultInputDate :: Input
-fullDefaultInputDate = Input fullDefaultInputTypeDate fullDefaultInputAttributesList
+fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
 
 fullDefaultInputTypeDate :: InputType
 fullDefaultInputTypeDate = InputTypeDate $ (InputDate "")
@@ -113,7 +113,7 @@ generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
                                                     , ItemInput fullDefaultInputTime] []
 
 fullDefaultInputTime :: Input
-fullDefaultInputTime = Input fullDefaultInputTypeTime fullDefaultInputAttributesList
+fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
 
 fullDefaultInputTypeTime :: InputType
 fullDefaultInputTypeTime = InputTypeTime $ (InputTime "")
@@ -133,13 +133,13 @@ fullDefaultInputSignature = Input fullDefaultInputTypeSignature fullDefaultInput
 fullDefaultInputTypeSignature :: InputType
 fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
 
--- | Radio
-
 fullDefaultInputAttributesList :: [InputAttribute]
 fullDefaultInputAttributesList = [tAttr, ixAttr]
               where 
                 ixAttr = InputIndexable $ IndexableAttribute True
-                tAttr = InputType $ InputTypeAttribute fullDefaultInputTypeText
+                tAttr = InputType $ InputTypeAttributeText
+-- | Radio
+
 
 fullDefaultOptionQualifier :: OptionQualifier
 fullDefaultOptionQualifier = OptionQualifier fullDefaultQualifierChoices []
@@ -156,7 +156,7 @@ fullDefaultQualifierInput = Input dit dia
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
    ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttribute dit
+   tAttr = InputType $ InputTypeAttributeDouble
 
 generateLabel :: Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]

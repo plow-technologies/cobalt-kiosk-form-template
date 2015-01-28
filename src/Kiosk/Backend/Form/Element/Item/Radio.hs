@@ -126,6 +126,6 @@ defaultQualifierInput = Input dit dia
    dia = [wAttr, tAttr, ixAttr]
    wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttribute dit
+   tAttr = InputType $ InputTypeAttributeText 
 
 
