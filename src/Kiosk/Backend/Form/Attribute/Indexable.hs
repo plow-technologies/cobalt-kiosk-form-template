@@ -17,7 +17,6 @@ Portability :  portable
 
 
 module Kiosk.Backend.Form.Attribute.Indexable (IndexableAttribute(..)) where
-
 import Kiosk.Backend.Form.Attribute
 import           Data.Aeson             (FromJSON, ToJSON)
 import Language.Haskell.TH (nameBase)
@@ -27,7 +26,9 @@ import Data.Text (pack
 import           Text.Read              (readMaybe)                 
 import           GHC.Generics           (Generic)
 import Data.Either.Validation (Validation(..))
+
 -- Indexable Attribute
+
 data IndexableAttribute = IndexableAttribute {
                           _getIndexable::Bool
 } deriving (Generic, Show, Ord, Eq)

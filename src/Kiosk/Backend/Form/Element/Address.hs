@@ -14,6 +14,7 @@ Portability :  portable
 {-# LANGUAGE OverloadedStrings  #-}
 
 module Kiosk.Backend.Form.Element.Address( Address(..)
+                                         , AddressAttributes (..)
                                          , defaultAddress) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)

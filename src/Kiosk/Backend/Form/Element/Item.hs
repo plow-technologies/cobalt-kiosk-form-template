@@ -15,6 +15,7 @@ Portability :  portable
 
 module Kiosk.Backend.Form.Element.Item ( Item(..)
                                        , ItemType (..)
+                                       , ItemAttributes (..)
                                        , defaultItem
                                        , defaultRadioItem) where 
 

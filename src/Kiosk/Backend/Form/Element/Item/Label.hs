@@ -16,6 +16,7 @@ Portability :  portable
 
 
 module Kiosk.Backend.Form.Element.Item.Label(Label (..)
+                                            , LabelAttributes(..)
                                             ,defaultLabel) where
 
 

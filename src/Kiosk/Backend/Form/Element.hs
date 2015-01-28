@@ -27,6 +27,8 @@ module Kiosk.Backend.Form.Element (module Kiosk.Backend.Form.Element) where
 import           Kiosk.Backend.Form.Element.Address              as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Company              as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Form                 as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Phone                 as Kiosk.Backend.Form.Element
+import           Kiosk.Backend.Form.Element.Logo                 as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Constant             as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Row                  as Kiosk.Backend.Form.Element
 import           Kiosk.Backend.Form.Element.Item                 as Kiosk.Backend.Form.Element
@@ -40,7 +42,6 @@ import           Kiosk.Backend.Form.Element.Item.TableTopHeader  as Kiosk.Backen
 
 
 {-|
-
 
 Description of Simple Elements
 * 'Address' The address of the company using the Kiosk

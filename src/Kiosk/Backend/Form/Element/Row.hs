@@ -14,7 +14,7 @@ Portability :  portable
 {-# LANGUAGE OverloadedStrings  #-}
 
 module Kiosk.Backend.Form.Element.Row (Row(..)
-                                      ,RowAttributes
+                                      ,RowAttributes(..)
                                       ,defaultRows) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
@@ -41,6 +41,7 @@ data RowAttributes = RowWidth WidthAttribute
 instance ToJSON RowAttributes where
 instance FromJSON RowAttributes where
 
+
 instance AttributeClass RowAttributes where
    toAttribute (RowWidth a) = toAttribute a
    fromAttribute  = tryAllRowAttributes
@@ -49,5 +50,5 @@ instance AttributeClass RowAttributes where
 
 
 defaultRows :: [Row]
-defaultRows = [Row [defaultItem] [RowWidth $ WidthAttribute (12::Int)]
-              ,Row [defaultRadioItem] [RowWidth $ WidthAttribute (12::Int)] ]
+defaultRows =  [Row [defaultItem] [RowWidth $ WidthAttribute (12::Int)]
+               ,Row [defaultRadioItem] [RowWidth $ WidthAttribute (12::Int)] ]

@@ -14,6 +14,7 @@ Portability :  portable
 {-# LANGUAGE OverloadedStrings  #-}
 
 module Kiosk.Backend.Form.Element.Company ( Company(..)
+                                          , CompanyAttributes (..)
                                           , defaultCompany) where 
 
 import           Data.Aeson                   (FromJSON, ToJSON)
