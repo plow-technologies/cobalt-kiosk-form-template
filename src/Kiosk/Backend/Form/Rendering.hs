@@ -80,6 +80,8 @@ renderInput (Input inputType attrs) = "<input " <> renderAttrList attrs
 renderInputType :: InputType -> Text
 renderInputType (InputTypeText (InputText t)) = t
 renderInputType (InputTypeSignature (Signature s)) = s
+renderInputType (InputTypeDate (InputDate d)) = d
+renderInputType (InputTypeTime (InputTime t)) = t
 renderInputType (InputTypeInt (InputInt i)) = pack . show $ i
 renderInputType (InputTypeDouble (InputDouble d)) = pack .show $ d
 

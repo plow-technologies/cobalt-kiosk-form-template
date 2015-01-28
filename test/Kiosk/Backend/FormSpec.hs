@@ -48,8 +48,8 @@ cobaltFormBody = [ truckNumberRow
     leaseInfoRow  = generateLabelRow "Lease Information"
     leaseNameRow = generateInputRowText "Name of Lease Operator"
     waterTypeAndAmountRow  = waterTypeRadioRow
-    dateRow  = generateInputRowText "Date"
-    timeInRow  = generateInputRowText "Time In"
+    dateRow  = generateInputRowDate "Date"
+    timeInRow  = generateInputRowTime "Time In"
     signatureRow  = generateInputRowText "Driver Signature"
 
 
@@ -61,7 +61,7 @@ cobaltFormBody = [ truckNumberRow
 
 
 waterTypeRadioRow :: Row 
-waterTypeRadioRow = Row [waterTypeRadio] [RowWidth $ WidthAttribute (12::Int)]            
+waterTypeRadioRow = Row [waterTypeRadio] []            
 
 -- waterTypeRadio  :: Item
 
@@ -70,15 +70,15 @@ waterTypeRadio  = Item [ItemRadio . generateRadio $ options ] []
      options = [generateOption "Produced Water" ]
 
 
-generateLabelRow labelText = Row [generateLabelItem labelText] [RowWidth $ WidthAttribute (12::Int)]                   
-generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] [ItemWidth $ WidthAttribute (12::Int)]
+generateLabelRow labelText = Row [generateLabelItem labelText] []                   
+generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] []
 
 
 -- Input Text
-generateInputRowText labelText = Row [generateInputItemText labelText] [RowWidth $ WidthAttribute (12::Int)]
+generateInputRowText labelText = Row [generateInputItemText labelText] []
 
 generateInputItemText  labelText = Item [ItemLabel . generateLabel $ labelText
-                                                    , ItemInput fullDefaultInputText] [ItemWidth $ WidthAttribute (12::Int)]
+                                                    , ItemInput fullDefaultInputText] []
 
 fullDefaultInputText :: Input
 fullDefaultInputText = Input fullDefaultInputTypeText fullDefaultInputAttributesList
@@ -86,11 +86,35 @@ fullDefaultInputText = Input fullDefaultInputTypeText fullDefaultInputAttributes
 fullDefaultInputTypeText :: InputType
 fullDefaultInputTypeText = InputTypeText $ InputText (""::Text)
 
+-- Input Date
+generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
+
+generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
+                                                    , ItemInput fullDefaultInputDate] []
+
+fullDefaultInputDate :: Input
+fullDefaultInputDate = Input fullDefaultInputTypeDate fullDefaultInputAttributesList
+
+fullDefaultInputTypeDate :: InputType
+fullDefaultInputTypeDate = InputTypeDate $ (InputDate "")
+
+-- Input Time
+generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
+
+generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
+                                                    , ItemInput fullDefaultInputTime] []
+
+fullDefaultInputTime :: Input
+fullDefaultInputTime = Input fullDefaultInputTypeTime fullDefaultInputAttributesList
+
+fullDefaultInputTypeTime :: InputType
+fullDefaultInputTypeTime = InputTypeTime $ (InputTime "")
+
 -- Input Signature
-generateInputRowSignature labelText = Row [generateInputItemSignature labelText] [RowWidth $ WidthAttribute (12::Int)]
+generateInputRowSignature labelText = Row [generateInputItemSignature labelText] []
 
 generateInputItemSignature  labelText = Item [ItemLabel . generateLabel $ labelText
-                                                    , ItemInput fullDefaultInputSignature] [ItemWidth $ WidthAttribute (12::Int)]
+                                                    , ItemInput fullDefaultInputSignature] []
 
 fullDefaultInputSignature :: Input
 fullDefaultInputSignature = Input fullDefaultInputTypeSignature fullDefaultInputAttributesList
@@ -101,26 +125,25 @@ fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
 -- | Radio
 
 fullDefaultInputAttributesList :: [InputAttribute]
-fullDefaultInputAttributesList = [wAttr, tAttr, ixAttr]
-              where wAttr = InputWidth $ WidthAttribute (12::Int)
-                    ixAttr = InputIndexable $ IndexableAttribute True
-                    tAttr = InputType $ InputTypeAttribute fullDefaultInputTypeText
+fullDefaultInputAttributesList = [tAttr, ixAttr]
+              where 
+                ixAttr = InputIndexable $ IndexableAttribute True
+                tAttr = InputType $ InputTypeAttribute fullDefaultInputTypeText
 
 fullDefaultOptionQualifier :: OptionQualifier
 fullDefaultOptionQualifier = OptionQualifier fullDefaultQualifierChoices []
 
 fullDefaultQualifierChoices :: [QualifierChoices]
-fullDefaultQualifierChoices = [QualifierLabel ( Label "Amount" [])
-                          ,QualifierInput fullDefaultQualifierInput]
+fullDefaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
+                              , QualifierInput fullDefaultQualifierInput]
 
 fullDefaultQualifierInput :: Input
 fullDefaultQualifierInput = Input dit dia
  where 
    dit = InputTypeDouble . InputDouble $ 0.0
-   dia = [wAttr, tAttr, ixAttr,minAttr,maxAttr]
+   dia = [tAttr, ixAttr,minAttr,maxAttr]
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
-   wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttribute dit
 

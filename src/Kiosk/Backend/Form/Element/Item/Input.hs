@@ -24,6 +24,8 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputInt (..)
                                              , Signature (..)
                                              , InputText(..)
+                                             , InputDate(..)
+                                             , InputTime(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
                                              , defaultInput
@@ -58,7 +60,9 @@ instance FromJSON Input where
 -- Input type can be Text input or Signature input
 data InputType = InputTypeText InputText
                 |InputTypeSignature Signature
-                |InputTypeInt InputInt 
+                |InputTypeInt InputInt
+                |InputTypeDate InputDate
+                |InputTypeTime InputTime
                 |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputType where
@@ -69,6 +73,18 @@ newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, 
 
 instance ToJSON InputText where
 instance FromJSON InputText where
+
+-- Date Type :Just Text
+newtype InputDate = InputDate { _getInputDate ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
+instance ToJSON InputDate where
+instance FromJSON InputDate where
+
+
+-- Time Type :Just Text
+newtype InputTime = InputTime { _getInputTime ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
+
+instance ToJSON InputTime where
+instance FromJSON InputTime where
 
 -- Signature Type Input store as base64 encode Bytestring
 newtype Signature = Signature {
@@ -140,11 +156,15 @@ instance AttributeClass InputTypeAttribute where
    toAttribute (InputTypeAttribute (InputTypeSignature _)) = Attribute "type" "'signature'"
    toAttribute (InputTypeAttribute (InputTypeInt _)) = Attribute "type" "'int'"
    toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "'double'"
+   toAttribute (InputTypeAttribute (InputTypeDate _)) = Attribute "type" "'date'"
+   toAttribute (InputTypeAttribute (InputTypeTime _)) = Attribute "type" "'time'"
    fromAttribute (Attribute "type" v) = case v of
                                          "text" -> Success . InputTypeAttribute . InputTypeText . InputText $  v
                                          "signature" -> Success . InputTypeAttribute . InputTypeSignature . Signature $ v
                                          "int" -> Success . InputTypeAttribute . InputTypeInt . InputInt $ 0
                                          "double" -> Success. InputTypeAttribute . InputTypeDouble . InputDouble $ 0.0
+                                         "date" -> Success. InputTypeAttribute . InputTypeDate . InputDate $ v
+                                         "time" -> Success. InputTypeAttribute . InputTypeTime . InputTime $ v
                                          _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
    fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
