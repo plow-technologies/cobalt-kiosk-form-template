@@ -24,17 +24,12 @@ module Kiosk.Backend.Form.Attribute.Path ( PathAttribute(..)
 
 import Kiosk.Backend.Form.Attribute
 
-import Data.Text (pack
-                 ,Text
-                 ,unpack)
-import Data.Monoid ((<>) )
-import Control.Applicative ((<$>))                                            
+import Data.Text (Text)
+
 
 import           GHC.Generics           (Generic)
 
 import           Data.Aeson             (FromJSON, ToJSON)
-
-import Text.Read (readMaybe)
 
 import Data.Either.Validation (Validation(..))
 
@@ -51,14 +46,5 @@ instance    FromJSON PathAttribute where
 
 instance AttributeClass PathAttribute where
   toAttribute (PathAttribute d) = Attribute "path" d
-  fromAttribute (Attribute "path" pathTxt) = convertToValidation $  
-                                                  PathAttribute <$> pathTxt
-
-
-
-  fromAttribute (Attribute other _) = wrongAttrResponse "maxd" other                                                            
--- convertToValidation :: (Num a)=>  (Maybe (MaxAttribute a) ) -> (Validation Text (MaxAttribute a))
-
-convertToValidation :: Maybe a -> Validation Text a
-convertToValidation Nothing = Failure ("Incorrect Number Type"::Text)
-convertToValidation (Just i) = Success i                     
+  fromAttribute (Attribute "path" pathTxt) = Success . PathAttribute $ pathTxt
+  fromAttribute (Attribute other _) = wrongAttrResponse "maxd" other                               

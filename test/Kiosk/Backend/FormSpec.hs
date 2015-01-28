@@ -19,14 +19,8 @@ spec = do
    where
     expectedString = "<form><company width='12'>Hull's Oilfield LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><constant type='Company' indexable='True'>Black Watch</constant><row width='12'><item width='12'><label width='12'>Legal Dest</label> <input width='12' type='text' indexable='True' maxd='150.0' mind='0.0'></input></item></row> <row width='12'><item ><radio><option >Pit Water</option><option-qualifier ><label >Amount</label> <input width='12' type='text' indexable='True'></input></option-qualifier></radio></item></row></form>"
 
--- TODO: 
--- Add Phone
--- Add Logo 
-defaultPhone :: Phone
-defaultPhone = Phone "580-229-0067" [PhoneWidth $ WidthAttribute (12::Int) ]   
-
 cobaltKioskForm :: String -> Form
-cobaltKioskForm waterHaulingName = Form cobaltEnvironmentalSolutions cobaltAddress [createWaterHauler "Black Watch"] cobaltFormBody
+cobaltKioskForm waterHaulingName = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler "Black Watch"] cobaltFormBody
 
 cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -49,14 +43,14 @@ cobaltFormBody = [ truckNumberRow
                  , timeInRow
                  , signatureRow]
   where 
-    truckNumberRow  = generateInputRow "Truck #"
-    permitNumberRow  = generateInputRow "Water Hauling Permit #"
+    truckNumberRow  = generateInputRowText "Truck #"
+    permitNumberRow  = generateInputRowText "Water Hauling Permit #"
     leaseInfoRow  = generateLabelRow "Lease Information"
-    leaseNameRow = generateInputRow "Name of Lease Operator"
+    leaseNameRow = generateInputRowText "Name of Lease Operator"
     waterTypeAndAmountRow  = waterTypeRadioRow
-    dateRow  = generateInputRow "Date"
-    timeInRow  = generateInputRow "Time In"
-    signatureRow  = generateInputRow "Driver Signature"
+    dateRow  = generateInputRowText "Date"
+    timeInRow  = generateInputRowText "Time In"
+    signatureRow  = generateInputRowText "Driver Signature"
 
 
 
@@ -64,9 +58,7 @@ cobaltFormBody = [ truckNumberRow
 
 
 
--- generateInputRow :: [Row]
-generateInputRow labelText = Row [generateInputItem labelText] [RowWidth $ WidthAttribute (12::Int)]
-                             
+
 
 waterTypeRadioRow :: Row 
 waterTypeRadioRow = Row [waterTypeRadio] [RowWidth $ WidthAttribute (12::Int)]            
@@ -78,15 +70,41 @@ waterTypeRadio  = Item [ItemRadio . generateRadio $ options ] []
      options = [generateOption "Produced Water" ]
 
 
---fullDefaultInputItem :: Item
-
-
 generateLabelRow labelText = Row [generateLabelItem labelText] [RowWidth $ WidthAttribute (12::Int)]                   
 generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] [ItemWidth $ WidthAttribute (12::Int)]
 
-generateInputItem  labelText = Item [ItemLabel . generateLabel $ labelText
-                                                , ItemInput fullDefaultInput] [ItemWidth $ WidthAttribute (12::Int)]
 
+-- Input Text
+generateInputRowText labelText = Row [generateInputItemText labelText] [RowWidth $ WidthAttribute (12::Int)]
+
+generateInputItemText  labelText = Item [ItemLabel . generateLabel $ labelText
+                                                    , ItemInput fullDefaultInputText] [ItemWidth $ WidthAttribute (12::Int)]
+
+fullDefaultInputText :: Input
+fullDefaultInputText = Input fullDefaultInputTypeText fullDefaultInputAttributesList
+
+fullDefaultInputTypeText :: InputType
+fullDefaultInputTypeText = InputTypeText $ InputText (""::Text)
+
+-- Input Signature
+generateInputRowSignature labelText = Row [generateInputItemSignature labelText] [RowWidth $ WidthAttribute (12::Int)]
+
+generateInputItemSignature  labelText = Item [ItemLabel . generateLabel $ labelText
+                                                    , ItemInput fullDefaultInputSignature] [ItemWidth $ WidthAttribute (12::Int)]
+
+fullDefaultInputSignature :: Input
+fullDefaultInputSignature = Input fullDefaultInputTypeSignature fullDefaultInputAttributesList
+
+fullDefaultInputTypeSignature :: InputType
+fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
+
+-- | Radio
+
+fullDefaultInputAttributesList :: [InputAttribute]
+fullDefaultInputAttributesList = [wAttr, tAttr, ixAttr]
+              where wAttr = InputWidth $ WidthAttribute (12::Int)
+                    ixAttr = InputIndexable $ IndexableAttribute True
+                    tAttr = InputType $ InputTypeAttribute fullDefaultInputTypeText
 
 fullDefaultOptionQualifier :: OptionQualifier
 fullDefaultOptionQualifier = OptionQualifier fullDefaultQualifierChoices []
@@ -98,8 +116,10 @@ fullDefaultQualifierChoices = [QualifierLabel ( Label "Amount" [])
 fullDefaultQualifierInput :: Input
 fullDefaultQualifierInput = Input dit dia
  where 
-   dit = InputTypeText . InputText $ "" 
-   dia = [wAttr, tAttr, ixAttr]
+   dit = InputTypeDouble . InputDouble $ 0.0
+   dia = [wAttr, tAttr, ixAttr,minAttr,maxAttr]
+   minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
+   maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
    wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttribute dit
@@ -111,17 +131,3 @@ generateRadio options = Radio options [fullDefaultOptionQualifier]
 generateOption :: Text -> Option 
 generateOption optionText = Option optionText []
 
-
-fullDefaultInput :: Input
-fullDefaultInput = Input fullDefaultInputType fullDefaultInputAttributesList
-
-fullDefaultInputType :: InputType
-fullDefaultInputType = InputTypeText $ InputText (""::Text)
-
-fullDefaultInputAttributesList :: [InputAttribute]
-fullDefaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
-              where wAttr = InputWidth $ WidthAttribute (12::Int)
-                    ixAttr = InputIndexable $ IndexableAttribute True
-                    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
-                    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
-                    tAttr = InputType $ InputTypeAttribute fullDefaultInputType

@@ -50,4 +50,4 @@ instance AttributeClass PhoneAttributes where
 
 
 defaultPhone :: Phone
-defaultPhone = Phone "Hull's Oilfield LLC" [PhoneWidth $ WidthAttribute (12::Int) ]
+defaultPhone = Phone "580-229-0067" [PhoneWidth $ WidthAttribute (12::Int) ]

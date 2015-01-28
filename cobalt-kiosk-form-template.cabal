@@ -7,23 +7,33 @@ License-File:           LICENSE
 Synopsis:               Form Types for Cobalt Kiosk Application Backend
 Description:            Form Types for Cobalt Kiosk Application Backend
 Category:               Apple
+
 Cabal-Version:          >= 1.10
+
 Build-Type:             Simple
 
 Library
+
   Default-Language:     Haskell2010
+
   HS-Source-Dirs:       src
+
   GHC-Options:          -Wall
+
   Exposed-Modules:      Kiosk.Backend.Form
                         Kiosk.Backend.Form.Element
                         Kiosk.Backend.Form.Attribute
+
   Other-Modules:        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Attribute.Action
                         Kiosk.Backend.Form.Attribute.Max
                         Kiosk.Backend.Form.Attribute.Min
                         Kiosk.Backend.Form.Attribute.Indexable
+                        Kiosk.Backend.Form.Attribute.Path
                         Kiosk.Backend.Form.Element.Form
                         Kiosk.Backend.Form.Element.Company
+                        Kiosk.Backend.Form.Element.Phone
+                        Kiosk.Backend.Form.Element.Logo
                         Kiosk.Backend.Form.Element.Address
                         Kiosk.Backend.Form.Element.Row                  
                         Kiosk.Backend.Form.Element.Constant
@@ -37,6 +47,7 @@ Library
                         Kiosk.Backend.Form.Element.Item.Label                 
                         Kiosk.Backend.Form.Rendering
                         Kiosk.Backend.Form.Parsers
+
   Build-Depends:        base            >= 4 && < 5
                       , aeson          
                       , either         
@@ -64,9 +75,6 @@ Test-Suite spec
                       , trifecta       
                       , blaze-markup
  
-
-
-
 Source-Repository head
   Type:                 git
   Location:             git@github.com:plow-technologies/cobalt-kiosk-form.git

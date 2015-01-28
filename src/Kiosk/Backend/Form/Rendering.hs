@@ -109,6 +109,19 @@ renderCompany (Company txt attrs) = "<company " <> renderAttrList attrs
                                                 <> ">"
                                                 <> txt
                                                 <> "</company>"
+
+-- Render Logo Tag                                                                                    
+renderLogo :: Logo  -> Text
+renderLogo (Logo txt attrs) = "<logo " <> renderAttrList attrs
+                                                        <> ">"
+                                                        <> txt
+                                                        <> "</logo>"                                                                   
+-- Render Phone Tag                                                                                    
+renderPhone :: Phone  -> Text
+renderPhone (Phone txt attrs) = "<phone " <> renderAttrList attrs
+                                                        <> ">"
+                                                        <> txt
+                                                        <> "</phone>"                                                
 -- Rendering Address Tag
 renderAddress :: Address -> Text
 renderAddress (Address txt attrs) = "<address " <> renderAttrList attrs
@@ -168,11 +181,13 @@ renderRowList rows = Data.Text.unwords $ renderRow <$> rows
 
 -- Rendering Onping Form
 renderOnpingForm :: Form -> Text
-renderOnpingForm (Form company address constants rows) = "<form>" <> renderCompany company
-                                                                  <> renderAddress address              
-                                                                  <> renderConstantList constants                                                          
-                                                                  <> renderRowList rows                 
-                                                                  <> "</form>"
+renderOnpingForm (Form company address logo phone constants rows) = "<form>" <> renderCompany company
+                                                                             <> renderAddress address
+                                                                             <> renderLogo logo
+                                                                             <> renderPhone phone              
+                                                                             <> renderConstantList constants                                                          
+                                                                             <> renderRowList rows                 
+                                                                             <> "</form>"
 
 -- Convert The XML Text into ByteString
 renderByteString :: Text -> ByteString

@@ -6,13 +6,6 @@
   <constant type='company'>Backhoe</constant>
   <row>
     <item>
-      <label>Name of Water Hauling Company</label>
-      <input type='text'></input>
-    </item>
-  </row>
-  
-  <row>
-    <item>
       <label>Truck #</label>
       <input type='text'></input>
     </item>
@@ -83,3 +76,5 @@
   </row>
   
 </form>
+
+

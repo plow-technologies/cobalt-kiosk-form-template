@@ -56,7 +56,7 @@ instance FromJSON Input where
 -- Input type can be Text input or Signature input
 data InputType = InputTypeText InputText
                 |InputTypeSignature Signature
-                |InputTypeInt InputInt
+                |InputTypeInt InputInt 
                 |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
 
 instance ToJSON InputType where
@@ -136,8 +136,8 @@ instance FromJSON InputTypeAttribute where
 instance AttributeClass InputTypeAttribute where
    toAttribute (InputTypeAttribute (InputTypeText _)) = Attribute "type" "'text'"
    toAttribute (InputTypeAttribute (InputTypeSignature _)) = Attribute "type" "'signature'"
-   toAttribute (InputTypeAttribute (InputTypeInt _)) = Attribute "type" "int"
-   toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "double"
+   toAttribute (InputTypeAttribute (InputTypeInt _)) = Attribute "type" "'int'"
+   toAttribute (InputTypeAttribute (InputTypeDouble _)) = Attribute "type" "'double'"
    fromAttribute (Attribute "type" v) = case v of
                                          "text" -> Success . InputTypeAttribute . InputTypeText . InputText $  v
                                          "signature" -> Success . InputTypeAttribute . InputTypeSignature . Signature $ v

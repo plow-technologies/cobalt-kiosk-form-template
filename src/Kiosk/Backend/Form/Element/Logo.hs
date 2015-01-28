@@ -23,7 +23,7 @@ import           GHC.Generics                 (Generic)
 import           Control.Applicative    ((<$>), (<|>))
 import           Data.Either.Validation (Validation(..))
 import           Data.Text                    (Text)  
-import           Kiosk.Backend.Form.Attribute.Width
+import           Kiosk.Backend.Form.Attribute.Path
 import           Kiosk.Backend.Form.Attribute
 -- A Logo mainly is the Name of the Logo
 data Logo = Logo {
@@ -43,11 +43,11 @@ instance ToJSON LogoAttributes where
 instance FromJSON LogoAttributes where
 
 instance AttributeClass LogoAttributes where
-   toAttribute (LogoWidth a) = toAttribute a
+   toAttribute (LogoPath a) = toAttribute a
    fromAttribute  = tryAllLogoAttributes
      where
-       tryAllLogoAttributes a' = LogoWidth <$> fromAttribute a' <|> Failure "Not a valid Logo Attirbute"
+       tryAllLogoAttributes a' = LogoPath <$> fromAttribute a' <|> Failure "Not a valid Logo Attirbute"
 
 
 defaultLogo :: Logo
-defaultLogo = Logo "Hull's Oilfield LLC" [LogoWidth $ WidthAttribute (12::Int) ]
+defaultLogo = Logo "" [LogoPath . PathAttribute $ "'Cobalt.png'"  ]
