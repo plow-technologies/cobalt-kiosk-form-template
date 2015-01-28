@@ -128,7 +128,7 @@ generateInputItemSignature  labelText = Item [ItemLabel . generateLabel $ labelT
                                                     , ItemInput fullDefaultInputSignature] []
 
 fullDefaultInputSignature :: Input
-fullDefaultInputSignature = Input fullDefaultInputTypeSignature fullDefaultInputAttributesList
+fullDefaultInputSignature = Input fullDefaultInputTypeSignature [InputType InputTypeAttributeSignature]
 
 fullDefaultInputTypeSignature :: InputType
 fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
