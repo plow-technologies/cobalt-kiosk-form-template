@@ -41,9 +41,11 @@ renderLabel (Label txt attrs) = "<label " <> renderAttrList attrs
                                           <> "</label>"
 -- Render Radio Tag
 renderRadio :: Radio -> Text
-renderRadio (Radio opts qualifiers) = "<radio>" <> renderOptionList opts
-                                                <> renderOptionQualifierList qualifiers
-                                                <> "</radio>"
+renderRadio (Radio labl opts qualifiers) = "<radio>" 
+                                            <> renderLabel labl
+                                            <> renderOptionList opts
+                                            <> renderOptionQualifierList qualifiers
+                                            <> "</radio>"
 -- Render Option Tag
 renderOptionList :: [Option] -> Text
 renderOptionList = renderList renderOption 

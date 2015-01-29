@@ -29,7 +29,8 @@ import Data.Aeson (ToJSON
                   ,FromJSON)
 import GHC.Generics (Generic)
 import Data.Text (Text)
-import Kiosk.Backend.Form.Element.Item.Label (Label(..))
+import Kiosk.Backend.Form.Element.Item.Label (Label(..)
+                                             ,defaultLabel)
 import Kiosk.Backend.Form.Element.Item.Input 
 import Kiosk.Backend.Form.Attribute (AttributeClass(..)
                                     ,Attribute(..) )
@@ -44,7 +45,9 @@ import Kiosk.Backend.Form.Attribute.Indexable
 
 
 -- |Radio Button parent element
-data Radio = Radio { _getRadioOptions :: [Option]
+data Radio = Radio { 
+                     _getRadioLabel :: Label
+                   , _getRadioOptions :: [Option]
                    ,  _getRadioQualifier :: [OptionQualifier]
             } deriving (Generic, Show)
 
@@ -107,7 +110,7 @@ instance FromJSON QualifierChoices where
 -- | DEFAULTS --------------------------
 
 defaultRadio :: Radio
-defaultRadio = Radio [defaultOption] [defaultOptionQualifier]
+defaultRadio = Radio defaultLabel [defaultOption] [defaultOptionQualifier]
 
 defaultOption :: Option 
 defaultOption = Option "Pit Water" []
