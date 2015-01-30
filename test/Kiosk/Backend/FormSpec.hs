@@ -31,7 +31,7 @@ cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnsweri
                
 
 createWaterHauler :: Text -> Constant
-createWaterHauler hauler = Constant hauler  [ ConstantAttributeType "'Company'"
+createWaterHauler hauler = Constant hauler  [ ConstantAttributeType "'Water Hauling Company'"
                                             , ConstantAttributeIndexable $ IndexableAttribute True ]                   
 cobaltFormBody :: [Row]
 cobaltFormBody = [ truckNumberRow

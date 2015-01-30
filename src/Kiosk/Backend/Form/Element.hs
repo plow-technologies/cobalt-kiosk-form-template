@@ -1,4 +1,5 @@
 {- |
+
 Module      :  Kiosk.Backend.Element
 Description :  Form Element Types for Kiosk
 Copyright   :  (c) <Plow Technology 2014>
@@ -16,6 +17,7 @@ of these attribute definitions come from the Attribute type.
 
 For example, 'Company' has 'CompanyAttribute', one of which is a 'WidthAttr'
 -}
+
 
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
@@ -42,7 +44,6 @@ import           Kiosk.Backend.Form.Element.Item.TableTopHeader  as Kiosk.Backen
 
 
 {-|
-
 Description of Simple Elements
 * 'Address' The address of the company using the Kiosk
 * 'Company' Name of the company using the Kiosk
@@ -55,5 +56,4 @@ Description of Simple Elements
 * 'Label' Label for an Item 
 * 'TableLeftHeader' put a bold text to the left  
 * 'TableTopHeader' put a bold text to the top
-
 |-}
