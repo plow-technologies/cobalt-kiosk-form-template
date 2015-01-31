@@ -1,0 +1,46 @@
+machine:
+  ghc:
+    version: 7.8.3
+
+  environment:
+    PATH: $HOME/.cabal/bin:$CIRCLE_ARTIFACTS:$PATH/$HOME/cobalt-kiosk-backend/.cabal-sandbox/bin
+
+dependencies:
+  cache_directories:
+    - "~/.cabal"
+    - "~/cobalt-kiosk-backend/.cabal-sandbox"
+
+  override:
+    - "if [ ! -f /home/ubuntu/.cabal/config ]; then cabal update && echo remote-repo: hackage.plowtech.net:http://hackage.plowtech.net/packages/archive >> ~/.cabal/config; else echo .cabal/config file already exists; fi"
+    - "echo remote-repo: hackage.plowtech.net:http://hackage.plowtech.net/packages/archive >> ~/.cabal/config"
+    - cabal update
+    - cabal sandbox init
+    - cabal install   --only-dependencies --enable-tests -j2
+
+test:
+  override:
+    - cabal configure --enable-tests 
+    - cabal build -j2:
+        timeout: 3000
+    - cabal test --show-details=streaming -j2:
+        timeout: 3000
+
+deployment:
+  staging:
+    branch: master
+    commands:
+      - cd ~/cobalt-kiosk-backend/dist/build/kiosk-backend/ && grsync -avz -e ssh kiosk-backend scott@54.69.197.241:/home/scott/node/cobalt-kiosk-backend/bin/:
+         timeout: 3000
+      - ssh scott@54.69.197.241 "./deploy/deploy_kiosk.sh && killall kiosk-backend":
+         timeout: 3000
+
+
+  production:
+    branch: production
+    commands:
+      - cd ~/cobalt-kiosk-backend/dist/build/kiosk-backend/ && rsync -avz -e ssh kiosk-backend node@108.168.240.123:/home/node/cobalt-kiosk-backend/bin/:
+         timeout: 3000
+      - ssh node@108.168.240.123 "./deploy/deploy_kiosk.sh && killall kiosk-backend":
+         timeout: 3000
+
+
