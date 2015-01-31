@@ -18,7 +18,7 @@ main = hspec spec
 spec :: Spec
 spec = do
   describe (nameBase 'genericAttributeDecoder) $ do    
-   it "should turn Attributes into something specifi" $ 
+   it "should turn Attributes into something specific" $ 
      True `shouldBe` True
   describe (nameBase 'inputParser ) $ do
     it "should parse <input> elements" $ do    
