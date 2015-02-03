@@ -26,7 +26,7 @@ cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
 
 cobaltAddress:: Address
-cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936" [AddressWidth $ WidthAttribute (12::Int)]
+cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\n" [AddressWidth $ WidthAttribute (12::Int)]
 
 
 
@@ -36,8 +36,10 @@ createWaterHauler hauler = Constant hauler  [ ConstantAttributeType "'Water Haul
 cobaltFormBody :: [Row]
 cobaltFormBody = [ truckNumberRow
                  , permitNumberRow
+                 , customerTicketNumberRow
                  , leaseInfoRow
-                 , leaseNameRow
+                 , leaseOperatorRow
+                 , leaseNameRow 
                  , waterTypeAndAmountRow
                  , dateRow
                  , timeInRow
@@ -45,8 +47,10 @@ cobaltFormBody = [ truckNumberRow
   where 
     truckNumberRow  = generateInputRowText "Truck #"
     permitNumberRow  = generateInputRowText "Water Hauling Permit #"
+    customerTicketNumberRow = generateInputRowText "Customer Ticket #"
     leaseInfoRow  = generateLabelRow "Lease Information"
-    leaseNameRow = generateInputRowText "Name of Lease Operator"
+    leaseOperatorRow = generateInputRowText "Name of Lease Operator"
+    leaseNameRow = generateInputRowText "Name of Lease"
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
