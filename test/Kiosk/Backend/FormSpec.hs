@@ -5,7 +5,9 @@ module Kiosk.Backend.FormSpec (main, spec) where
 import Kiosk.Backend.Form
 import Language.Haskell.TH (nameBase )
 import Test.Hspec
-
+import Network.Wreq
+import Data.Aeson
+import Data.Traversable
 import Data.Text
 
 main :: IO ()
@@ -18,6 +20,27 @@ spec = do
       (renderOnpingForm . cobaltKioskForm $ "Black Watch") `shouldBe` expectedString
    where
     expectedString = "<form><company width='12'>Cobalt Environmental Solutions LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><logo path='Cobalt.png'></logo><phone width='12'>580-229-0067</phone><constant type='Water Hauling Company' indexable='True'>Black Watch</constant><row ><item ><label width='12'>Truck #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Water Hauling Permit #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Lease Information</label></item></row> <row ><item ><label width='12'>Name of Lease Operator</label> <input type='text' indexable='True'></input></item></row> <row ><item ><radio><label width='12'>Type of Water Hauled</label><option >Produced Water</option> <option >Pit Water</option> <option >Fresh Water</option> <option >Flowback Water</option><option-qualifier ><label >Amount</label> <input type='double' indexable='True' mind='0.0' maxd='150.0'>0.0</input></option-qualifier></radio></item></row> <row ><item ><label width='12'>Date</label> <input type='date'></input></item></row> <row ><item ><label width='12'>Time In</label> <input type='time'></input></item></row> <row ><item ><label width='12'>Driver Signature</label> <input type='signature'></input></item></row></form>" 
+
+
+updateThisThing i n = post ("http://alarm.plowtech.net:2834/form/update?formid=" ++ (show i)) (encode.cobaltKioskForm $ n)
+
+currentForms = [(0,"Big Star Trucking")
+               ,(1,"Bullet Energy Services")
+               ,(2,"C & J Trucking")
+               ,(3,"Big Mac Tank Trucks")
+               ,(4,"Brady Welding and Machine Shop")
+               ,(5,"Kleen Oilfield Services")
+               ,(6,"B & C Backhoe & Transports")
+               ,(7,"Forsythe Oilfield ")
+               ,(8,"Hulls Oilfield")
+               ,(9,"South Central Oilfield Services")
+               ,(10, "Top-O-Texas")
+               ,(11,"Mitchell Tank Truck Services")
+               ,(12,"Fluid Services")
+               ,(13,"Davenport Oilfield Services")
+               ,(14,"Test Company")]
+
+updateAllFormsForAllCompanies = traverse (uncurry updateThisThing)   currentForms
 
 cobaltKioskForm :: Text -> Form
 cobaltKioskForm waterHaulingName = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody

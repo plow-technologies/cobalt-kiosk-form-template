@@ -72,7 +72,8 @@ Test-Suite spec
                       , either         
                       , text           
                       , bytestring      
-                      , trifecta       
+                      , trifecta
+                      , wreq
                       , blaze-markup
  
 Source-Repository head
