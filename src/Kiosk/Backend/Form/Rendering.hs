@@ -19,9 +19,17 @@ import           Data.Monoid                ((<>))
 import           Data.Text                  (Text, pack, unwords)
 import           Data.Text.Encoding         (encodeUtf8)
 import           Kiosk.Backend.Form.Element
+
 import Kiosk.Backend.Form.Attribute
+
+
+import Text.Blaze.Html (toHtml)
+
+import Text.Blaze.Html.Renderer.String 
+
 -- | Render Generator
 
+xmlSanitize = pack . renderHtml . toHtml
 -- Rendering a Attribute
 renderAttribute :: Attribute -> Text
 renderAttribute attr = name attr <>
@@ -37,7 +45,7 @@ renderAttrList attrs = Data.Text.unwords $ renderAttribute. toAttribute <$> attr
 renderLabel :: Label -> Text
 renderLabel (Label txt attrs) = "<label " <> renderAttrList attrs
                                           <> ">"
-                                          <> txt
+                                          <> (xmlSanitize txt)
                                           <> "</label>"
 -- Render Radio Tag
 renderRadio :: Radio -> Text
@@ -53,7 +61,7 @@ renderOptionList = renderList renderOption
 renderOption:: Option -> Text
 renderOption(Option txt attrs) = "<option " <> renderAttrList attrs
                                                  <> ">"
-                                                 <> txt
+                                                 <> (xmlSanitize txt)
                                                  <> "</option>"
 -- Render OptionQualifier Tag
 renderOptionQualifierList :: [OptionQualifier] -> Text
@@ -91,7 +99,7 @@ renderInputType (InputTypeDouble (InputDouble d)) = pack .show $ d
 renderButton :: Button -> Text
 renderButton (Button txt attrs) = "<button " <> renderAttrList attrs
                                              <> ">"
-                                             <> txt
+                                             <> xmlSanitize txt
                                              <> "</button>"
 -- Rendering Empty Block
 renderEmptyBlock :: EmptyBlock -> Text
@@ -99,26 +107,26 @@ renderEmptyBlock _emptyBlock = pack . show $ (""::String)
 
 -- Rendering TableTopHeader Tag
 renderTableTopHeader :: TableTopHeader -> Text
-renderTableTopHeader  (TableTopHeader txt) = "<tableTopHeader>"  <> txt
+renderTableTopHeader  (TableTopHeader txt) = "<tableTopHeader>"  <> xmlSanitize txt
                                                                  <> "</tableTopHeader>"
 
 -- Rendering TableLeftHeader Tag
 renderTableLeftHeader :: TableLeftHeader -> Text
-renderTableLeftHeader  (TableLeftHeader txt) =  "<tableLeftHeader>" <> txt
+renderTableLeftHeader  (TableLeftHeader txt) =  "<tableLeftHeader>" <> xmlSanitize txt
                                                                     <> "</tableLeftHeader>"
 
 -- Rendering Company Tag
 renderCompany :: Company -> Text
 renderCompany (Company txt attrs) = "<company " <> renderAttrList attrs
                                                 <> ">"
-                                                <> txt
+                                                <> xmlSanitize txt
                                                 <> "</company>"
 
 -- Render Logo Tag                                                                                    
 renderLogo :: Logo  -> Text
 renderLogo (Logo txt attrs) = "<logo " <> renderAttrList attrs
                                                         <> ">"
-                                                        <> txt
+                                                        <> xmlSanitize txt
                                                         <> "</logo>"                                                                   
 -- Render Phone Tag                                                                                    
 renderPhone :: Phone  -> Text
@@ -138,7 +146,7 @@ renderAddress (Address txt attrs) = "<address " <> renderAttrList attrs
 renderConstant :: Constant -> Text 
 renderConstant (Constant txt attrs)  = "<constant " <> renderAttrList attrs
                                                     <> ">"
-                                                    <> txt
+                                                    <> (xmlSanitize txt)
                                                     <> "</constant>"
 
 -- Rendering a list of Constants
