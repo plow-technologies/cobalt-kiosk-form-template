@@ -29,6 +29,7 @@ import Text.Blaze.Html.Renderer.String
 
 -- | Render Generator
 
+xmlSanitize :: Text -> Text
 xmlSanitize = pack . renderHtml . toHtml
 -- Rendering a Attribute
 renderAttribute :: Attribute -> Text
