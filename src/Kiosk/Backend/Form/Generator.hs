@@ -38,6 +38,8 @@ import Data.String (IsString)
 import Data.ByteString.Lazy (ByteString)
 
 
+
+
 insertThisForm :: String -> String -> WaterHaulingCompany -> IO (Either Text (Response ByteString))
 insertThisForm url port whc@(WaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
                                                                                             url  <>
@@ -45,7 +47,6 @@ insertThisForm url port whc@(WaterHaulingCompany Nothing _ _) = fmap Right $ pos
                                                                                             port <>
                                                                                             "/form/add") (encode  [convertToKioskForm $ whc])
 insertThisForm _url _port (WaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"                                                                            
-
 
 
 updateThisForm :: String -> WaterHaulingCompany -> IO (Either Text (Response ByteString))
@@ -286,5 +287,5 @@ currentForms = [ WaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
                , WaterHaulingCompany (Just 12) FluidServices exampleUUID
                , WaterHaulingCompany (Just 13) DavenportOilfieldServices exampleUUID
                , WaterHaulingCompany (Just 14) TestCompany exampleUUID
-               , WaterHaulingCompany Nothing SoonerStar exampleUUID
-               , WaterHaulingCompany Nothing NexStream exampleUUID]
+               , WaterHaulingCompany (Just 15) SoonerStar exampleUUID
+               , WaterHaulingCompany (Just 16) NexStream exampleUUID]
