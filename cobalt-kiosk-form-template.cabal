@@ -24,6 +24,8 @@ Library
                         Kiosk.Backend.Form.Element
                         Kiosk.Backend.Form.Attribute
                         Kiosk.Backend.Form.Generator
+                        Kiosk.Backend.Form.Generator.Cobalt
+                        Kiosk.Backend.Form.Generator.RockShore
 
   Other-Modules:        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Attribute.Action
