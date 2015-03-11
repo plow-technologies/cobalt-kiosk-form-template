@@ -20,7 +20,7 @@ Try and keep as much generation data in our DB as possible.
 
 -}
 
-module Kiosk.Backend.Form.Generator ( updateThisThing) where 
+module Kiosk.Backend.Form.Generator ( updateThisForm) where 
 
 import Kiosk.Backend.Form
 
@@ -37,12 +37,23 @@ import Data.Text (pack
 import Data.String (IsString)
 import Data.ByteString.Lazy (ByteString)
 
-updateThisThing :: String -> WaterHaulingCompany -> IO (Response ByteString)
-updateThisThing url whc@(WaterHaulingCompany i _wc _u) = post ("http://" <> 
-                                                               url <>
-                                                               ":2833/form/update?formid=" <>
-                                                               (show i)) (encode.cobaltKioskForm $ whc)
 
+insertThisForm :: String -> String -> WaterHaulingCompany -> IO (Either Text (Response ByteString))
+insertThisForm url port whc@(WaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
+                                                                                            url  <>
+                                                                                            ":"  <>
+                                                                                            port <>
+                                                                                            "/form/add") (encode  [convertToKioskForm $ whc])
+insertThisForm _url _port (WaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"                                                                            
+
+
+
+updateThisForm :: String -> WaterHaulingCompany -> IO (Either Text (Response ByteString))
+updateThisForm url whc@(WaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <> 
+                                                                                       url <>
+                                                                                       ":2833/form/update?formid=" <>
+                                                                                       (show i)) (encode.convertToKioskForm $ whc)                                                                                       
+updateThisForm url whc@(WaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
 
 cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -197,12 +208,14 @@ generateOption :: Text -> Option
 generateOption optionText = Option optionText []
 
 
-cobaltKioskForm :: WaterHaulingCompany -> Form
-cobaltKioskForm waterHaulingCompany = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody
+convertToKioskForm :: WaterHaulingCompany -> Form
+convertToKioskForm waterHaulingCompany = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody
   where 
     waterHaulingName = _whcCompanyName $ waterHaulingCompany
 
-data WaterHaulingCompany = WaterHaulingCompany { _whcFormId::FormId
+
+
+data WaterHaulingCompany = WaterHaulingCompany { _whcFormId:: Maybe FormId
                                                , _whcCompanyName :: CompanyName                                                          
                                                , _whcGetUUID :: UUID }
                                 deriving (Eq,Ord)                 
@@ -233,6 +246,8 @@ data CompanyName = BigStarTrucking
                    | FluidServices
                    | DavenportOilfieldServices
                    | TestCompany
+                   | SoonerStar
+                   | NexStream
           deriving (Eq,Ord)
 
 
@@ -252,21 +267,24 @@ instance Show CompanyName where
   show (FluidServices) = "Fluid Services"
   show (DavenportOilfieldServices) = "Davenport Oilfield Services"
   show (TestCompany    ) = "Test Company"
-
+  show (SoonerStar    ) = "Sooner Star"
+  show (NexStream    ) = "NexStream"
 
 currentForms :: [WaterHaulingCompany]
-currentForms = [ WaterHaulingCompany 0 BigStarTrucking exampleUUID
-               , WaterHaulingCompany 1 BulletEnergyServices exampleUUID
-               , WaterHaulingCompany 2 CandJTrucking exampleUUID
-               , WaterHaulingCompany 3 BigMacTankTrucks exampleUUID
-               , WaterHaulingCompany 4 BradyWeldingandMachineShop exampleUUID
-               , WaterHaulingCompany 5 KleenOilfieldServices exampleUUID
-               , WaterHaulingCompany 6 BandCBackhoeandTransports exampleUUID
-               , WaterHaulingCompany 7 ForsytheOilfield exampleUUID
-               , WaterHaulingCompany 8 HullsOilfield exampleUUID
-               , WaterHaulingCompany 9 SouthCentralOilfieldServices exampleUUID
-               , WaterHaulingCompany 10 TopOTexas exampleUUID
-               , WaterHaulingCompany 11 MitchellTankTruckServices exampleUUID
-               , WaterHaulingCompany 12 FluidServices exampleUUID
-               , WaterHaulingCompany 13 DavenportOilfieldServices exampleUUID
-               , WaterHaulingCompany 14 TestCompany exampleUUID]
+currentForms = [ WaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
+               , WaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
+               , WaterHaulingCompany (Just 2) CandJTrucking exampleUUID
+               , WaterHaulingCompany (Just 3) BigMacTankTrucks exampleUUID
+               , WaterHaulingCompany (Just 4) BradyWeldingandMachineShop exampleUUID
+               , WaterHaulingCompany (Just 5) KleenOilfieldServices exampleUUID
+               , WaterHaulingCompany (Just 6) BandCBackhoeandTransports exampleUUID
+               , WaterHaulingCompany (Just 7) ForsytheOilfield exampleUUID
+               , WaterHaulingCompany (Just 8) HullsOilfield exampleUUID
+               , WaterHaulingCompany (Just 9) SouthCentralOilfieldServices exampleUUID
+               , WaterHaulingCompany (Just 10) TopOTexas exampleUUID
+               , WaterHaulingCompany (Just 11) MitchellTankTruckServices exampleUUID
+               , WaterHaulingCompany (Just 12) FluidServices exampleUUID
+               , WaterHaulingCompany (Just 13) DavenportOilfieldServices exampleUUID
+               , WaterHaulingCompany (Just 14) TestCompany exampleUUID
+               , WaterHaulingCompany Nothing SoonerStar exampleUUID
+               , WaterHaulingCompany Nothing NexStream exampleUUID]
