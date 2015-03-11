@@ -1,19 +1,19 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}  
-module Kiosk.Backend.Form.Generator.RockShore () where
+module Kiosk.Backend.Form.Generator.RockShore ( insertThisFormInRockShore
+                                              , updateThisFormInRockShore) where
+                                              
 import Kiosk.Backend.Form
-
 import Network.Wreq (Response
                     ,post)
 import Data.Aeson
-
 import Data.Monoid ((<>))   
-
 import Data.Text (pack
                  ,Text)
-
 import Data.String (IsString)
 import Data.ByteString.Lazy (ByteString)
+
+
 
 insertThisFormInRockShore :: String -> String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
 insertThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
@@ -28,7 +28,7 @@ updateThisFormInRockShore url whc@(RockShoreWaterHaulingCompany (Just i) _wc _u)
                                                                                                url <>
                                                                                                ":2833/form/update?formid=" <>
                                                                                                (show i)) (encode.convertToKioskForm $ whc)                                                                                       
-updateThisFormInRockShore url whc@(RockShoreWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
+updateThisFormInRockShore _url whc@(RockShoreWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
 
 rockShoreEnergy :: Company
 rockShoreEnergy  = Company "Rock Shore Energy, LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -183,7 +183,7 @@ generateOption :: Text -> Option
 generateOption optionText = Option optionText []
 
 convertToKioskForm :: RockShoreWaterHaulingCompany -> Form
-convertToKioskForm waterHaulingCompany = Form rockShoreEnergy rockShoreAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] rockShoreFormBody
+convertToKioskForm waterHaulingCompany = Form rockShoreEnergy rockShoreAddress rockShoreLogo defaultPhone [createWaterHauler waterHaulingName] rockShoreFormBody
   where 
     waterHaulingName = _whcCompanyName $ waterHaulingCompany
 
@@ -261,3 +261,7 @@ currentForms = [ RockShoreWaterHaulingCompany (Just 0) BigStarTrucking exampleUU
                , RockShoreWaterHaulingCompany (Just 14) TestCompany exampleUUID
                , RockShoreWaterHaulingCompany (Just 15) SoonerStar exampleUUID
                , RockShoreWaterHaulingCompany (Just 16) NexStream exampleUUID]
+
+
+rockShoreLogo :: Logo
+rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
