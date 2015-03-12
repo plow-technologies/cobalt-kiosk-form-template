@@ -201,7 +201,7 @@ newtype UUID = UUID { _getUUID :: Text}
             deriving (Read,Eq,Show,IsString,ToJSON,FromJSON,Ord)
 
 exampleUUID :: UUID
-exampleUUID = "a2e3609e-154d-4e60-80e0-c77189098617"
+exampleUUID = "ed0c7e53-f510-45c5-a024-5d6b1247c731"
 
 data CompanyName = BigStarTrucking
                    | BulletEnergyServices
@@ -250,25 +250,25 @@ instance Show CompanyName where
 
 
 currentForms :: [RockShoreWaterHaulingCompany]
-currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing BulletEnergyServices ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing Advantage ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing ArkomaTanks ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing BasicEnergyServices ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing CottonwoodDrilling ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing DalesTankService ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing FluidServices ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing GandCConstruction ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing HammandPhillipsService ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing HullsOilfieldService ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing JNSTrucking ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing KleenOilfieldService ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing LaurcoEnergies ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing MSMEnvironmental ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing Nabors ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing RHRServices ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing SandHTankService ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing SandM ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing TestCompany ed0c7e53-f510-45c5-a024-5d6b1247c731]
+currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking exampleUUID
+               , RockShoreWaterHaulingCompany Nothing BulletEnergyServices exampleUUID
+               , RockShoreWaterHaulingCompany Nothing Advantage exampleUUID
+               , RockShoreWaterHaulingCompany Nothing ArkomaTanks exampleUUID
+               , RockShoreWaterHaulingCompany Nothing BasicEnergyServices exampleUUID
+               , RockShoreWaterHaulingCompany Nothing CottonwoodDrilling exampleUUID
+               , RockShoreWaterHaulingCompany Nothing DalesTankService exampleUUID
+               , RockShoreWaterHaulingCompany Nothing FluidServices exampleUUID
+               , RockShoreWaterHaulingCompany Nothing GandCConstruction exampleUUID
+               , RockShoreWaterHaulingCompany Nothing HammandPhillipsService exampleUUID
+               , RockShoreWaterHaulingCompany Nothing HullsOilfieldService exampleUUID
+               , RockShoreWaterHaulingCompany Nothing JNSTrucking exampleUUID
+               , RockShoreWaterHaulingCompany Nothing KleenOilfieldService exampleUUID
+               , RockShoreWaterHaulingCompany Nothing LaurcoEnergies exampleUUID
+               , RockShoreWaterHaulingCompany Nothing MSMEnvironmental exampleUUID
+               , RockShoreWaterHaulingCompany Nothing Nabors exampleUUID
+               , RockShoreWaterHaulingCompany Nothing RHRServices exampleUUID
+               , RockShoreWaterHaulingCompany Nothing SandHTankService exampleUUID
+               , RockShoreWaterHaulingCompany Nothing SandM exampleUUID
+               , RockShoreWaterHaulingCompany Nothing TestCompany exampleUUID]
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
