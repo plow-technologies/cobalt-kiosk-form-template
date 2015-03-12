@@ -220,7 +220,7 @@ data CompanyName = BigStarTrucking
                    | MSMEnvironmental
                    | Nabors
                    | RHRServices
-                   | SandHTank Service
+                   | SandHTankService
                    | SandM
                    | TestCompany
           deriving (Eq,Ord)
@@ -244,7 +244,7 @@ instance Show CompanyName where
   show (MSMEnvironmental) = "MSM Environmental LLC"
   show (Nabors) = "Nabors"
   show (RHRServices) = "RHR Services"
-  show (SandHTank Service) = "S and H Tank"
+  show (SandHTankService) = "S and H Tank Service"
   show (SandM) = "S and M"
   show (TestCompany) = "Test Company"
 
@@ -267,7 +267,7 @@ currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking ed0c7e53-f
                , RockShoreWaterHaulingCompany Nothing MSMEnvironmental ed0c7e53-f510-45c5-a024-5d6b1247c731
                , RockShoreWaterHaulingCompany Nothing Nabors ed0c7e53-f510-45c5-a024-5d6b1247c731
                , RockShoreWaterHaulingCompany Nothing RHRServices ed0c7e53-f510-45c5-a024-5d6b1247c731
-               , RockShoreWaterHaulingCompany Nothing SandHTank Service ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing SandHTankService ed0c7e53-f510-45c5-a024-5d6b1247c731
                , RockShoreWaterHaulingCompany Nothing SandM ed0c7e53-f510-45c5-a024-5d6b1247c731
                , RockShoreWaterHaulingCompany Nothing TestCompany ed0c7e53-f510-45c5-a024-5d6b1247c731]
 rockShoreLogo :: Logo
