@@ -205,63 +205,70 @@ exampleUUID = "a2e3609e-154d-4e60-80e0-c77189098617"
 
 data CompanyName = BigStarTrucking
                    | BulletEnergyServices
-                   | CandJTrucking
-                   | BigMacTankTrucks
-                   | BradyWeldingandMachineShop
-                   | KleenOilfieldServices
-                   | BandCBackhoeandTransports
-                   | ForsytheOilfield 
-                   | HullsOilfield
-                   | SouthCentralOilfieldServices
-                   | TopOTexas
-                   | MitchellTankTruckServices
+                   | Advantage
+                   | ArkomaTanks
+                   | BasicEnergyServices
+                   | CottonwoodDrilling
+                   | DalesTankService
                    | FluidServices
-                   | DavenportOilfieldServices
+                   | GandCConstruction
+                   | HammandPhillipsService
+                   | HullsOilfieldService
+                   | JNSTrucking
+                   | KleenOilfieldService
+                   | LaurcoEnergies
+                   | MSMEnvironmental
+                   | Nabors
+                   | RHRServices
+                   | SandHTank Service
+                   | SandM
                    | TestCompany
-                   | SoonerStar
-                   | NexStream
           deriving (Eq,Ord)
 
 
 instance Show CompanyName where
   show (BigStarTrucking) = "Big Star Trucking"
   show (BulletEnergyServices) = "Bullet Energy Services"
-  show (CandJTrucking) = "C and J Trucking"
-  show (BigMacTankTrucks) = "Big Mac Trucks"
-  show (BradyWeldingandMachineShop) = "Bradly Welding and Machine Shop"
-  show (KleenOilfieldServices) = "Kleen Oilfield Services"
-  show (BandCBackhoeandTransports) = "B and C Backhoe and Transports"
-  show (ForsytheOilfield ) = "Forsythe Oilfield"
-  show (HullsOilfield) = "Hulls Oilfield"
-  show (SouthCentralOilfieldServices) = "South Central Oilfield Services"
-  show (TopOTexas) = "Top-O-Texas"
-  show (MitchellTankTruckServices) = "Mitchell Tank Truck Services"
-  show (FluidServices) = "Fluid Services"
-  show (DavenportOilfieldServices) = "Davenport Oilfield Services"
-  show (TestCompany    ) = "Test Company"
-  show (SoonerStar    ) = "Sooner Star"
-  show (NexStream    ) = "NexStream"
+  show (Advantage) = "Advantage"
+  show (ArkomaTanks) = "Arkoma Tanks LLC"
+  show (BasicEnergyServices) = "Basic Energy Services"
+  show (CottonwoodDrilling) = "Cottonwood Drilling"
+  show (DalesTankService) = "Dales Tank Service"
+  show (FluidServices) = "Fluid Services LLC"
+  show (GandCConstruction) = "G and C Construction International"
+  show (HammandPhillipsService) = "Hamm and Phillips Service Co"
+  show (HullsOilfieldService) = "Hulls Oilfield Trucking"
+  show (JNSTrucking) = "JNS Trucking"
+  show (KleenOilfieldService) = "Kleen Oilfield Service Co"
+  show (LaurcoEnergies) = "Laurco Energies Inc"
+  show (MSMEnvironmental) = "MSM Environmental LLC"
+  show (Nabors) = "Nabors"
+  show (RHRServices) = "RHR Services"
+  show (SandHTank Service) = "S and H Tank"
+  show (SandM) = "S and M"
+  show (TestCompany) = "Test Company"
 
 
 currentForms :: [RockShoreWaterHaulingCompany]
-currentForms = [ RockShoreWaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
-               , RockShoreWaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 2) CandJTrucking exampleUUID
-               , RockShoreWaterHaulingCompany (Just 3) BigMacTankTrucks exampleUUID
-               , RockShoreWaterHaulingCompany (Just 4) BradyWeldingandMachineShop exampleUUID
-               , RockShoreWaterHaulingCompany (Just 5) KleenOilfieldServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 6) BandCBackhoeandTransports exampleUUID
-               , RockShoreWaterHaulingCompany (Just 7) ForsytheOilfield exampleUUID
-               , RockShoreWaterHaulingCompany (Just 8) HullsOilfield exampleUUID
-               , RockShoreWaterHaulingCompany (Just 9) SouthCentralOilfieldServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 10) TopOTexas exampleUUID
-               , RockShoreWaterHaulingCompany (Just 11) MitchellTankTruckServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 12) FluidServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 13) DavenportOilfieldServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 14) TestCompany exampleUUID
-               , RockShoreWaterHaulingCompany (Just 15) SoonerStar exampleUUID
-               , RockShoreWaterHaulingCompany (Just 16) NexStream exampleUUID]
-
-
+currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing BulletEnergyServices ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing Advantage ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing ArkomaTanks ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing BasicEnergyServices ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing CottonwoodDrilling ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing DalesTankService ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing FluidServices ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing GandCConstruction ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing HammandPhillipsService ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing HullsOilfieldService ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing JNSTrucking ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing KleenOilfieldService ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing LaurcoEnergies ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing MSMEnvironmental ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing Nabors ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing RHRServices ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing SandHTank Service ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing SandM ed0c7e53-f510-45c5-a024-5d6b1247c731
+               , RockShoreWaterHaulingCompany Nothing TestCompany ed0c7e53-f510-45c5-a024-5d6b1247c731]
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
