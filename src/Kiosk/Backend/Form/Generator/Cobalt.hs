@@ -1,6 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}  
-module Kiosk.Backend.Form.Generator.Cobalt () where
+module Kiosk.Backend.Form.Generator.Cobalt (insertThisFormInCobalt, 
+                                            updateThisFormInCobalt,
+                                            currentCobaltForms) where
 
 import Kiosk.Backend.Form
 
@@ -249,8 +251,8 @@ instance Show CompanyName where
   show (SoonerStar    ) = "Sooner Star"
   show (NexStream    ) = "NexStream"
 
-currentForms :: [CobaltWaterHaulingCompany]
-currentForms = [ CobaltWaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
+currentCobaltForms :: [CobaltWaterHaulingCompany]
+currentCobaltForms = [ CobaltWaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
                , CobaltWaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
                , CobaltWaterHaulingCompany (Just 2) CandJTrucking exampleUUID
                , CobaltWaterHaulingCompany (Just 3) BigMacTankTrucks exampleUUID

@@ -1,7 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}  
 module Kiosk.Backend.Form.Generator.RockShore ( insertThisFormInRockShore
-                                              , updateThisFormInRockShore) where
+                                              , updateThisFormInRockShore
+                                              , currentRockshoreForms) where
                                               
 import Kiosk.Backend.Form
 import Network.Wreq (Response
@@ -251,8 +252,8 @@ instance Show CompanyName where
   show (AandATankTruck) = "A and A Tank Truck Co"
 
 
-currentForms :: [RockShoreWaterHaulingCompany]
-currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking exampleUUID
+currentRockshoreForms :: [RockShoreWaterHaulingCompany]
+currentRockshoreForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking exampleUUID
                , RockShoreWaterHaulingCompany Nothing BulletEnergyServices exampleUUID
                , RockShoreWaterHaulingCompany Nothing Advantage exampleUUID
                , RockShoreWaterHaulingCompany Nothing ArkomaTanks exampleUUID
