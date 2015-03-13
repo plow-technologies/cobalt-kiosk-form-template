@@ -204,25 +204,26 @@ exampleUUID :: UUID
 exampleUUID = "ed0c7e53-f510-45c5-a024-5d6b1247c731"
 
 data CompanyName = BigStarTrucking
-                   | BulletEnergyServices
-                   | Advantage
-                   | ArkomaTanks
-                   | BasicEnergyServices
-                   | CottonwoodDrilling
-                   | DalesTankService
-                   | FluidServices
-                   | GandCConstruction
-                   | HammandPhillipsService
-                   | HullsOilfieldService
-                   | JNSTrucking
-                   | KleenOilfieldService
-                   | LaurcoEnergies
-                   | MSMEnvironmental
-                   | Nabors
-                   | RHRServices
-                   | SandHTankService
-                   | SandM
-                   | TestCompany
+                     | BulletEnergyServices
+                     | Advantage
+                     | ArkomaTanks
+                     | BasicEnergyServices
+                     | CottonwoodDrilling
+                     | DalesTankService
+                     | FluidServices
+                     | GandCConstruction
+                     | HammandPhillipsService
+                     | HullsOilfieldService
+                     | JNSTrucking
+                     | KleenOilfieldService
+                     | LaurcoEnergies 
+                     | MSMEnvironmental
+                     | Nabors
+                     | RHRServices
+                     | SandHTankService
+                     | SandM
+                     | TestCompany
+                     |AandATankTruck
           deriving (Eq,Ord)
 
 
@@ -247,6 +248,7 @@ instance Show CompanyName where
   show (SandHTankService) = "S and H Tank Service"
   show (SandM) = "S and M"
   show (TestCompany) = "Test Company"
+  show (AandATankTruck) = "A and A Tank Truck Co"
 
 
 currentForms :: [RockShoreWaterHaulingCompany]
@@ -269,6 +271,7 @@ currentForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking exampleUUI
                , RockShoreWaterHaulingCompany Nothing RHRServices exampleUUID
                , RockShoreWaterHaulingCompany Nothing SandHTankService exampleUUID
                , RockShoreWaterHaulingCompany Nothing SandM exampleUUID
-               , RockShoreWaterHaulingCompany Nothing TestCompany exampleUUID]
+               , RockShoreWaterHaulingCompany Nothing TestCompany exampleUUID
+               , RockShoreWaterHaulingCompany Nothing AandATankTruck exampleUUID]
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
