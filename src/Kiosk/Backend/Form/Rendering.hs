@@ -19,13 +19,9 @@ import           Data.Monoid                ((<>))
 import           Data.Text                  (Text, pack, unwords)
 import           Data.Text.Encoding         (encodeUtf8)
 import           Kiosk.Backend.Form.Element
-
-import Kiosk.Backend.Form.Attribute
-
-
-import Text.Blaze.Html (toHtml)
-
-import Text.Blaze.Html.Renderer.String 
+import           Kiosk.Backend.Form.Attribute
+import           Text.Blaze.Html (toHtml)
+import           Text.Blaze.Html.Renderer.String 
 
 -- | Render Generator
 
@@ -85,6 +81,14 @@ renderInput (Input inputType attrs) = "<input " <> renderAttrList attrs
                                                 <> ">"
                                                 <> renderInputType inputType
                                                 <> "</input>"
+
+-- Rendering Automatic Input Tag
+renderAutoInput :: Input -> Text
+renderAutoInput (Input inputType attrs) = "<auto-input " <> renderAttrList attrs
+                                                <> ">"
+                                                <> renderInputType inputType
+                                                <> "</auto-input>"
+
 
 
 -- Rendering Different Input Type
@@ -158,13 +162,14 @@ renderConstantList constants = Data.Text.unwords $ renderConstant <$> constants
 renderItemType :: ItemType -> Text
 renderItemType it =
   case it of
-       (ItemLabel l) -> renderLabel l
-       (ItemInput i) -> renderInput i
-       (ItemButton b) -> renderButton b
-       (ItemEmptyBlock e) -> renderEmptyBlock e
-       (ItemRadio r)  -> renderRadio r
+       (ItemLabel l)            -> renderLabel l
+       (ItemInput i)            -> renderInput i
+       (ItemAutoInput i)        -> renderAutoInput i 
+       (ItemButton b)           -> renderButton b
+       (ItemEmptyBlock e)       -> renderEmptyBlock e
+       (ItemRadio r)            -> renderRadio r
        (ItemTableLeftHeader lh) -> renderTableLeftHeader lh
-       (ItemTableTopHeader th) -> renderTableTopHeader th
+       (ItemTableTopHeader th)  -> renderTableTopHeader th
 
 -- Rendering a list of ItemTypes
 renderItemTypeList :: [ItemType] -> Text

@@ -60,12 +60,13 @@ instance AttributeClass ItemAttributes where
 
 -- A Item type can be a label, input, emptyBlock, tableTopHeader, tableLeftHeader
 data ItemType = ItemLabel Label
-               |ItemInput Input
-               |ItemButton Button
-               |ItemRadio Radio 
-               |ItemEmptyBlock EmptyBlock
-               |ItemTableTopHeader TableTopHeader
-               |ItemTableLeftHeader TableLeftHeader                
+              | ItemInput Input
+              | ItemAutoInput Input
+              | ItemButton Button
+              | ItemRadio Radio 
+              | ItemEmptyBlock EmptyBlock
+              | ItemTableTopHeader TableTopHeader
+              | ItemTableLeftHeader TableLeftHeader                
            deriving (Generic, Show)
 
 instance ToJSON ItemType where
