@@ -15,6 +15,10 @@ import Data.String (IsString)
 import Data.ByteString.Lazy (ByteString)
 
 
+-- travsere printForm currentRockshoreForms for debugging
+printForm :: RockShoreWaterHaulingCompany -> IO ()
+printForm whc@(RockShoreWaterHaulingCompany Nothing _ _) = print $ convertToKioskForm $ whc
+printForm (RockShoreWaterHaulingCompany (Just _) _ _) = print ("Could not print" :: String)
 
 insertThisFormInRockShore :: String -> String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
 insertThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
@@ -29,7 +33,7 @@ updateThisFormInRockShore url whc@(RockShoreWaterHaulingCompany (Just i) _wc _u)
                                                                                                url <>
                                                                                                ":2833/form/update?formid=" <>
                                                                                                (show i)) (encode.convertToKioskForm $ whc)                                                                                       
-updateThisFormInRockShore _url whc@(RockShoreWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
+updateThisFormInRockShore _url (RockShoreWaterHaulingCompany _ _ _) = return $ Left "Can't update form w/o id"
 
 rockShoreEnergy :: Company
 rockShoreEnergy  = Company "Rock Shore Energy, LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -112,7 +116,7 @@ generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
 
 generateInputItemDate :: Text -> Item
 generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
-                                                    , ItemInput fullDefaultInputDate] []
+                                                    , ItemAutoInput fullDefaultInputDate] []
 
 fullDefaultInputDate :: Input
 fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
@@ -126,7 +130,7 @@ generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
 
 generateInputItemTime :: Text -> Item
 generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
-                                                    , ItemInput fullDefaultInputTime] []
+                                                    , ItemAutoInput fullDefaultInputTime] []
 
 fullDefaultInputTime :: Input
 fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
