@@ -228,7 +228,9 @@ data CompanyName = BigStarTrucking
                      | SandHTankService
                      | SandM
                      | TestCompany
-                     |AandATankTruck
+                     | AandATankTruck
+                     | SonnyTrucking
+                     | TerracoProductionLLC        
           deriving (Eq,Ord)
 
 
@@ -254,29 +256,43 @@ instance Show CompanyName where
   show (SandM) = "S and M"
   show (TestCompany) = "Test Company"
   show (AandATankTruck) = "A and A Tank Truck Co"
+  show (SonnyTrucking) = "Sonny Trucking "
+  show (TerracoProductionLLC) = "Terraco Production LLC"  
 
+currentForms :: [RockShoreWaterHaulingCompany]
+currentForms = [ RockShoreWaterHaulingCompany  (Just 0) BigStarTrucking exampleUUID
+               , RockShoreWaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
+               , RockShoreWaterHaulingCompany (Just 2) Advantage exampleUUID
+               , RockShoreWaterHaulingCompany (Just 3) ArkomaTanks exampleUUID
+               , RockShoreWaterHaulingCompany (Just 4) BasicEnergyServices exampleUUID
+               , RockShoreWaterHaulingCompany (Just 5) CottonwoodDrilling exampleUUID
+               , RockShoreWaterHaulingCompany (Just 6) DalesTankService exampleUUID
+               , RockShoreWaterHaulingCompany (Just 7) FluidServices exampleUUID
+               , RockShoreWaterHaulingCompany (Just 8) GandCConstruction exampleUUID
+               , RockShoreWaterHaulingCompany (Just 9) HammandPhillipsService exampleUUID
+               , RockShoreWaterHaulingCompany (Just 10) HullsOilfieldService exampleUUID
+               , RockShoreWaterHaulingCompany (Just 11) JNSTrucking exampleUUID
+               , RockShoreWaterHaulingCompany (Just 12) KleenOilfieldService exampleUUID
+               , RockShoreWaterHaulingCompany (Just 13) LaurcoEnergies exampleUUID
+               , RockShoreWaterHaulingCompany (Just 14) MSMEnvironmental exampleUUID
+               , RockShoreWaterHaulingCompany (Just 15) Nabors exampleUUID
+               , RockShoreWaterHaulingCompany (Just 16) RHRServices exampleUUID
+               , RockShoreWaterHaulingCompany (Just 17) SandHTankService exampleUUID
+               , RockShoreWaterHaulingCompany (Just 18) SandM exampleUUID
+               , RockShoreWaterHaulingCompany (Just 19) TestCompany exampleUUID
+               , RockShoreWaterHaulingCompany (Just 20) AandATankTruck exampleUUID
+               , RockShoreWaterHaulingCompany (Just 21) SonnyTrucking exampleUUID               
+               , RockShoreWaterHaulingCompany (Just 22) TerracoProductionLLC exampleUUID]
 
-currentRockshoreForms :: [RockShoreWaterHaulingCompany]
-currentRockshoreForms = [ RockShoreWaterHaulingCompany Nothing BigStarTrucking exampleUUID
-               , RockShoreWaterHaulingCompany Nothing BulletEnergyServices exampleUUID
-               , RockShoreWaterHaulingCompany Nothing Advantage exampleUUID
-               , RockShoreWaterHaulingCompany Nothing ArkomaTanks exampleUUID
-               , RockShoreWaterHaulingCompany Nothing BasicEnergyServices exampleUUID
-               , RockShoreWaterHaulingCompany Nothing CottonwoodDrilling exampleUUID
-               , RockShoreWaterHaulingCompany Nothing DalesTankService exampleUUID
-               , RockShoreWaterHaulingCompany Nothing FluidServices exampleUUID
-               , RockShoreWaterHaulingCompany Nothing GandCConstruction exampleUUID
-               , RockShoreWaterHaulingCompany Nothing HammandPhillipsService exampleUUID
-               , RockShoreWaterHaulingCompany Nothing HullsOilfieldService exampleUUID
-               , RockShoreWaterHaulingCompany Nothing JNSTrucking exampleUUID
-               , RockShoreWaterHaulingCompany Nothing KleenOilfieldService exampleUUID
-               , RockShoreWaterHaulingCompany Nothing LaurcoEnergies exampleUUID
-               , RockShoreWaterHaulingCompany Nothing MSMEnvironmental exampleUUID
-               , RockShoreWaterHaulingCompany Nothing Nabors exampleUUID
-               , RockShoreWaterHaulingCompany Nothing RHRServices exampleUUID
-               , RockShoreWaterHaulingCompany Nothing SandHTankService exampleUUID
-               , RockShoreWaterHaulingCompany Nothing SandM exampleUUID
-               , RockShoreWaterHaulingCompany Nothing TestCompany exampleUUID
-               , RockShoreWaterHaulingCompany Nothing AandATankTruck exampleUUID]
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
+
+
+
+
+postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4500/user/key/join/insert" (toJSON (uuid,username,formId) )
+
+postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4500/user/key/join/delete" (toJSON (uuid,username) ) 
+
+
+
