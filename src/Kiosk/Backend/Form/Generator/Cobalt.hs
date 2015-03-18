@@ -110,14 +110,13 @@ fullDefaultInputText = Input fullDefaultInputTypeText fullDefaultInputAttributes
 
 fullDefaultInputTypeText :: InputType
 fullDefaultInputTypeText = InputTypeText $ InputText (""::Text)
-
 -- Input Date
 generateInputRowDate :: Text -> Row
 generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
 
 generateInputItemDate :: Text -> Item
 generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
-                                                    , ItemInput fullDefaultInputDate] []
+                                                    , ItemAutoInput fullDefaultInputDate] []
 
 fullDefaultInputDate :: Input
 fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
@@ -131,13 +130,14 @@ generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
 
 generateInputItemTime :: Text -> Item
 generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
-                                                    , ItemInput fullDefaultInputTime] []
+                                                    , ItemAutoInput fullDefaultInputTime] []
 
 fullDefaultInputTime :: Input
 fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
 
 fullDefaultInputTypeTime :: InputType
 fullDefaultInputTypeTime = InputTypeTime $ (InputTime "")
+
 
 -- Input Signature
 
@@ -251,6 +251,7 @@ instance Show CompanyName where
   show (SoonerStar    ) = "Sooner Star"
   show (NexStream    ) = "NexStream"
 
+
 currentCobaltForms :: [CobaltWaterHaulingCompany]
 currentCobaltForms = [ CobaltWaterHaulingCompany (Just 0) BigStarTrucking exampleUUID
                , CobaltWaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
@@ -269,3 +270,33 @@ currentCobaltForms = [ CobaltWaterHaulingCompany (Just 0) BigStarTrucking exampl
                , CobaltWaterHaulingCompany (Just 14) TestCompany exampleUUID
                , CobaltWaterHaulingCompany (Just 15) SoonerStar exampleUUID
                , CobaltWaterHaulingCompany (Just 16) NexStream exampleUUID]
+
+
+-- | Use this to pretend everything is new                        
+currentCobaltFormsNothingMode (CobaltWaterHaulingCompany _ c e) = CobaltWaterHaulingCompany Nothing c e
+
+
+postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4600/user/key/join/insert" (toJSON (uuid,username,formId) )
+postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4600/user/key/join/delete" (toJSON (uuid,username) ) 
+
+
+useridlist = [ "bigstar"
+             , "bullet"
+             , "cjtrucking"
+             , "bigmac"
+             , "bradywelding"
+             , "kleen"
+             , "bcbackhoe"
+             , "forsythe"
+             , "hulls"
+             , "southcentraloil"
+             , "topotexas"
+             , "mitchelltank"
+             , "fluidservices"
+             , "davenport"
+             , "testcorp"
+             , "soonerstar"
+             , "nexstream"
+               ]
+
+formIdList = [0 .. (length useridlist)]

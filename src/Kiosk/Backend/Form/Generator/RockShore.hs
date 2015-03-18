@@ -88,8 +88,7 @@ waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ optio
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
                ,generateOption "Fresh Water"
-               ,generateOption "Flowback Water" 
-               ,generateOption "Acid Water"]
+               ,generateOption "Flowback Water" ]
 
 generateLabelRow :: Text -> Row
 generateLabelRow labelText = Row [generateLabelItem labelText] []                   
@@ -288,6 +287,10 @@ currentRockshoreForms = [ RockShoreWaterHaulingCompany (Just 0)  BigStarTrucking
                         , RockShoreWaterHaulingCompany (Just 21)    SonnyTrucking exampleUUID               
                         , RockShoreWaterHaulingCompany (Just 22)    TerracoProductionLLC exampleUUID
                         , RockShoreWaterHaulingCompany (Just 23)    BigMacTrucking exampleUUID]
+
+  
+  -- | Use this to pretend everything is new                        
+currentRockshoreFormsNothingMode (RockShoreWaterHaulingCompany _ c e) = RockShoreWaterHaulingCompany Nothing c e
 
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
