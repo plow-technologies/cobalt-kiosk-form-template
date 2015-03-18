@@ -13,7 +13,7 @@ import Data.Text (pack
                  ,Text)
 import Data.String (IsString)
 import Data.ByteString.Lazy (ByteString)
-
+import Data.Traversable (traverse)
 
 -- travsere printForm currentRockshoreForms for debugging
 printForm :: RockShoreWaterHaulingCompany -> IO ()
@@ -28,12 +28,13 @@ insertThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany Nothing _ _
                                                                                                     "/form/add") (encode  [convertToKioskForm $ whc])
 insertThisFormInRockShore _url _port (RockShoreWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"                                                                            
 
-updateThisFormInRockShore :: String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
-updateThisFormInRockShore url whc@(RockShoreWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <> 
-                                                                                               url <>
-                                                                                               ":2833/form/update?formid=" <>
-                                                                                               (show i)) (encode.convertToKioskForm $ whc)                                                                                       
-updateThisFormInRockShore _url (RockShoreWaterHaulingCompany _ _ _) = return $ Left "Can't update form w/o id"
+updateThisFormInRockShore :: String -> String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
+updateThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <> 
+                                                                                                    url <>
+                                                                                                    ":" <>
+                                                                                                    port <> "/form/update?formid=" <>
+                                                                                                    (show i)) (encode.convertToKioskForm $ whc)                                                                                       
+updateThisFormInRockShore _url _port (RockShoreWaterHaulingCompany _ _ _) = return $ Left "Can't update form w/o id"
 
 rockShoreEnergy :: Company
 rockShoreEnergy  = Company "Rock Shore Energy, LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -61,9 +62,9 @@ rockShoreFormBody = [ truckNumberRow
     truckNumberRow  = generateInputRowText "Truck #"
     permitNumberRow  = generateInputRowText "Water Hauling Permit #"
     customerTicketNumberRow = generateInputRowText "Customer Ticket #"
-    leaseInfoRow  = generateLabelRow "Lease Information"
-    leaseOperatorRow = generateInputRowText "Name of Lease Operator"
-    leaseNameRow = generateInputRowText "Name of Lease"
+    leaseInfoRow  = generateLabelRow "Lease or Well Information"
+    leaseOperatorRow = generateInputRowText "Name of Lease/Well Operator"
+    leaseNameRow = generateInputRowText "Name of Lease or Well"
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
@@ -87,7 +88,8 @@ waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ optio
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
                ,generateOption "Fresh Water"
-               ,generateOption "Flowback Water" ]
+               ,generateOption "Flowback Water" 
+               ,generateOption "Acid Water"]
 
 generateLabelRow :: Text -> Row
 generateLabelRow labelText = Row [generateLabelItem labelText] []                   
@@ -230,9 +232,10 @@ data CompanyName = BigStarTrucking
                      | TestCompany
                      | AandATankTruck
                      | SonnyTrucking
-                     | TerracoProductionLLC        
-          deriving (Eq,Ord)
+                     | TerracoProductionLLC
+                     | BigMacTrucking        
 
+          deriving (Eq,Ord)
 
 instance Show CompanyName where
   show (BigStarTrucking) = "Big Star Trucking"
@@ -258,41 +261,36 @@ instance Show CompanyName where
   show (AandATankTruck) = "A and A Tank Truck Co"
   show (SonnyTrucking) = "Sonny Trucking "
   show (TerracoProductionLLC) = "Terraco Production LLC"  
+  show (BigMacTrucking) = "Big Mac Trucking"
 
-currentForms :: [RockShoreWaterHaulingCompany]
-currentForms = [ RockShoreWaterHaulingCompany  (Just 0) BigStarTrucking exampleUUID
-               , RockShoreWaterHaulingCompany (Just 1) BulletEnergyServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 2) Advantage exampleUUID
-               , RockShoreWaterHaulingCompany (Just 3) ArkomaTanks exampleUUID
-               , RockShoreWaterHaulingCompany (Just 4) BasicEnergyServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 5) CottonwoodDrilling exampleUUID
-               , RockShoreWaterHaulingCompany (Just 6) DalesTankService exampleUUID
-               , RockShoreWaterHaulingCompany (Just 7) FluidServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 8) GandCConstruction exampleUUID
-               , RockShoreWaterHaulingCompany (Just 9) HammandPhillipsService exampleUUID
-               , RockShoreWaterHaulingCompany (Just 10) HullsOilfieldService exampleUUID
-               , RockShoreWaterHaulingCompany (Just 11) JNSTrucking exampleUUID
-               , RockShoreWaterHaulingCompany (Just 12) KleenOilfieldService exampleUUID
-               , RockShoreWaterHaulingCompany (Just 13) LaurcoEnergies exampleUUID
-               , RockShoreWaterHaulingCompany (Just 14) MSMEnvironmental exampleUUID
-               , RockShoreWaterHaulingCompany (Just 15) Nabors exampleUUID
-               , RockShoreWaterHaulingCompany (Just 16) RHRServices exampleUUID
-               , RockShoreWaterHaulingCompany (Just 17) SandHTankService exampleUUID
-               , RockShoreWaterHaulingCompany (Just 18) SandM exampleUUID
-               , RockShoreWaterHaulingCompany (Just 19) TestCompany exampleUUID
-               , RockShoreWaterHaulingCompany (Just 20) AandATankTruck exampleUUID
-               , RockShoreWaterHaulingCompany (Just 21) SonnyTrucking exampleUUID               
-               , RockShoreWaterHaulingCompany (Just 22) TerracoProductionLLC exampleUUID]
+currentRockshoreForms :: [RockShoreWaterHaulingCompany]
+currentRockshoreForms = [ RockShoreWaterHaulingCompany (Just 0)  BigStarTrucking exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 1)  BulletEnergyServices exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 2)  Advantage exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 3)  ArkomaTanks exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 4)  BasicEnergyServices exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 5)  CottonwoodDrilling exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 6)  DalesTankService exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 7)  FluidServices exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 8)  GandCConstruction exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 9)  HammandPhillipsService exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 10)    HullsOilfieldService exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 11)    JNSTrucking exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 12)    KleenOilfieldService exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 13)    LaurcoEnergies exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 14)    MSMEnvironmental exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 15)    Nabors exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 16)    RHRServices exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 17)    SandHTankService exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 18)    SandM exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 19)    TestCompany exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 20)    AandATankTruck exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 21)    SonnyTrucking exampleUUID               
+                        , RockShoreWaterHaulingCompany (Just 22)    TerracoProductionLLC exampleUUID
+                        , RockShoreWaterHaulingCompany (Just 23)    BigMacTrucking exampleUUID]
 
 rockShoreLogo :: Logo
 rockShoreLogo = Logo "" [LogoPath . PathAttribute $ "'RockShoreEnergy.png'"  ]
 
-
-
-
 postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4500/user/key/join/insert" (toJSON (uuid,username,formId) )
-
 postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4500/user/key/join/delete" (toJSON (uuid,username) ) 
-
-
-
