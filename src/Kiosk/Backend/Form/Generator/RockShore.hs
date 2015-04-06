@@ -57,6 +57,7 @@ rockShoreFormBody = [ truckNumberRow
                  , waterTypeAndAmountRow
                  , dateRow
                  , timeInRow
+                 , driverNameRow
                  , signatureRow]
   where 
     truckNumberRow  = generateInputRowText "Truck #"
@@ -68,6 +69,7 @@ rockShoreFormBody = [ truckNumberRow
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
+    driverNameRow = generateInputRowText "Driver's Name"
     signatureRow  = generateInputRowSignature "Driver Signature"
 
 
