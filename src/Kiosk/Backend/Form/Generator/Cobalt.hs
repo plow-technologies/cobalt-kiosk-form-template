@@ -27,12 +27,14 @@ insertThisFormInCobalt url port whc@(CobaltWaterHaulingCompany Nothing _ _) = fm
 insertThisFormInCobalt _url _port (CobaltWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"
 
 
-updateThisFormInCobalt :: String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
-updateThisFormInCobalt url whc@(CobaltWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <>
+updateThisFormInCobalt :: String -> String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
+updateThisFormInCobalt url port whc@(CobaltWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <>
                                                                                                url <>
-                                                                                               ":2833/form/update?formid=" <>
+                                                                                               ":" <>
+                                                                                               port <>
+                                                                                               "/form/update?formid=" <>
                                                                                                (show i)) (encode.convertToKioskForm $ whc)
-updateThisFormInCobalt url whc@(CobaltWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
+updateThisFormInCobalt _url _port whc@(CobaltWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
 
 cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -55,6 +57,7 @@ cobaltFormBody = [ truckNumberRowpnnnnnnnn
                  , waterTypeAndAmountRow
                  , dateRow
                  , timeInRow
+                 , driverNameRow
                  , signatureRow]
   where
     truckNumberRow  = generateInputRowText "Truck #"
@@ -66,6 +69,7 @@ cobaltFormBody = [ truckNumberRowpnnnnnnnn
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
+    driverNameRow = generateInputRowText "Driver's Name"
     signatureRow  = generateInputRowSignature "Driver Signature"
 
 
@@ -206,7 +210,7 @@ newtype UUID = UUID { _getUUID :: Text}
             deriving (Read,Eq,Show,IsString,ToJSON,FromJSON,Ord)
 
 exampleUUID :: UUID
-exampleUUID = "a2e3609e-154d-4e60-80e0-c77189098617"
+exampleUUID = "64d45215-7df3-4c32-9d50-1a28cc3a94bf"
 
 
 
