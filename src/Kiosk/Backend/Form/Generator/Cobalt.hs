@@ -1,23 +1,21 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}  
-module Kiosk.Backend.Form.Generator.Cobalt (insertThisFormInCobalt, 
+{-# LANGUAGE OverloadedStrings          #-}
+module Kiosk.Backend.Form.Generator.Cobalt (insertThisFormInCobalt,
                                             updateThisFormInCobalt,
                                             currentCobaltForms) where
 
-import Kiosk.Backend.Form
+import           Kiosk.Backend.Form
 
-import Network.Wreq (Response
-                    ,post)
-import Data.Aeson
+import           Data.Aeson
+import           Network.Wreq         (Response, post)
 
 -- import Data.Traversable
-import Data.Monoid ((<>))   
+import           Data.Monoid          ((<>))
 
-import Data.Text (pack
-                 ,Text)
+import           Data.Text            (Text, pack)
 
-import Data.String (IsString)
-import Data.ByteString.Lazy (ByteString)
+import           Data.ByteString.Lazy (ByteString)
+import           Data.String          (IsString)
 
 
 insertThisFormInCobalt :: String -> String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
@@ -26,14 +24,14 @@ insertThisFormInCobalt url port whc@(CobaltWaterHaulingCompany Nothing _ _) = fm
                                                                                                     ":"  <>
                                                                                                     port <>
                                                                                                     "/form/add") (encode  [convertToKioskForm $ whc])
-insertThisFormInCobalt _url _port (CobaltWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"                                                                            
+insertThisFormInCobalt _url _port (CobaltWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"
 
 
 updateThisFormInCobalt :: String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
-updateThisFormInCobalt url whc@(CobaltWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <> 
+updateThisFormInCobalt url whc@(CobaltWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <>
                                                                                                url <>
                                                                                                ":2833/form/update?formid=" <>
-                                                                                               (show i)) (encode.convertToKioskForm $ whc)                                                                                       
+                                                                                               (show i)) (encode.convertToKioskForm $ whc)
 updateThisFormInCobalt url whc@(CobaltWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
 
 cobaltEnvironmentalSolutions :: Company
@@ -46,19 +44,19 @@ cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\n" [Addr
 
 createWaterHauler :: CompanyName  -> Constant
 createWaterHauler whc = Constant (pack.show $ whc)  [ ConstantAttributeType "'Water Hauling Company'"
-                                                                , ConstantAttributeIndexable $ IndexableAttribute True ]                   
+                                                                , ConstantAttributeIndexable $ IndexableAttribute True ]
 cobaltFormBody :: [Row]
-cobaltFormBody = [ truckNumberRow
+cobaltFormBody = [ truckNumberRowpnnnnnnnn
                  , permitNumberRow
                  , customerTicketNumberRow
                  , leaseInfoRow
                  , leaseOperatorRow
-                 , leaseNameRow 
+                 , leaseNameRow
                  , waterTypeAndAmountRow
                  , dateRow
                  , timeInRow
                  , signatureRow]
-  where 
+  where
     truckNumberRow  = generateInputRowText "Truck #"
     permitNumberRow  = generateInputRowText "Water Hauling Permit #"
     customerTicketNumberRow = generateInputRowText "Customer Ticket #"
@@ -78,12 +76,12 @@ cobaltFormBody = [ truckNumberRow
 
 
 
-waterTypeRadioRow :: Row 
-waterTypeRadioRow = Row [waterTypeRadio] []            
+waterTypeRadioRow :: Row
+waterTypeRadioRow = Row [waterTypeRadio] []
 
 
 waterTypeRadio :: Item
-waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []                     
+waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []
    where
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
@@ -91,7 +89,7 @@ waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ optio
                ,generateOption "Flowback Water" ]
 
 generateLabelRow :: Text -> Row
-generateLabelRow labelText = Row [generateLabelItem labelText] []                   
+generateLabelRow labelText = Row [generateLabelItem labelText] []
 
 generateLabelItem :: Text -> Item
 generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] []
@@ -156,7 +154,7 @@ fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
 
 fullDefaultInputAttributesList :: [InputAttribute]
 fullDefaultInputAttributesList = [tAttr, ixAttr]
-              where 
+              where
                 ixAttr = InputIndexable $ IndexableAttribute True
                 tAttr = InputType $ InputTypeAttributeText
 -- | Radio
@@ -171,11 +169,11 @@ fullDefaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
 
 fullDefaultQualifierInput :: Input
 fullDefaultQualifierInput = Input dit dia
- where 
+ where
    dit = InputTypeDouble . InputDouble $ 0.0
    dia = [tAttr, ixAttr,minAttr,maxAttr]
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
-   maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
+   maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttributeDouble
 
@@ -185,21 +183,21 @@ generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)
 generateRadio :: Text -> [Option] -> Radio
 generateRadio labelText options = Radio (generateLabel labelText) options [fullDefaultOptionQualifier]
 
-generateOption :: Text -> Option 
+generateOption :: Text -> Option
 generateOption optionText = Option optionText []
 
 
 convertToKioskForm :: CobaltWaterHaulingCompany -> Form
 convertToKioskForm waterHaulingCompany = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody
-  where 
+  where
     waterHaulingName = _whcCompanyName $ waterHaulingCompany
 
 
 
 data CobaltWaterHaulingCompany = CobaltWaterHaulingCompany { _whcFormId:: Maybe FormId
-                                               , _whcCompanyName :: CompanyName                                                          
-                                               , _whcGetUUID :: UUID }
-                                deriving (Eq,Ord)                 
+                                               , _whcCompanyName        :: CompanyName
+                                               , _whcGetUUID            :: UUID }
+                                deriving (Eq,Ord)
 
 newtype FormId = FormId {_getFormId :: Integer}
             deriving (Read,Eq,Show,Num,ToJSON,FromJSON,Ord)
@@ -219,7 +217,7 @@ data CompanyName = BigStarTrucking
                    | BradyWeldingandMachineShop
                    | KleenOilfieldServices
                    | BandCBackhoeandTransports
-                   | ForsytheOilfield 
+                   | ForsytheOilfield
                    | HullsOilfield
                    | SouthCentralOilfieldServices
                    | TopOTexas
@@ -272,12 +270,12 @@ currentCobaltForms = [ CobaltWaterHaulingCompany (Just 0) BigStarTrucking exampl
                , CobaltWaterHaulingCompany (Just 16) NexStream exampleUUID]
 
 
--- | Use this to pretend everything is new                        
+-- | Use this to pretend everything is new
 currentCobaltFormsNothingMode (CobaltWaterHaulingCompany _ c e) = CobaltWaterHaulingCompany Nothing c e
 
 
 postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4600/user/key/join/insert" (toJSON (uuid,username,formId) )
-postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4600/user/key/join/delete" (toJSON (uuid,username) ) 
+postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4600/user/key/join/delete" (toJSON (uuid,username) )
 
 
 useridlist = [ "bigstar"
