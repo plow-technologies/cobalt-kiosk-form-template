@@ -9,9 +9,8 @@ Portability :  portable
 <Different Types of Attributes that are contain in the element>
 -}
 
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Attribute ( AttributeClass(..)
                                     , Attribute(..)
