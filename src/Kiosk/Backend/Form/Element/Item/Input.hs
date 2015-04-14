@@ -30,6 +30,7 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputTypeAttribute(..)
                                              , defaultInput
                                              , defaultInputType
+                                             , csvDateStd
                                              , defaultInputAttributesList) where
 
 import           Control.Applicative                    ((<$>), (<|>))
@@ -46,6 +47,8 @@ import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
 import           Kiosk.Backend.Form.Attribute.Width
+import           Text.Trifecta                          (decimal)
+
 
 -- Input Type
 data Input = Input {
@@ -75,9 +78,19 @@ instance ToJSON InputText where
 instance FromJSON InputText where
 
 -- Date Type :Just Text
+
+csvDateStd :: Text
+csvDateStd = "%Y/%m/%d"
+
+checkDateFormat :: Text -> Either Text Text
+checkDateFormat itxt = undefined
+
 newtype InputDate = InputDate { _getInputDate ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
 instance ToJSON InputDate where
 instance FromJSON InputDate where
+
+makeInputDate :: Text -> Either Text InputDate
+makeInputDate itxt = undefined
 
 
 -- Time Type :Just Text
@@ -185,4 +198,4 @@ defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
                     ixAttr = InputIndexable $ IndexableAttribute True
                     minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
                     maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
-                    tAttr = InputType $ InputTypeAttributeText 
+                    tAttr = InputType $ InputTypeAttributeText

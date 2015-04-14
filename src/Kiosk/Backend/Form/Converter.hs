@@ -19,7 +19,8 @@ module Kiosk.Backend.Form.Converter () where
 import           Kiosk.Backend.Form.Element.Item.Input (InputDate (..),
                                                         InputText (..),
                                                         InputType (..),
-                                                        Signature (..))
+                                                        Signature (..),
+                                                        csvDateStd)
 
 {-|
 convert an input into a given input if possible.
@@ -46,7 +47,7 @@ convertToSignature _ (InputText s) = Signature s
 
 convertToDate :: InputDate -> InputText -> InputDate
 convertToDate = undefined
--- -- --
+
 
 
 
