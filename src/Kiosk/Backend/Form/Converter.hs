@@ -14,13 +14,13 @@ Convert one form InputType into another, if possible.  Otherwise fail.
 
 
 
-module Kiosk.Backend.Form.Converter () where
+module Kiosk.Backend.Form.Converter (convertInputIfPossible) where
 
 import           Kiosk.Backend.Form.Element.Item.Input (InputDate (..),
                                                         InputText (..),
                                                         InputType (..),
                                                         Signature (..),
-                                                        csvDateStd)
+                                                        makeInputDate)
 
 {-|
 convert an input into a given input if possible.
@@ -38,15 +38,21 @@ data InputType = InputTypeText InputText
 
 |-}
 
+convertInputIfPossible :: InputType -> InputType -> InputType
 convertInputIfPossible (InputTypeSignature insignature) (InputTypeText intext) = InputTypeSignature .
                                                                                  convertToSignature insignature $ intext
-convertInputIfPossible (InputTypeDate indate) (InputTypeText intext) = InputTypeDate . convertToDate indate $ intext
+convertInputIfPossible (InputTypeDate indate) (InputTypeText intext) = either InputTypeText InputTypeDate $ convertToDate indate intext
+convertInputIfPossible _ t = t
 
 convertToSignature :: Signature -> InputText -> Signature
 convertToSignature _ (InputText s) = Signature s
 
-convertToDate :: InputDate -> InputText -> InputDate
-convertToDate = undefined
+-- |SILENT fail here, the input date will just not be converted
+-- I am thinking this will help with backwards compatability
+convertToDate :: InputDate -> InputText -> Either InputText InputDate
+convertToDate id itxt@(InputText t) =  either (const $ Left itxt)
+                                              Right
+                                              (makeInputDate t)
 
 
 
