@@ -28,6 +28,7 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputTime(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
+                                             , _getInputDate
                                              , makeInputDate
                                              , defaultInput
                                              , defaultInputType
@@ -35,7 +36,7 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , defaultInputAttributesList) where
 
 import           Control.Applicative                    ((*>), (<$>), (<|>))
-import           Control.Monad
+
 import           Data.Aeson                             (FromJSON, ToJSON)
 import           Data.Either.Validation                 (Validation (..))
 import           Data.Monoid                            ((<>))
@@ -49,12 +50,10 @@ import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
 import           Kiosk.Backend.Form.Attribute.Width
-import           Text.Trifecta                          (char, decimal, eof,
-                                                         parseTest)
+import           Text.Trifecta                          (char, decimal, eof)
 import           Text.Trifecta.Delta
 import           Text.Trifecta.Parser
 import qualified Text.Trifecta.Result                   as R
-
 
 -- Input Type
 data Input = Input {
