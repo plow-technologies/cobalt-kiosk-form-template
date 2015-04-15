@@ -24,10 +24,11 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputInt (..)
                                              , Signature (..)
                                              , InputText(..)
-                                             , InputDate(..)
+                                             , InputDate
                                              , InputTime(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
+                                             , makeInputDate
                                              , defaultInput
                                              , defaultInputType
                                              , csvDateStd
@@ -92,19 +93,20 @@ checkDateFormat itxt = case parseString testParser (Columns 0 0) (unpack itxt) o
                             (R.Success _) -> Right itxt
                             (R.Failure d) -> Left . pack . show $ d
 
-testParser :: Parser Bool
-testParser = decimal *>
-                char '/' *>
-                decimal  *>
-                char '/' *>
-                decimal *> (return True)
+testParser :: Parser ()
+testParser = decimal  *>
+             char '/' *>
+             decimal  *>
+             char '/' *>
+             decimal  *> eof
 
 newtype InputDate = InputDate { _getInputDate ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
 instance ToJSON InputDate where
 instance FromJSON InputDate where
 
 makeInputDate :: Text -> Either Text InputDate
-makeInputDate itxt = undefined
+makeInputDate itxt = InputDate <$>
+                     checkDateFormat itxt
 
 
 -- Time Type :Just Text
