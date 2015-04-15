@@ -33,11 +33,12 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , csvDateStd
                                              , defaultInputAttributesList) where
 
-import           Control.Applicative                    ((<$>), (<|>))
+import           Control.Applicative                    ((*>), (<$>), (<|>))
+import           Control.Monad
 import           Data.Aeson                             (FromJSON, ToJSON)
 import           Data.Either.Validation                 (Validation (..))
 import           Data.Monoid                            ((<>))
-import           Data.Text                              (Text, pack)
+import           Data.Text                              (Text, pack, unpack)
 import           Data.Typeable                          (Typeable)
 import           GHC.Generics                           (Generic)
 import           Kiosk.Backend.Form.Attribute           (Attribute (..),
@@ -47,7 +48,11 @@ import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
 import           Kiosk.Backend.Form.Attribute.Width
-import           Text.Trifecta                          (decimal)
+import           Text.Trifecta                          (char, decimal, eof,
+                                                         parseTest)
+import           Text.Trifecta.Delta
+import           Text.Trifecta.Parser
+import qualified Text.Trifecta.Result                   as R
 
 
 -- Input Type
@@ -79,11 +84,20 @@ instance FromJSON InputText where
 
 -- Date Type :Just Text
 
-csvDateStd :: Text
+csvDateStd :: String
 csvDateStd = "%Y/%m/%d"
 
 checkDateFormat :: Text -> Either Text Text
-checkDateFormat itxt = undefined
+checkDateFormat itxt = case parseString testParser (Columns 0 0) (unpack itxt) of
+                            (R.Success _) -> Right itxt
+                            (R.Failure d) -> Left . pack . show $ d
+
+testParser :: Parser Bool
+testParser = decimal *>
+                char '/' *>
+                decimal  *>
+                char '/' *>
+                decimal *> (return True)
 
 newtype InputDate = InputDate { _getInputDate ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
 instance ToJSON InputDate where
