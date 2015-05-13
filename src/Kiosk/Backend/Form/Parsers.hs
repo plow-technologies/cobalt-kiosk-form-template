@@ -1,34 +1,122 @@
-{- |
-Module      :  Kiosk.Backend.Parsers
-Description :  XML Parsers for the Forms
-Copyright   :  (c) <Plow Technology 2014>
-License     :  <MIT>
-Maintainer  :  <lingpo.huang@plowtech.net>
-Stability   :  unstable
-Portability :  portable
-<Parse the XML coming from frontend into Haskell Types>
--}
-
-{-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE OverloadedStrings         #-}
 
 module Kiosk.Backend.Form.Parsers where
 
-import           Data.Either                  (rights)
-import           Data.Either.Validation       (validationToEither)
-import           Data.Text                    (pack)
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Element
-import           Text.Trifecta
 
-import           Control.Applicative          ((<$>), (<|>))
+import           Control.Applicative
 
-data Element = Element { element    :: String
-                        ,attributes :: [Attribute]
-                        ,value      :: String
-                        }
-  deriving (Show)
+import           Data.Attoparsec.Text
+import           Data.Either
+import qualified Data.Text                    as T
 
+
+data Element = Element {
+    element    :: T.Text
+  , attributes :: [Attribute]
+  , value      :: T.Text
+} deriving (Show)
+
+
+-- Generic Element Parser
+
+{-
+parseTag :: Parser Tag
+parseTag = do
+  _ <- char '<'
+  closingTag <- optional $ char '/'
+
+  c <- many1 letter
+  as <- try $ many' parseAttributes
+
+  emptyTag <- optional $ char '/'
+
+  let t = (if   isJust closingTag 
+         then ClosingTag
+         else if isJust emptyTag   
+            then EmptyTag
+            else OpeningTag)
+
+  _ <- char '>'
+  return $ Tag (T.pack c) t as
+
+
+parseElementZ :: String -> Parser Element
+parseElementZ nameString = innerElementParser
+ where
+   textOrNullParser = many $ noneOf "<"
+   innerElementParser = do
+             (elemName, attrList) <- angles parseElement'
+             elemValue <- textOrNullParser
+             _ <- angles $ many (noneOf ">")
+             return $ Element elemName attrList elemValue
+   parseElement' = do _ <- symbol nameString
+                      attrList <- many parseAttributes
+                      return (nameString, attrList)
+-}
+
+textOrNullParser :: Parser String
+textOrNullParser = manyTill anyChar (char '<') -- string "<!--" *> manyTill anyChar (string "-->") -- manyTill string "<"
+
+parseElement :: T.Text -> Parser Element
+parseElement elemName = do
+  _ <- char '<' <?> "Didn not find opening angle '<'"
+  --closingTag <- optional $ char '/'
+
+  _ <- string elemName  <?> "Didn't find elemName tag"
+  attrList <- try $ many' parseAttributes
+  _ <- char '>' <?> "Did not find closing angle '>'"
+
+  --elemValue <- letter *> manyTill char '<'
+  elemValue <- textOrNullParser
+  --emptyTag <- optional $ char '/'
+  {-
+  let t = (if   isJust closingTag 
+         then ClosingTag
+         else if isJust emptyTag   
+            then EmptyTag
+            else OpeningTag)
+  -}
+  return $ Element elemName attrList (T.pack elemValue)
+
+-- break on empty attrName
+-- make sure length attrName' == attrName
+parseAttributes :: Parser Attribute
+parseAttributes = do
+  _ <- many1 space
+  
+  --_ <- string attrName <?> "Attribute name string did not match"
+  --_ <- char '='  <?> "Attribute name string did not match"
+  nameFirstLetter <- letter
+  nameRest <- manyTill letter (char '=')
+  
+  q <- char '\'' <|> char '"'
+  attrVal <- takeTill (== q)
+  _ <- char q
+
+  let a = Attribute (T.pack $ nameFirstLetter:nameRest) attrVal
+  
+  return a
+
+genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
+genericAttributeDecoder attrs = do
+  let eAttrList = fromAttribute <$> attrs
+  case rights eAttrList of
+    [] -> []
+    attrs' -> attrs'
+-- genericAttributeDecoder :: AttributeClass t => [Attribute] -> [Parser t]
+
+{-
+genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
+genericAttributeDecoder  attr = do
+                       let eAttrList = validationToEither. fromAttribute <$> attr
+                       case rights eAttrList of
+                            [] -> []
+                            attrs -> attrs
+-}
+{-
+stringLiteral :: Parser Text
 
 -- Generic Element Parser
 
@@ -59,38 +147,35 @@ genericAttributeDecoder  attr = do
                        case rights eAttrList of
                             [] -> []
                             attrs -> attrs
+-}
 
-parseInputType :: [InputAttribute] -> String -> InputType
-parseInputType ([InputType (InputTypeAttributeText )]) elemVal =  InputTypeText . InputText . pack $ elemVal
-parseInputType ([InputType (InputTypeAttributeSignature )]) elemVal = InputTypeSignature. Signature . pack $ elemVal
-parseInputType ([InputType (InputTypeAttributeInt )]) elemVal = InputTypeInt . InputInt $ (read elemVal :: Int)
-parseInputType ([InputType (InputTypeAttributeDouble )]) elemVal = InputTypeDouble . InputDouble $ (read elemVal :: Double)
-parseInputType [] _ = InputTypeText. InputText . pack $ ""
-parseInputType _  _ = InputTypeText. InputText . pack $ ""
+parseInputType :: [InputAttribute] -> T.Text -> InputType
+parseInputType ([InputType (InputTypeAttributeText )]) elemVal =  InputTypeText . InputText . T.pack $ (T.unpack elemVal)
+parseInputType ([InputType (InputTypeAttributeSignature )]) elemVal = InputTypeSignature. Signature . T.pack $ (T.unpack elemVal)
+parseInputType ([InputType (InputTypeAttributeInt )]) elemVal = InputTypeInt . InputInt $ (read (T.unpack elemVal) :: Int)
+parseInputType ([InputType (InputTypeAttributeDouble )]) elemVal = InputTypeDouble . InputDouble $ (read (T.unpack elemVal) :: Double)
+parseInputType [] _ = InputTypeText. InputText . T.pack $ ""
+parseInputType _  _ = InputTypeText. InputText . T.pack $ ""
 
 
 -- | Element with Content Parser
 
 -- Button Parser
-buttonParser :: (TokenParsing f, Monad f) => f Button
+buttonParser :: Parser Button
 buttonParser = buttonFromElement <$> parseElement "button"
     where
-      buttonFromElement (Element _ attr elemVal) = Button (pack elemVal) (genericAttributeDecoder attr)
+      buttonFromElement (Element _ attr elemVal) = Button elemVal (genericAttributeDecoder attr)
 
 -- Label Parser
-labelParser :: (TokenParsing f, Monad f) => f Label
+labelParser :: Parser Label
 labelParser = labelFromElement <$> parseElement "label"
     where
-      labelFromElement (Element _ attr elemVal) = Label (pack elemVal) (genericAttributeDecoder attr)
--- Input Parser
-inputParser :: (TokenParsing f, Monad f) => f Input
+      labelFromElement (Element _ attr elemVal) = Label elemVal (genericAttributeDecoder attr)
+
+inputParser :: Parser Input
 inputParser = inputFromElement <$> parseElement "input"
     where
       inputFromElement (Element _ attr elemVal) = Input (parseInputType (genericAttributeDecoder attr) elemVal) (genericAttributeDecoder attr)
-
       
-
-
-
 
 

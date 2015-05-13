@@ -1,57 +1,35 @@
-{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+module Kiosk.Backend.Form.Element.Item.Button ( Button (..)
+	                                          , defaultButton
+	                                          , defaultButtonAttributeList) where
 
-{- |
-Module      :  Kiosk.Backend.Form.Element.Item.Button
-Description :  Button Element
-Copyright   :  Plow Technologies LLC
-License     :  MIT License
-
-Maintainer  :  Scott Murphy
-Stability   :  experimental
-Portability :  portable
-
--}
-
-
-module Kiosk.Backend.Form.Element.Item.Button (Button (..), defaultButton, defaultButtonAttributeList) where
-
-
-import           Control.Applicative                 ((<$>), (<|>))
-import           Data.Aeson                          (FromJSON, ToJSON)
-import           Data.Either.Validation              (Validation (..))
-import           Data.Text                           (Text)
-import           GHC.Generics                        (Generic)
-import           Kiosk.Backend.Form.Attribute        (AttributeClass (..))
+import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Action
 import           Kiosk.Backend.Form.Attribute.Width
+import qualified Data.Text as T
+import Text.Read   (readMaybe)
+
 -- Button is Text with set of attributes
 data Button = Button {
-   _getButtonText :: Text,
+   _getButtonText :: T.Text,
    _buttonAttrib  :: [ButtonAttributes]
-} deriving (Generic, Show)
+} deriving (Show)
 
-instance ToJSON Button where
-instance FromJSON Button where
+data ButtonAttributes = ButtonWidth WidthAttribute | ButtonAction ActionAttribute deriving (Show)
 
-
--- Button Atrributes
-data ButtonAttributes = ButtonWidth WidthAttribute | ButtonAction ActionAttribute deriving (Generic, Show)
-
-instance ToJSON ButtonAttributes where
-instance FromJSON ButtonAttributes where
 
 instance AttributeClass ButtonAttributes where
    toAttribute (ButtonWidth w) = toAttribute w
    toAttribute (ButtonAction a) = toAttribute a
-   fromAttribute  = tryAllButtonAttributes
-     where
-       tryAllButtonAttributes a' = ButtonWidth <$> fromAttribute a'  <|>
-                                   ButtonAction <$> fromAttribute a' <|>
-                                   Failure "Not a valid button Attirbute"
+   fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
+                                              (Just w') -> Right (ButtonWidth $ WidthAttribute w')
+                                              Nothing -> Left $ T.concat ["WidthAttribute value not parsing -->",w]
+   fromAttribute (Attribute "action" v) = case readMaybe (T.unpack v) of
+  									           (Just v') -> Right (ButtonAction $ ActionAttribute v')
+  									           Nothing -> Left $ T.concat ["ActionAttribute value not parsing -->",v]
 
-
+   fromAttribute _ = Left "Not a valid button attribute"
 
 defaultButton :: Button
 defaultButton = Button "Submit Button" defaultButtonAttributeList

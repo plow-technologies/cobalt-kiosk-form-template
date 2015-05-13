@@ -1,89 +1,72 @@
-Name:                   cobalt-kiosk-form-template
-Version:                1.3.2
-Author:                 Lingpo Huang <lingpo.huang@plowtech.net>
-Maintainer:             Lingpo Huang <lingpo.huang@plowtech.net>
-License:                BSD3
-License-File:           LICENSE
-Synopsis:               Form Types for Cobalt Kiosk Application Backend
-Description:            Form Types for Cobalt Kiosk Application Backend
-Category:               Apple
+name:                cobalt-kiosk-form-template
+version:             1.3.0
+synopsis:            Form Types for Cobal Kiosk Application Backend
+description:         Form Types for Cobal Kiosk Application Backend
+license:             AllRightsReserved
+license-file:        LICENSE
+author:              James M.C. Haver II
+maintainer:          james.haver@plowtech.net
+category:            Database
+build-type:          Simple
+cabal-version:       >=1.10
 
-Cabal-Version:          >= 1.10
-
-Build-Type:             Simple
-
-Library
-
-  Default-Language:     Haskell2010
-
-  HS-Source-Dirs:       src
-
-  GHC-Options:          -Wall
-
-  Exposed-Modules:      Kiosk.Backend.Form
-                        Kiosk.Backend.Form.Element
+library
+  exposed-modules:      Kiosk.Backend.Form
                         Kiosk.Backend.Form.Attribute
-                        Kiosk.Backend.Form.Generator
-                        Kiosk.Backend.Form.Generator.Cobalt
-                        Kiosk.Backend.Form.Generator.RockShore
+                        Kiosk.Backend.Form.Element
+                        Kiosk.Backend.Form.Parsers
 
-  Other-Modules:        Kiosk.Backend.Form.Attribute.Width
-                        Kiosk.Backend.Form.Attribute.Action
+  other-modules:        Kiosk.Backend.Form.Attribute.Width
                         Kiosk.Backend.Form.Attribute.Max
                         Kiosk.Backend.Form.Attribute.Min
                         Kiosk.Backend.Form.Attribute.Indexable
+                        Kiosk.Backend.Form.Attribute.Action
                         Kiosk.Backend.Form.Attribute.Path
-                        Kiosk.Backend.Form.Element.Form
-                        Kiosk.Backend.Form.Element.Company
-                        Kiosk.Backend.Form.Element.Phone
-                        Kiosk.Backend.Form.Element.Logo
+
                         Kiosk.Backend.Form.Element.Address
-                        Kiosk.Backend.Form.Element.Row                  
-                        Kiosk.Backend.Form.Element.Constant
-                        Kiosk.Backend.Form.Element.Item
-                        Kiosk.Backend.Form.Element.Item.Radio
-                        Kiosk.Backend.Form.Element.Item.TableLeftHeader      
-                        Kiosk.Backend.Form.Element.Item.TableTopHeader
-                        Kiosk.Backend.Form.Element.Item.EmptyBlock
+                        Kiosk.Backend.Form.Element.Company
+                        Kiosk.Backend.Form.Element.Constant 
+                        Kiosk.Backend.Form.Element.Form 
+                        Kiosk.Backend.Form.Element.Logo
+                        Kiosk.Backend.Form.Element.Phone
+
+                        Kiosk.Backend.Form.Element.Item  
                         Kiosk.Backend.Form.Element.Item.Button
+                        Kiosk.Backend.Form.Element.Item.EmptyBlock
                         Kiosk.Backend.Form.Element.Item.Input
-                        Kiosk.Backend.Form.Element.Item.Label                 
-                        Kiosk.Backend.Form.Rendering
-                        Kiosk.Backend.Form.Parsers
-
-  Build-Depends:        base            >= 4 && < 5
-                      , aeson
-                      , wreq    
-                      , either         
-                      , here
-                      , text
-                      , blaze-html 
-                      , template-haskell
-                      , bytestring      
-                      , trifecta       
-                      , blaze-markup == 0.6.2.0 
+                        Kiosk.Backend.Form.Element.Item.Label
+                        Kiosk.Backend.Form.Element.Item.Radio
+                        Kiosk.Backend.Form.Element.Item.TableLeftHeader
+                        Kiosk.Backend.Form.Element.Item.TableTopHeader
+                        Kiosk.Backend.Form.Element.Row
 
 
-Test-Suite spec
-  Type:                 exitcode-stdio-1.0
-  Default-Language:     Haskell2010
-  Hs-Source-Dirs:       src
-                      , test
-  Ghc-Options:          -Wall
-  Main-Is:              Spec.hs
-  Build-Depends:        base
-                      , hspec
-                      , aeson          
-                      , here
-                      , blaze-html
-                      , template-haskell
-                      , either         
-                      , text           
-                      , bytestring      
-                      , trifecta
-                      , wreq
-                      , blaze-markup
- 
-Source-Repository head
-  Type:                 git
-  Location:             git@github.com:plow-technologies/cobalt-kiosk-form.git
+
+
+  other-extensions:     ForeignFunctionInterface 
+                      , OverloadedStrings
+  
+  build-depends:        base       >= 4.7  && <4.8
+                      , attoparsec >= 0.12 && <0.13 
+                      , text       >= 1.2  && <1.3
+  
+  hs-source-dirs:     src
+  
+  ghc-options:        -Wall
+  
+  default-language:   Haskell2010
+
+test-suite spec
+  type:                exitcode-stdio-1.0
+  default-language:    Haskell2010
+  hs-source-dirs:      src
+                     , test
+  
+  ghc-options:         -Wall
+  
+  main-is:             Test.hs
+
+  build-depends:       base >=4.7 && <4.8
+                     , attoparsec >=0.12 && <0.13 
+                     , text >=1.2 && <1.3
+  

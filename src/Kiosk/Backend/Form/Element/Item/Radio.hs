@@ -1,21 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
-
-
-{- |
-Module      :  Kiosk.Backend.Form.Element.Item.Radio
-Description :  Radio Element, this is where json is created
-Copyright   :  Plow Technologies LLC
-License     :  MIT License
-
-Maintainer  :  Scott Murphy
-Stability   :  experimental
-Portability :  portable
-
-
-
--}
 
 
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
@@ -24,18 +7,12 @@ module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
                                               , QualifierChoices (..)
                                               , defaultRadio) where
 
-
-import Data.Aeson (ToJSON
-                  ,FromJSON)
-import GHC.Generics (Generic)
-import Data.Text (Text)
-import Kiosk.Backend.Form.Element.Item.Label (Label(..)
-                                             ,defaultLabel)
+import qualified Data.Text as T
+import Kiosk.Backend.Form.Element.Item.Label ( Label(..)
+                                             , defaultLabel)
 import Kiosk.Backend.Form.Element.Item.Input 
-import Kiosk.Backend.Form.Attribute (AttributeClass(..)
-                                    ,Attribute(..) )
-import           Data.Either.Validation (Validation(..))
-
+import Kiosk.Backend.Form.Attribute ( AttributeClass(..)
+                                    , Attribute(..) )
 
 import Kiosk.Backend.Form.Attribute.Width 
 import Kiosk.Backend.Form.Attribute.Indexable
@@ -46,68 +23,37 @@ import Kiosk.Backend.Form.Attribute.Indexable
 
 -- |Radio Button parent element
 data Radio = Radio { 
-                     _getRadioLabel :: Label
-                   , _getRadioOptions :: [Option]
-                   ,  _getRadioQualifier :: [OptionQualifier]
-            } deriving (Generic, Show)
+    _getRadioLabel :: Label
+  , _getRadioOptions :: [Option]
+  , _getRadioQualifier :: [OptionQualifier]
+} deriving (Show)                                 
 
+data Option = Option { 
+    _getOptionText :: T.Text
+  , _optionAttrib :: [OptionAttributes]                   
+} deriving (Show)
 
-instance ToJSON Radio where
-instance FromJSON Radio where 
--- | Option for radio button 
-
-data Option = Option { _getOptionText :: Text
-                     , _optionAttrib :: [OptionAttributes]                   
-             } deriving (Generic, Show)
-
-instance ToJSON Option where 
-instance FromJSON Option where         
-
-data OptionAttributes = OptionNull
-  deriving (Generic, Show)
- 
-instance ToJSON OptionAttributes where
-instance FromJSON OptionAttributes where  
+data OptionAttributes = OptionNull deriving (Show)
 
 
 instance AttributeClass OptionAttributes where 
-         toAttribute (OptionNull) = Attribute "" ""
-         fromAttribute _ = Success OptionNull                                            
+	toAttribute (OptionNull) = Attribute "" ""
+	fromAttribute _ = Right OptionNull   
 
 
-         
--- --------------------------------------------------         
+data OptionQualifier = OptionQualifier { 
+    _getOptionQualifierText :: [QualifierChoices]
+  , _optionQualifierAttrib :: [OptionQualifierAttributes]                   
+} deriving (Show)
 
-   
--- | Option Qualifier (like a text field that is paired with the output   
--- It is a separate element and at the same level as Option
-   
-data OptionQualifier = OptionQualifier { _getOptionQualifierText :: [QualifierChoices]
-                                       , _optionQualifierAttrib :: [OptionQualifierAttributes]                   
-                      } deriving (Generic, Show)
-
-instance ToJSON OptionQualifier where 
-instance FromJSON OptionQualifier where         
-
-data OptionQualifierAttributes = OptionQualifierNull
-  deriving (Generic, Show)
-
-  
-instance ToJSON OptionQualifierAttributes where  
-instance FromJSON OptionQualifierAttributes where
+data OptionQualifierAttributes = OptionQualifierNull deriving (Show)
 
 instance AttributeClass OptionQualifierAttributes where 
-         toAttribute (OptionQualifierNull) = Attribute "" ""
-         fromAttribute _ = Success OptionQualifierNull                  
+	toAttribute (OptionQualifierNull) = Attribute "" ""
+	fromAttribute _ = Right OptionQualifierNull                  
 
+data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Show)
 
-data QualifierChoices = QualifierInput Input | QualifierLabel Label
-  deriving (Show,Generic)                                                              
-
-instance ToJSON QualifierChoices where 
-instance FromJSON QualifierChoices where 
-
--- | DEFAULTS --------------------------
 
 defaultRadio :: Radio
 defaultRadio = Radio defaultLabel [defaultOption] [defaultOptionQualifier]
@@ -119,8 +65,8 @@ defaultOptionQualifier :: OptionQualifier
 defaultOptionQualifier = OptionQualifier defaultQualifierChoices []
 
 defaultQualifierChoices :: [QualifierChoices]
-defaultQualifierChoices = [QualifierLabel ( Label "Amount" [])
-                          ,QualifierInput defaultQualifierInput]
+defaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
+                          , QualifierInput defaultQualifierInput]
 
 defaultQualifierInput :: Input
 defaultQualifierInput = Input dit dia
@@ -130,5 +76,3 @@ defaultQualifierInput = Input dit dia
    wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttributeText 
-
-

@@ -1,50 +1,18 @@
-{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 
-
-
-{- |
-Module      :  Kiosk.Backend.Form.Attribute.Max
-Description :  Max Attribute, determine max of something
-Copyright   :  Plow Technologies LLC 
-License     :  MIT License
-
-Maintainer  :  Scott Murphy
-Stability   :  experimental
-Portability :  portable
-
-
-
--}
-
-        
-module Kiosk.Backend.Form.Attribute.Path ( PathAttribute(..)
-                                          ) where
+module Kiosk.Backend.Form.Attribute.Path (PathAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
+import qualified Data.Text as T
+import Text.Read   (readMaybe)
 
-import Data.Text (Text)
-
-
-import           GHC.Generics           (Generic)
-
-import           Data.Aeson             (FromJSON, ToJSON)
-
-import Data.Either.Validation (Validation(..))
-
-
-data PathAttribute = PathAttribute { _getPath :: Text }
-    deriving (Generic,Show,Eq,Ord)
-
-instance   ToJSON PathAttribute where 
-instance    FromJSON PathAttribute where 
-
-
-
-
+data PathAttribute = PathAttribute { 
+	_getPath :: T.Text 
+} deriving (Show,Eq,Ord)
 
 instance AttributeClass PathAttribute where
-  toAttribute (PathAttribute d) = Attribute "path" d
-  fromAttribute (Attribute "path" pathTxt) = Success . PathAttribute $ pathTxt
-  fromAttribute (Attribute other _) = wrongAttrResponse "maxd" other                               
+  toAttribute (PathAttribute a) = Attribute "path" (T.pack ("'" ++ show a ++ "'"))
+  fromAttribute (Attribute "path" v) = case readMaybe (T.unpack v) of
+  									(Just v') -> Right (PathAttribute v')
+  									Nothing -> Left $ T.concat ["PathAttribute value not parsing -->",v]
+  fromAttribute (Attribute other _) = wrongAttrResponse "path" other

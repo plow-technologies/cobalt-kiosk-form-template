@@ -1,42 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
-
-
-{- |
-Module      :  Kiosk.Backend.Form.Attribute.Action
-Description :  Action Attribute, determines action of an element
-Copyright   :  Plow Technologies LLC 
-License     :  MIT License
-
-Maintainer  :  Scott Murphy
-Stability   :  experimental
-Portability :  portable
-
--}
-
 
 module Kiosk.Backend.Form.Attribute.Action (ActionAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
-import           Data.Aeson             (FromJSON, ToJSON)
+import qualified Data.Text as T
+import Text.Read   (readMaybe)
 
-import Data.Text (pack
-                 ,unpack)
-
-import           GHC.Generics           (Generic)
-import Data.Either.Validation (Validation(..))
-
--- Action Attribute
-data ActionAttribute = ActionAttribute {
-   _getFunctionName :: String
-} deriving (Generic, Show)
-
-instance ToJSON ActionAttribute where
-instance FromJSON ActionAttribute where
+data ActionAttribute = ActionAttribute { 
+	_getFunctionName :: T.Text 
+} deriving (Show,Eq,Ord)
 
 instance AttributeClass ActionAttribute where
-   toAttribute (ActionAttribute a) = Attribute "action" (pack.show $ a)
-   fromAttribute (Attribute "action" v) = Success. ActionAttribute . unpack $ v
-   fromAttribute (Attribute other _) = wrongAttrResponse "action" other
-
-
+  toAttribute (ActionAttribute a) = Attribute "action" (T.pack ("'" ++ show a ++ "'"))
+  fromAttribute (Attribute "action" v) = case readMaybe (T.unpack v) of
+  									(Just v') -> Right (ActionAttribute v')
+  									Nothing -> Left $ T.concat ["ActionAttribute value not parsing -->",v]
+  fromAttribute (Attribute other _) = wrongAttrResponse "action" other

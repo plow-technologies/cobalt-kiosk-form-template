@@ -1,22 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
-
-
-{- |
-Module      :  Kiosk.Backend.Form.Element.Item.Input
-Description :  Input Element, this is where json is created
-Copyright   :  Plow Technologies LLC
-License     :  MIT License
-
-Maintainer  :  Scott Murphy
-Stability   :  experimental
-Portability :  portable
-
-
-
--}
-
 
 module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputType(..)
@@ -32,13 +14,7 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , defaultInputType
                                              , defaultInputAttributesList) where
 
-import           Control.Applicative                    ((<$>), (<|>))
-import           Data.Aeson                             (FromJSON, ToJSON)
-import           Data.Either.Validation                 (Validation (..))
-import           Data.Monoid                            ((<>))
-import           Data.Text                              (Text, pack)
-import           Data.Typeable                          (Typeable)
-import           GHC.Generics                           (Generic)
+
 import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          AttributeClass (..),
                                                          wrongAttrResponse)
@@ -47,64 +23,43 @@ import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
 import           Kiosk.Backend.Form.Attribute.Width
 
+
+
+import qualified Data.Text as T
+import Text.Read (readMaybe)
 -- Input Type
 data Input = Input {
-              _getInput    :: InputType,
-              _inputAttrib :: [InputAttribute]
-} deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON Input where
-instance FromJSON Input where
-
+  _getInput    :: InputType,
+  _inputAttrib :: [InputAttribute]
+} deriving (Show, Ord, Eq)
 
 -- Input type can be Text input or Signature input
-data InputType = InputTypeText InputText
-                |InputTypeSignature Signature
-                |InputTypeInt InputInt
-                |InputTypeDate InputDate
-                |InputTypeTime InputTime
-                |InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputType where
-instance FromJSON InputType where
+data InputType =  InputTypeText InputText
+                | InputTypeSignature Signature
+                | InputTypeInt InputInt
+                | InputTypeDate InputDate
+                | InputTypeTime InputTime
+                | InputTypeDouble InputDouble deriving (Show, Ord, Eq)
 
 -- Text Type Input
-newtype InputText = InputText { _getInputText::Text  } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputText where
-instance FromJSON InputText where
+newtype InputText = InputText { _getInputText :: T.Text  } deriving (Show, Ord, Eq)
 
 -- Date Type :Just Text
-newtype InputDate = InputDate { _getInputDate ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
-instance ToJSON InputDate where
-instance FromJSON InputDate where
-
+newtype InputDate = InputDate { _getInputDate :: T.Text} deriving (Show, Ord, Eq)
 
 -- Time Type :Just Text
-newtype InputTime = InputTime { _getInputTime ::Text} deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputTime where
-instance FromJSON InputTime where
+newtype InputTime = InputTime { _getInputTime :: T.Text} deriving (Show, Ord, Eq)
 
 -- Signature Type Input store as base64 encode Bytestring
 newtype Signature = Signature {
-_signature :: Text
- } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON Signature where
-instance FromJSON Signature where
+  _signature :: T.Text
+} deriving (Show, Ord, Eq)
 
 -- Number Type Input
-newtype InputInt = InputInt { _getInputInt::Int  } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputInt where
-instance FromJSON InputInt where
+newtype InputInt = InputInt { _getInputInt::Int  } deriving (Show, Ord, Eq)
 
 -- Number Type Double
-newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Generic, Show, Ord, Eq, Typeable)
-
-instance ToJSON InputDouble where
-instance FromJSON InputDouble where
+newtype InputDouble = InputDouble { _getInputDouble::Double } deriving (Show, Ord, Eq)
 
 -- Input Attributes
 data InputAttribute = InputWidth WidthAttribute
@@ -112,10 +67,8 @@ data InputAttribute = InputWidth WidthAttribute
                     | InputIndexable IndexableAttribute
                     | InputMaxDouble MaxAttributeDouble
                     | InputMinDouble MinAttributeDouble
-                   deriving (Generic, Show, Ord, Eq)
+                   deriving (Show, Ord, Eq)
 
-instance ToJSON InputAttribute where
-instance FromJSON InputAttribute where
 
 instance AttributeClass InputAttribute where
    toAttribute (InputWidth a) = toAttribute a
@@ -123,23 +76,21 @@ instance AttributeClass InputAttribute where
    toAttribute (InputMaxDouble d) = toAttribute d
    toAttribute (InputMinDouble d) = toAttribute d
    toAttribute (InputType i) = toAttribute i
-   fromAttribute = tryAllTypeAttributes
-     where
-       tryAllTypeAttributes a' = InputWidth <$>
-                                 fromAttribute a' <|>
-                                 InputType <$>
-                                 fromAttribute a' <|>
-                                 InputMaxDouble <$>
-                                 fromAttribute a' <|>
-                                 InputMinDouble <$>
-                                 fromAttribute a' <|>
-                                 InputIndexable <$>
-                                 fromAttribute a' <|>
-                                 Failure "Not a valid input Attribute"
-
-
--- InputConstraintAttribute
-
+   fromAttribute (Attribute t v) = case t of
+                                      "width" -> case readMaybe (T.unpack v) of
+                                                      (Just v') -> Right $ InputWidth $ WidthAttribute v'
+                                                      Nothing   -> Left $ T.concat ["WidthAttribute value not parsing -->",t,v]
+                                      "maxd" -> case (readMaybe (T.unpack v)) of
+                                                     (Just v') -> Right  $ InputMaxDouble $ MaxAttributeDouble v'
+                                                     Nothing   -> Left $ T.concat ["MaxAttributeDouble value not parsing -->",t,v]
+                                      "mind" -> case (readMaybe (T.unpack v)) of
+                                                     (Just v') -> Right  $ InputMinDouble $ MinAttributeDouble v'
+                                                     Nothing   -> Left $ T.concat ["MinAttributeDouble value not parsing -->",t,v]
+                                      "index" -> case (readMaybe (T.unpack v)) of
+                                                     (Just v') -> Right  $ InputIndexable $ IndexableAttribute v'
+                                                     Nothing   -> Left $ T.concat ["IndexableAttribute value not parsing -->",t,v]
+                                      
+                                      _ -> Left $ T.concat ["TypeAttribute value not parsing -->",t,v]
 
 -- Type Attribute
 data InputTypeAttribute = InputTypeAttributeDouble
@@ -148,10 +99,7 @@ data InputTypeAttribute = InputTypeAttributeDouble
                         | InputTypeAttributeSignature
                         | InputTypeAttributeDate
                         | InputTypeAttributeTime
-   deriving (Generic, Show, Ord, Eq)
-
-instance ToJSON InputTypeAttribute where
-instance FromJSON InputTypeAttribute where
+   deriving (Show, Ord, Eq)
 
 -- instance AttributeClass InputType where
 
@@ -163,13 +111,14 @@ instance AttributeClass InputTypeAttribute where
    toAttribute InputTypeAttributeDate  = Attribute "type" "'date'"
    toAttribute InputTypeAttributeTime = Attribute "type" "'time'"
    fromAttribute (Attribute "type" v) = case v of
-                                         "text" -> Success $ InputTypeAttributeText
-                                         "signature" -> Success $ InputTypeAttributeSignature
-                                         "int" -> Success $ InputTypeAttributeInt
-                                         "double" -> Success$ InputTypeAttributeDouble
-                                         "date" -> Success$ InputTypeAttributeDate
-                                         "time" -> Success$ InputTypeAttributeTime
-                                         _ -> Failure $ pack "TypeAttribute value not parsing -->" <> v
+                                         "text" -> Right $ InputTypeAttributeText
+                                         "signature" -> Right $ InputTypeAttributeSignature
+                                         "int" -> Right $ InputTypeAttributeInt
+                                         "double" -> Right $ InputTypeAttributeDouble
+                                         "date" -> Right $ InputTypeAttributeDate
+                                         "time" -> Right $ InputTypeAttributeTime
+                                         _ -> Left $ T.concat ["TypeAttribute value not parsing -->",v]
+
    fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
 
@@ -177,12 +126,12 @@ defaultInput :: Input
 defaultInput = Input defaultInputType defaultInputAttributesList
 
 defaultInputType :: InputType
-defaultInputType = InputTypeText $ InputText (""::Text)
+defaultInputType = InputTypeText $ InputText ("" :: T.Text)
 
 defaultInputAttributesList :: [InputAttribute]
 defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
               where wAttr = InputWidth $ WidthAttribute (12::Int)
                     ixAttr = InputIndexable $ IndexableAttribute True
-                    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
-                    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
+                    minAttr = InputMinDouble $ MinAttributeDouble (0.0   :: Double)
+                    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0 :: Double)
                     tAttr = InputType $ InputTypeAttributeText 
