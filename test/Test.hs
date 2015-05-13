@@ -4,40 +4,42 @@ module Main where
 
 import Kiosk.Backend.Form
 
+import Control.Applicative
 import Data.Attoparsec.Text
 import System.Exit (exitFailure) 
--- (exitFailure, exitSuccess)
---import qualified Data.Text as T
 
 main :: IO ()
 main = do
+	let b = parseOnly buttonParser "<button width='12' action='sendJson'></button>"
+	print b
+	let c =  parseOnly (parseElement "button") "<button width='12' action='sendJson'></button>"
+	print c
 	{-
-	print $ parseOnly parseXML "<abc></abc>   "
-	print $ parseOnly parseXML "<abc data='1'></abc>   "
-	print $ parseOnly parseXML "<abc   data='1'  boy='girl'></abc>   "
-	print $ parseOnly parseXML "<abc   data='1'  boy='girl'> <div class='ngClass'>  </div> </abc>   "
-	let a = toAttribute $ WidthAttribute 1
-	print a
-	-}
-	-- print $ parseOnly (parseAttributesZ "abc") " abc='123'"
-	-- print $ parseOnly (parseAttributesZ "abc") " abce='123'"
-	-- print $ parseOnly (parseAttributesZ "abc") " ab='123'"
+	let l = parseOnly (parseElement "label") "<label width='12'>Legal Dest</label>"
+	print l
+	let ll = parseOnly labelParser "<label width='12'>Legal Dest</label>"
+	print ll
+	let b = parseOnly buttonParser "<button width='12' action='sendJson'></button>"
+	print b
 	
-	--let z = Attribute "width" (T.pack ("'" ++ show 1 ++ "'"))
-	--print z
-	--let x = fromAttribute (z :: Attribute)
-	--print "Hello"
-	--let t = fromAttribute ( Attribute "maxd" "1.0")
+	let t = ( Attribute "maxd" "1.0")
+	print t
+	
+	let e = genericAttributeDecoder [t] 
+	-}
+	{-
 	let x = parseOnly (parseElement "input") "<input type='double' indexable='True'>3.3</input>"
 	case x of
 		Right x' -> do 
 			--let y = (genericAttributeDecoder $ attributes x')
 			print x'
 			--let z = (genericAttributeDecoder $ attributes x')
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') "input")
+			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
 			print y
 			print "hello"
 		Left _ -> print "didn't parse"
 	--print $ parseInputType (genericAttributeDecoder attr) elemVal
 	print $ parseOnly inputParser "<input type='double' indexable='True'>3.3</input>"
+	-- "<input type='double' indexable='True'>3.3</input>"
+	-}
 	exitFailure
