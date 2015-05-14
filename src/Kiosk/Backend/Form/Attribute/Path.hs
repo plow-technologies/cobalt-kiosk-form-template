@@ -1,14 +1,17 @@
+{-# LANGUAGE RankNTypes        #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric     #-}
 
 module Kiosk.Backend.Form.Attribute.Path (PathAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
 import qualified Data.Text as T
 import Text.Read   (readMaybe)
+import           GHC.Generics           (Generic)
 
 data PathAttribute = PathAttribute { 
 	_getPath :: T.Text 
-} deriving (Show,Eq,Ord)
+} deriving (Generic,Show,Eq,Ord)
 
 instance AttributeClass PathAttribute where
   toAttribute (PathAttribute a) = Attribute "path" (T.pack ("'" ++ show a ++ "'"))

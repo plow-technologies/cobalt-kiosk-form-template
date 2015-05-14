@@ -1,14 +1,18 @@
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Attribute.Min (MinAttributeDouble(..)) where
 
 import Kiosk.Backend.Form.Attribute
+
+import           GHC.Generics           (Generic)
 import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import           Text.Read   (readMaybe)
 
 data MinAttributeDouble = MinAttributeDouble {
     _getGenericMinAmt  :: Double
-} deriving (Show, Ord, Eq)
+} deriving (Show, Ord, Eq, Generic)
 
 instance AttributeClass MinAttributeDouble where
    toAttribute (MinAttributeDouble d) = Attribute "mind" (T.pack ("'" ++ show d ++ "'"))

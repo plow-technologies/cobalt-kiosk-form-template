@@ -1,11 +1,13 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
 
 module Kiosk.Backend.Form.Element.Item ( Item(..)
                                        , ItemType (..)
                                        , ItemAttributes (..)
-                                       , defaultItem) where
-                                       -- , defaultRadioItem) where 
+                                       , defaultItem
+                                       , defaultRadioItem) where
 
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Width
@@ -18,7 +20,7 @@ import           Kiosk.Backend.Form.Element.Item.Radio
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
 
-
+import GHC.Generics (Generic)
 import qualified Data.Text as T
 import Text.Read   (readMaybe)
 
@@ -26,10 +28,10 @@ import Text.Read   (readMaybe)
 data Item = Item {
   _item       :: [ItemType],
   _itemAttrib :: [ItemAttributes]
-} deriving (Show)
+} deriving (Generic, Show)
 
 -- Item Attributes
-data ItemAttributes = ItemWidth WidthAttribute deriving (Show)
+data ItemAttributes = ItemWidth WidthAttribute deriving (Generic, Show)
 
 instance AttributeClass ItemAttributes where
    toAttribute (ItemWidth a) = toAttribute a
@@ -46,7 +48,7 @@ data ItemType = ItemLabel Label
               | ItemEmptyBlock EmptyBlock
               | ItemTableTopHeader TableTopHeader
               | ItemTableLeftHeader TableLeftHeader  
-    deriving (Show)                                            
+    deriving (Generic, Show)                                            
 
 defaultItem :: Item
 defaultItem = defaultInputItem
@@ -54,5 +56,5 @@ defaultItem = defaultInputItem
 defaultInputItem :: Item
 defaultInputItem = Item [ItemLabel defaultLabel, ItemInput defaultInput] [ItemWidth $ WidthAttribute (12::Int)]
 
---defaultRadioItem :: Item
---defaultRadioItem = Item [ItemRadio defaultRadio] []
+defaultRadioItem :: Item
+defaultRadioItem = Item [ItemRadio defaultRadio] []

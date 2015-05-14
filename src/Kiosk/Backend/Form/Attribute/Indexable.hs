@@ -1,14 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
-
+{-# LANGUAGE DeriveGeneric     #-}
 module Kiosk.Backend.Form.Attribute.Indexable (IndexableAttribute(..)) where
 
 import Kiosk.Backend.Form.Attribute
 import qualified Data.Text as T
+import           GHC.Generics           (Generic)
 import Text.Read   (readMaybe)
 
 data IndexableAttribute = IndexableAttribute { 
 	_getIndexable :: Bool
-} deriving (Show,Eq,Ord)
+} deriving (Generic, Show,Eq,Ord)
 
 instance AttributeClass IndexableAttribute where
   toAttribute (IndexableAttribute a) = Attribute "indexable" (T.pack ("'" ++ show a ++ "'"))

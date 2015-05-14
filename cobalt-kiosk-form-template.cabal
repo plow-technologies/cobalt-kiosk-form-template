@@ -13,6 +13,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:      Kiosk.Backend.Form
                         Kiosk.Backend.Form.Attribute
+                        Kiosk.Backend.Form.Converter
                         Kiosk.Backend.Form.Element
                         Kiosk.Backend.Form.Parsers
 
@@ -45,6 +46,7 @@ library
 
   other-extensions:     ForeignFunctionInterface 
                       , OverloadedStrings
+                      
   
   build-depends:        base       >= 4.7  && <4.8
                       , attoparsec >= 0.12 && <0.13 

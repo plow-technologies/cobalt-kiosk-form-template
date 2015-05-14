@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
 
 
@@ -7,6 +9,7 @@ module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
                                               , QualifierChoices (..)
                                               , defaultRadio) where
 
+import GHC.Generics (Generic)
 import qualified Data.Text as T
 import Kiosk.Backend.Form.Element.Item.Label ( Label(..)
                                              , defaultLabel)
@@ -26,12 +29,12 @@ data Radio = Radio {
     _getRadioLabel :: Label
   , _getRadioOptions :: [Option]
   , _getRadioQualifier :: [OptionQualifier]
-} deriving (Show)                                 
+} deriving (Generic, Show)                                 
 
 data Option = Option { 
     _getOptionText :: T.Text
   , _optionAttrib :: [OptionAttributes]                   
-} deriving (Show)
+} deriving (Generic, Show)
 
 data OptionAttributes = OptionNull deriving (Show)
 
@@ -44,7 +47,7 @@ instance AttributeClass OptionAttributes where
 data OptionQualifier = OptionQualifier { 
     _getOptionQualifierText :: [QualifierChoices]
   , _optionQualifierAttrib :: [OptionQualifierAttributes]                   
-} deriving (Show)
+} deriving (Generic, Show)
 
 data OptionQualifierAttributes = OptionQualifierNull deriving (Show)
 

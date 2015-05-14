@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Element.Item.Label( Label (..)
@@ -7,12 +8,13 @@ import Kiosk.Backend.Form.Attribute.Width
 import Kiosk.Backend.Form.Attribute
 import qualified Data.Text as T
 import Text.Read (readMaybe)
+import GHC.Generics (Generic)
 
 -- A label is a text with set of attributes
 data Label = Label {
   _getLabelText :: T.Text,
   _labelAttrib  :: [LabelAttributes]
-} deriving (Show, Ord, Eq)
+} deriving (Generic, Show)
 
 -- Label Attributes
 data LabelAttributes = LabelWidth WidthAttribute deriving (Show, Ord, Eq)
