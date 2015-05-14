@@ -9,7 +9,7 @@ import Text.Read   (readMaybe)
 
 data IndexableAttribute = IndexableAttribute { 
 	_getIndexable :: Bool
-} deriving (Generic, Show,Eq,Ord)
+} deriving (Generic,Show,Eq,Ord)
 
 instance AttributeClass IndexableAttribute where
   toAttribute (IndexableAttribute a) = Attribute "indexable" (T.pack ("'" ++ show a ++ "'"))
