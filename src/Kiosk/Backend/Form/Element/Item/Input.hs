@@ -8,7 +8,7 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputInt (..)
                                              , Signature (..)
                                              , InputText(..)
-                                             , InputDate
+                                             , InputDate(..)
                                              , InputTime(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
