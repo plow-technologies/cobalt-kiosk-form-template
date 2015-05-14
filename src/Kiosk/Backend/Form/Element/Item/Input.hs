@@ -114,7 +114,24 @@ instance AttributeClass InputAttribute where
    toAttribute (InputMinDouble d) = toAttribute d
    toAttribute (InputType i) = toAttribute i
    
-   --fromAttribute (Attribute "text" v) = fromAttribute (Attribute "text" v)
+
+   fromAttribute (Attribute "type" v) = case fromAttribute (Attribute "type" v) of
+                                          -- The InputType $ t force the value of v to be InputTypeAttribute
+                                          -- Is there a more explicit way to coerce the type? 
+                                          -- fromAttribute (Attribute "type" v) :: InputTypeAttribute doesn't seem to work 
+                                          Right t -> Right $ InputType $ t
+                                          Left _ ->  Left  $ T.concat ["TypeAttribute value not parsing -->",v]
+   
+   {- ugly version of InputTypeAttribute but also works, delete in next commit
+   fromAttribute (Attribute "type" v) = case v of
+                                         "text"      -> Right $ InputType $ InputTypeAttributeText
+                                         "signature" -> Right $ InputType $ InputTypeAttributeSignature
+                                         "int"       -> Right $ InputType $ InputTypeAttributeInt
+                                         "double"    -> Right $ InputType $ InputTypeAttributeDouble
+                                         "date"      -> Right $ InputType $ InputTypeAttributeDate
+                                         "time"      -> Right $ InputType $ InputTypeAttributeTime
+                                         _           -> Left $ T.concat ["TypeAttribute value not parsing -->",v]
+   -}
    fromAttribute (Attribute t v) = case t of
                                       "width" -> case readMaybe (T.unpack v) of
                                                       (Just v') -> Right $ InputWidth $ WidthAttribute v'
@@ -125,10 +142,9 @@ instance AttributeClass InputAttribute where
                                       "mind" -> case (readMaybe (T.unpack v)) of
                                                      (Just v') -> Right  $ InputMinDouble $ MinAttributeDouble v'
                                                      Nothing   -> Left $ T.concat ["MinAttributeDouble value not parsing -->",t,v]
-                                      "index" -> case (readMaybe (T.unpack v)) of
+                                      "indexable" -> case (readMaybe (T.unpack v)) of
                                                      (Just v') -> Right  $ InputIndexable $ IndexableAttribute v'
                                                      Nothing   -> Left $ T.concat ["IndexableAttribute value not parsing -->",t,v]
-                                      --"type" -> InputType $ fromAttribute "type" v
                                       _ -> Left $ T.concat ["TypeAttribute value not parsing -->",t,v]
     
 -- Type Attribute

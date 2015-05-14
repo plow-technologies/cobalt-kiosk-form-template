@@ -8,127 +8,29 @@ import Control.Applicative
 import Data.Attoparsec.Text
 import System.Exit (exitFailure) 
 
+-- I found this commented out in the old version
+-- not sure if it is still supposed to look like this
+-- "<input type='double' indexable='True'>0.0</input>"
+-- expectedInputDouble :: Input
+-- expectedInputDouble = Input {_getInput = InputTypeText (InputText {_getInputText = ""}), _inputAttrib = [InputType (InputTypeAttribute {_getTypeName = InputTypeDouble (InputDouble {_getInputDouble = 0.0})}),InputIndexable (IndexableAttribute {_getIndexable = True})]}
+
 main :: IO ()
 main = do
-	{-
-	print "parse button element"
-	let buttonElement = parseOnly (parseElement "button") "<button width='12' action='sendJson'></button>"
-	print buttonElement
-	print "parse button element to Button Type"
-	let buttonParserResult = parseOnly buttonParser "<button width='12' action='sendJson'></button>"
-	print buttonParserResult
-
-	print "genericAttributeDecoder WidthAttribute:" 
-	let t = genericAttributeDecoder [Attribute "width" "12"] :: [WidthAttribute]
-	print t
-
-	print "genericAttributeDecoder ActionAttribute:"
-	let a = genericAttributeDecoder [Attribute "action" "sendJson"] :: [ActionAttribute]
-	print a
-
-	print "genericAttributeDecoder MaxAttributeDouble:"
-	let db = genericAttributeDecoder [Attribute "maxd" "12"] ::  [MaxAttributeDouble]
-	print db
-	
-	let ll = parseOnly labelParser "<label width='12'>Legal Dest</label>"
-	print ll
-	-}
-
-
-	print "genericAttributeDecoder InputTypeAttribute:"
-	let inputAt = genericAttributeDecoder [Attribute "type" "double"] :: [InputTypeAttribute]
-	print inputAt
-
-	--print "genericAttributeDecoder InputTypeAttribute:"
-	--let w = fromAttribute <$> [InputWidth $ Attribute "width" "1.0"]
-	--print w
-	--print $ parseInputType inputAt
-
-	let x = parseOnly (parseElement "input") "<input type='double' indexable='True'>3.3</input>"
-	print x
-	case x of
-		Right x' -> do 
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
-			print y
-		Left _ -> print "didn't parse"
-
-
-	
-	--print $ Input (parseInputType inputAt "3.3") inputAt
-	{-
-	let sigTest = parseOnly (parseElement "input") "<input type='signature'>blahblahblah</input>"
-	print sigTest
-	
-	case sigTest of
-		Right x' -> do 
-			print $ attributes x'
-			let as = genericAttributeDecoder (attributes x') :: [InputAttribute]
-			print as
-			let y = (parseInputType (as) (value x'))
-			print y
-		Left _ -> print "didn't parse"
-
-	print "parse input with Maxd:"
-	let maxdButton = parseOnly (parseElement "input") "<input type='double' maxd='12.3'>3.3</input>"
-	print maxdButton
-	case maxdButton of
-		Right x' -> do 
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
-			print y
-		Left _ -> print "didn't parse"
-
-	let x = parseOnly (parseElement "input") "<input type='double' indexable='True'>3.3</input>"
-	print x
-	case x of
-		Right x' -> do 
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
-			print y
-		Left _ -> print "didn't parse"
-
-	let e = parseOnly (parseElement "input") "<input type='borke' indexable='True'>3.3</input>"
-	print e
-	case e of
-		Right x' -> do 
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
-			print y
-		Left _ -> print "didn't parse"
-	-}
-	--let z = Attribute "width" "12"
-	--print z
-	--print $ fromAttribute z
-	--print $ genericAttributeDecoder defaultInputAttributesList
-	{-
-	case c of
-		Right c' -> print $ genericAttributeDecoder $ attributes c'
-		Left _ -> print "nothing"
-	print defaultButtonAttributeList
-	-}
-	{-
-	let l = parseOnly (parseElement "label") "<label width='12'>Legal Dest</label>"
-	print l
-	let ll = parseOnly labelParser "<label width='12'>Legal Dest</label>"
-	print ll
-	let b = parseOnly buttonParser "<button width='12' action='sendJson'></button>"
-	print b
-	
-	let t = ( Attribute "maxd" "1.0")
-	print t
-	
-	let e = genericAttributeDecoder [t] 
-	-}
-	{-
-	let x = parseOnly (parseElement "input") "<input type='double' indexable='True'>3.3</input>"
-	case x of
-		Right x' -> do 
-			--let y = (genericAttributeDecoder $ attributes x')
-			print x'
-			--let z = (genericAttributeDecoder $ attributes x')
-			let y = (parseInputType (genericAttributeDecoder $ attributes x') (value x'))
-			print y
-			print "hello"
-		Left _ -> print "didn't parse"
-	--print $ parseInputType (genericAttributeDecoder attr) elemVal
+	-- with indexable
+	-- index forces the type to be InputTypeText, value is lost
 	print $ parseOnly inputParser "<input type='double' indexable='True'>3.3</input>"
-	-- "<input type='double' indexable='True'>3.3</input>"
-	-}
+	print $ parseOnly inputParser "<input type='text' indexable='True'>Plowtech</input>"
+	print $ parseOnly inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
+	print $ parseOnly inputParser "<input type='int' indexable='True'>1234</input>"
+	
+	-- without indexable
+	print $ parseOnly inputParser "<input type='double'>3.3</input>"
+	print $ parseOnly inputParser "<input type='text'>Plowtech</input>"
+	print $ parseOnly inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
+	print $ parseOnly inputParser "<input type='int'>1234</input>"
+	
+	-- button and label
+	print $ parseOnly buttonParser "<button width='12' action='sendJson'></button>"
+	print $ parseOnly labelParser "<label width='12'>Legal Dest</label>"
+
 	exitFailure
