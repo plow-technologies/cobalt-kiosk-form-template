@@ -15,8 +15,9 @@ import           Control.Applicative
 import           Data.Attoparsec.Text
 import           Data.Either
 import           Data.List                              (sort)
+import           Data.Monoid                            ((<>))
+import           Data.Text                              (Text)
 import qualified Data.Text                              as T
-
 data Element = Element {
     element    :: T.Text
   , attributes :: [Attribute]
@@ -27,39 +28,36 @@ parseForm :: Parser Form
 parseForm = do
   parseOpenTag "entry"
   parseOpenTag "form"
-
   company <- parseCompanyElement
   address <- parseAddressElement
   logo    <- parseLogoElement
   phone   <- parsePhoneElement
-
-  constants <- many' $ try $ parseConstantElement
-  rows      <- many' $ try $ parseRow
-
+  constants <- many' $ try parseConstantElement
+  rows      <- many' $ try parseRow
   parseCloseTag "form"
   parseCloseTag "entry"
 
   return $ Form company address logo phone constants rows
 
 parseOpenTag :: T.Text -> Parser ()
-parseOpenTag elemName = (char '<' <?> "parseOpenTag did not find opening angle '<'" )    *>
-                        (string elemName  <?> "parseOpenTag did not find elemName tag" ) *>
-                        (char '>' <?> "parseOpenTag did not find closing angle '>'")     *>
+parseOpenTag elemName = parseOpeningAngle  *>
+                        parseElemName elemName *>
+                        parseClosingAngle  *>
                         pure ()
 
 parseOpenTagWithAttributes :: T.Text -> Parser Element
 parseOpenTagWithAttributes elemName = do
-  _ <- char '<' <?> "parseOpenTag did not find opening angle '<'"
-  _ <- string elemName  <?> "parseOpenTag did not find elemName tag"
+  _ <- parseOpeningAngle
+  _ <- parseElemName elemName
   attrList <- try $ many' parseAttributes
-  _ <- char '>' <?> "parseOpenTag did not find closing angle '>'"
+  _ <- parseClosingAngle
   return $ Element elemName attrList ""
 
 parseCloseTag :: T.Text -> Parser ()
-parseCloseTag elemName = (char '<' <?> "parseCloseTag did not find opening angle '<'") *>
+parseCloseTag elemName = parseOpeningAngle *>
                          (char '/' <?> "parseCloseTag did not find backslash '/'") *>
-                         (string elemName  <?> "parseCloseTag did not find elemName tag") *>
-                         (char '>' <?> "parseCloseTag did not find closing angle '>'") *>
+                         parseElemName elemName *>
+                         parseClosingAngle *>
                          pure ()
 
 
@@ -77,7 +75,7 @@ parseAddressElement = do
 parseLogoElement :: Parser Logo
 parseLogoElement = do
   logo <- parseElementWithRequiredAttributes "logo" ["path"]
-  let logoAttribs = map (\x -> LogoPath . PathAttribute $ val x) $ filter (\x -> name x == "path") (attributes logo)
+  let logoAttribs = map (LogoPath . PathAttribute . val ) $ filter (\x -> name x == "path") (attributes logo)
   --let pathAttribs = filter (\x -> name x == "path") (attributes logo)
   --let logoAttribs = map (\x -> LogoPath . PathAttribute $ val x) pathAttribs
   return $ Logo (value logo) logoAttribs
@@ -211,7 +209,6 @@ parseRadio :: Parser Item
 parseRadio = do
   iElem <- parseOpenTagWithAttributes "item" <?> "parseRadio: did not find item."
   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
-
   labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
 
@@ -220,7 +217,7 @@ parseRadio = do
   -- currently not using option attributes
   let ops = map (\x -> Option (value x ) []) optionElements
 
-  opqs <- many' $ parseOptionQualifier
+  opqs <- many' parseOptionQualifier
 
   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
@@ -233,12 +230,10 @@ textOrNullParser = takeTill (== '<')
 
 parseElement :: T.Text -> Parser Element
 parseElement elemName = do
-  _ <- char '<' <?> "Did not find opening angle '<'"
-
+  _ <- parseOpeningAngle
   _ <- string elemName  <?> "parseElement did not find elemName tag"
   attrList <- try $ many' parseAttributes
-  _ <- char '>' <?> "Did not find closing angle '>'"
-
+  _ <- parseClosingAngle
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
 
@@ -246,11 +241,10 @@ parseElement elemName = do
 
 parseElementWithoutAttributes :: T.Text -> Parser Element
 parseElementWithoutAttributes elemName = do
-  _ <- char '<' <?> "Did not find opening angle '<'"
+  _ <- parseOpeningAngle
 
-  _ <- string elemName  <?> "parseElement did not find elemName tag"
-  _ <- char '>' <?> "Did not find closing angle '>'"
-
+  _ <- parseElement elemName
+  _ <- parseClosingAngle
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
 
@@ -258,18 +252,18 @@ parseElementWithoutAttributes elemName = do
 
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
 parseElementWithRequiredAttributes elemName requiredAttrs = do
-  _ <- char '<' <?> "Did not find opening angle '<'"
+  _ <- parseOpeningAngle
 
-  _ <- string elemName  <?> "parseElement did not find elemName tag"
+  _ <- parseElement elemName
   attrList <- try $ many' parseAttributes
-  _ <- char '>' <?> "Did not find closing angle '>'"
+  _ <- parseClosingAngle
 
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
 
-  case (sort requiredAttrs) == (sort (map name attrList)) of
+  case sort requiredAttrs == sort (map name attrList) of
     True  -> return $ Element elemName attrList elemValue
-    False -> fail   $ T.unpack  $ T.concat $
+    False -> fail   $ T.unpack  . T.concat $
       ["parseElementWithRequiredAttributes parsed the following attributes: "] ++ [(T.intercalate ", " (map name attrList))] ++
       [", but requires the following attributes: "] ++ [(T.intercalate ", " requiredAttrs)] ++ ["."]
 
@@ -322,3 +316,19 @@ inputParser = inputFromElement <$> parseElement "input"
 
 
 
+
+
+-- | parse primitives
+
+parseClosingAngle :: Parser Char
+parseClosingAngle = char '>'
+                    <?> "Did not find closing angle '>'"
+
+
+parseOpeningAngle :: Parser Char
+parseOpeningAngle = char '<'
+                    <?> "parseOpenTag did not find opening angle '<'"
+
+parseElemName :: Text -> Parser Text
+parseElemName elemName = string elemName
+                         <?> "parseElemName did not find '" <> T.unpack elemName <> "'"

@@ -18,8 +18,6 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , defaultInputType
                                              , csvDateStd
                                              , defaultInputAttributesList) where
-
-
 import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          AttributeClass (..),
                                                          wrongAttrResponse)
@@ -51,12 +49,12 @@ data InputType =  InputTypeText InputText
                 | InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
 
 -- Text Type Input
-newtype InputText = InputText { 
+newtype InputText = InputText {
     _getInputText :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
 -- Date Type :Just Text
-newtype InputDate = InputDate { 
+newtype InputDate = InputDate {
     _getInputDate :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
@@ -79,7 +77,7 @@ testParser = decimal  *>
              decimal  *> endOfInput
 
 -- Time Type :Just Text
-newtype InputTime = InputTime { 
+newtype InputTime = InputTime {
     _getInputTime :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
@@ -89,13 +87,13 @@ newtype Signature = Signature {
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
 -- Number Type Input
-newtype InputInt = InputInt { 
-    _getInputInt::Int  
+newtype InputInt = InputInt {
+    _getInputInt::Int
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
 -- Number Type Double
-newtype InputDouble = InputDouble { 
-    _getInputDouble::Double 
+newtype InputDouble = InputDouble {
+    _getInputDouble::Double
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
 -- Input Attributes
@@ -113,15 +111,15 @@ instance AttributeClass InputAttribute where
   toAttribute (InputMaxDouble d) = toAttribute d
   toAttribute (InputMinDouble d) = toAttribute d
   toAttribute (InputType i) = toAttribute i
-   
+
 
   fromAttribute (Attribute "type" v) = case fromAttribute (Attribute "type" v) of
                                           -- The InputType $ t force the value of v to be InputTypeAttribute
-                                          -- Is there a more explicit way to coerce the type? 
-                                          -- fromAttribute (Attribute "type" v) :: InputTypeAttribute doesn't seem to work 
+                                          -- Is there a more explicit way to coerce the type?
+                                          -- fromAttribute (Attribute "type" v) :: InputTypeAttribute doesn't seem to work
                                           Right t -> Right $ InputType $ t
                                           Left _ ->  Left  $ T.concat ["TypeAttribute value not parsing -->",v]
-   
+
   fromAttribute (Attribute t v) = case t of
                                       "width" -> case readMaybe (T.unpack v) of
                                                       (Just v') -> Right $ InputWidth $ WidthAttribute v'
@@ -136,7 +134,7 @@ instance AttributeClass InputAttribute where
                                                      (Just v') -> Right  $ InputIndexable $ IndexableAttribute v'
                                                      Nothing   -> Left $ T.concat ["IndexableAttribute value not parsing -->",t,v]
                                       _ -> Left $ T.concat ["TypeAttribute value not parsing -->",t,v]
-    
+
 -- Type Attribute
 data InputTypeAttribute = InputTypeAttributeDouble
                         | InputTypeAttributeInt
@@ -179,4 +177,4 @@ defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
                     ixAttr = InputIndexable $ IndexableAttribute True
                     minAttr = InputMinDouble $ MinAttributeDouble (0.0   :: Double)
                     maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0 :: Double)
-                    tAttr = InputType $ InputTypeAttributeText 
+                    tAttr = InputType $ InputTypeAttributeText
