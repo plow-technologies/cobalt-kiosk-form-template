@@ -108,31 +108,21 @@ data InputAttribute = InputWidth WidthAttribute
 
 
 instance AttributeClass InputAttribute where
-   toAttribute (InputWidth a) = toAttribute a
-   toAttribute (InputIndexable a) = toAttribute a
-   toAttribute (InputMaxDouble d) = toAttribute d
-   toAttribute (InputMinDouble d) = toAttribute d
-   toAttribute (InputType i) = toAttribute i
+  toAttribute (InputWidth a) = toAttribute a
+  toAttribute (InputIndexable a) = toAttribute a
+  toAttribute (InputMaxDouble d) = toAttribute d
+  toAttribute (InputMinDouble d) = toAttribute d
+  toAttribute (InputType i) = toAttribute i
    
 
-   fromAttribute (Attribute "type" v) = case fromAttribute (Attribute "type" v) of
+  fromAttribute (Attribute "type" v) = case fromAttribute (Attribute "type" v) of
                                           -- The InputType $ t force the value of v to be InputTypeAttribute
                                           -- Is there a more explicit way to coerce the type? 
                                           -- fromAttribute (Attribute "type" v) :: InputTypeAttribute doesn't seem to work 
                                           Right t -> Right $ InputType $ t
                                           Left _ ->  Left  $ T.concat ["TypeAttribute value not parsing -->",v]
    
-   {- ugly version of InputTypeAttribute but also works, delete in next commit
-   fromAttribute (Attribute "type" v) = case v of
-                                         "text"      -> Right $ InputType $ InputTypeAttributeText
-                                         "signature" -> Right $ InputType $ InputTypeAttributeSignature
-                                         "int"       -> Right $ InputType $ InputTypeAttributeInt
-                                         "double"    -> Right $ InputType $ InputTypeAttributeDouble
-                                         "date"      -> Right $ InputType $ InputTypeAttributeDate
-                                         "time"      -> Right $ InputType $ InputTypeAttributeTime
-                                         _           -> Left $ T.concat ["TypeAttribute value not parsing -->",v]
-   -}
-   fromAttribute (Attribute t v) = case t of
+  fromAttribute (Attribute t v) = case t of
                                       "width" -> case readMaybe (T.unpack v) of
                                                       (Just v') -> Right $ InputWidth $ WidthAttribute v'
                                                       Nothing   -> Left $ T.concat ["WidthAttribute value not parsing -->",t,v]
@@ -159,13 +149,13 @@ data InputTypeAttribute = InputTypeAttributeDouble
 -- instance AttributeClass InputType where
 
 instance AttributeClass InputTypeAttribute where
-   toAttribute InputTypeAttributeText  = Attribute "type" "'text'"
-   toAttribute InputTypeAttributeSignature  = Attribute "type" "'signature'"
-   toAttribute InputTypeAttributeInt  = Attribute "type" "'int'"
-   toAttribute InputTypeAttributeDouble  = Attribute "type" "'double'"
-   toAttribute InputTypeAttributeDate  = Attribute "type" "'date'"
-   toAttribute InputTypeAttributeTime = Attribute "type" "'time'"
-   fromAttribute (Attribute "type" v) = case v of
+  toAttribute InputTypeAttributeText  = Attribute "type" "'text'"
+  toAttribute InputTypeAttributeSignature  = Attribute "type" "'signature'"
+  toAttribute InputTypeAttributeInt  = Attribute "type" "'int'"
+  toAttribute InputTypeAttributeDouble  = Attribute "type" "'double'"
+  toAttribute InputTypeAttributeDate  = Attribute "type" "'date'"
+  toAttribute InputTypeAttributeTime = Attribute "type" "'time'"
+  fromAttribute (Attribute "type" v) = case v of
                                          "text"      -> Right $ InputTypeAttributeText
                                          "signature" -> Right $ InputTypeAttributeSignature
                                          "int"       -> Right $ InputTypeAttributeInt
@@ -174,7 +164,7 @@ instance AttributeClass InputTypeAttribute where
                                          "time"      -> Right $ InputTypeAttributeTime
                                          _           -> Left $ T.concat ["TypeAttribute value not parsing -->",v]
 
-   fromAttribute (Attribute other _) = wrongAttrResponse "type" other
+  fromAttribute (Attribute other _) = wrongAttrResponse "type" other
 
 
 defaultInput :: Input

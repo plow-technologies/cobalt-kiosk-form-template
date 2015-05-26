@@ -71,13 +71,14 @@ main = do
   print $ parseOnly parseForm "<entry><form></form></entry>"
   print $ parseOnly parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>"
   
-  print $ parseOnly parseGeneralInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
-  print $ parseOnly parseSign "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
+  print $ parseOnly parseInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
+  print $ parseOnly parseSignature "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
   print $ parseOnly parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>"
   
+  print $ parseOnly parseRadio "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>"
   exitFailure
 
-
+-- <option>2</option><option>3</option>
 --updateThisThing i n = post ("http://alarm.plowtech.net:2834/form/update?formid=" ++ (show i)) (encode.cobaltKioskForm $ n)
 --updateAllFormsForAllCompanies = traverse (uncurry updateThisThing)   currentForms
 --expectedString
