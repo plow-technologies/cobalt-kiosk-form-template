@@ -14,8 +14,8 @@ import           Control.Applicative
 
 import           Data.Attoparsec.Text
 import           Data.Either
-import           Data.List (sort)
-import qualified Data.Text                    as T
+import           Data.List                              (sort)
+import qualified Data.Text                              as T
 
 data Element = Element {
     element    :: T.Text
@@ -24,15 +24,15 @@ data Element = Element {
 } deriving (Show)
 
 parseForm :: Parser Form
-parseForm = do 
+parseForm = do
   parseOpenTag "entry"
   parseOpenTag "form"
-  
+
   company <- parseCompanyElement
   address <- parseAddressElement
   logo    <- parseLogoElement
   phone   <- parsePhoneElement
-  
+
   constants <- many' $ try $ parseConstantElement
   rows      <- many' $ try $ parseRow
 
@@ -42,11 +42,10 @@ parseForm = do
   return $ Form company address logo phone constants rows
 
 parseOpenTag :: T.Text -> Parser ()
-parseOpenTag elemName = do
-  _ <- char '<' <?> "parseOpenTag did not find opening angle '<'"
-  _ <- string elemName  <?> "parseOpenTag did not find elemName tag"
-  _ <- char '>' <?> "parseOpenTag did not find closing angle '>'"
-  return ()
+parseOpenTag elemName = (char '<' <?> "parseOpenTag did not find opening angle '<'" )    *>
+                        (string elemName  <?> "parseOpenTag did not find elemName tag" ) *>
+                        (char '>' <?> "parseOpenTag did not find closing angle '>'")     *>
+                        pure ()
 
 parseOpenTagWithAttributes :: T.Text -> Parser Element
 parseOpenTagWithAttributes elemName = do
@@ -90,7 +89,7 @@ parsePhoneElement = do
   return $ Phone (value phone) []
 
 parseConstantElement :: Parser Constant
-parseConstantElement = do 
+parseConstantElement = do
   constant <- parseElementWithRequiredAttributes "constant" ["type","indexable"]
   return $ Constant (value constant) (map parseConstantAttributeType $ attributes constant)
 
@@ -105,7 +104,7 @@ parseConstantAttributeType (Attribute _           _      ) = ConstantAttributeTy
 instance AttributeClass ConstantAttributes where
   toAttribute   (ConstantAttributeType t) = Attribute "type" t
   toAttribute   (ConstantAttributeIndexable i) = toAttribute i
-  fromAttribute (Attribute "type" i) =  Right $ ConstantAttributeType $ i 
+  fromAttribute (Attribute "type" i) =  Right $ ConstantAttributeType $ i
   fromAttribute _ = Left "Not a valid button Attribute"
 
 genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
@@ -141,9 +140,9 @@ data Row = Row {
 } deriving (Show)
 -}
 parseRow :: Parser Row
-parseRow = do 
+parseRow = do
   parseOpenTag "row"
-  
+
   -- all of these parses return Item
   items <- many $ try $ parseInput <|> parseSignature <|> parseButton <|> parseRadio <|> parseLabel
 
@@ -155,14 +154,14 @@ parseInputOfType :: T.Text -> Parser Item
 parseInputOfType inputType = do
   -- look for width or break
   iElem <- parseOpenTagWithAttributes "item"
-  
-  labelElem <- parseElement "label"　
+
+  labelElem <- parseElement "label"
   inputElem <- parseElement inputType
-  
+
   -- look for width or break
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
   let itemInput = Input (parseInputType (genericAttributeDecoder $ attributes inputElem) (value inputElem)) (genericAttributeDecoder $ attributes inputElem)
-  
+
   parseCloseTag "item"
   return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
 
@@ -175,7 +174,7 @@ parseSignature = parseInputOfType "input"
 parseButton :: Parser Item
 parseButton = do
   iElem <- parseOpenTagWithAttributes "item"
-  
+
   buttonElement <- parseElement "button"
   let b = Button (value buttonElement) (genericAttributeDecoder $ attributes buttonElement)
 
@@ -185,9 +184,9 @@ parseButton = do
 parseLabel :: Parser Item
 parseLabel = do
   iElem <- parseOpenTagWithAttributes "item"
-  
-  labelElem <- parseElement "label"　
-  
+
+  labelElem <- parseElement "label"
+
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
   -- Label elemVal (genericAttributeDecoder attrs)
 
@@ -197,14 +196,14 @@ parseLabel = do
 parseOptionQualifier :: Parser OptionQualifier
 parseOptionQualifier = do
   iElem <- parseOpenTagWithAttributes "option-qualifier"
-  
-  labelElem <- parseElement "label"　
+
+  labelElem <- parseElement "label"
   inputElem <- parseElement "input"
-  
+
   -- look for width or break
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
   let itemInput = Input (parseInputType (genericAttributeDecoder $ attributes inputElem) (value inputElem)) (genericAttributeDecoder $ attributes inputElem)
-  
+
   parseCloseTag "item"
 
   return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
@@ -213,7 +212,7 @@ parseRadio :: Parser Item
 parseRadio = do
   iElem <- parseOpenTagWithAttributes "item" <?> "parseRadio: did not find item."
   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
-  
+
   labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
 
@@ -221,12 +220,12 @@ parseRadio = do
   --Option "Pit Water" []
   -- currently not using option attributes
   let ops = map (\x -> Option (value x ) []) optionElements
-  
+
   opqs <- many' $ parseOptionQualifier
-  
+
   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
-  
+
   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
 
 
@@ -271,17 +270,17 @@ parseElementWithRequiredAttributes elemName requiredAttrs = do
 
   case (sort requiredAttrs) == (sort (map name attrList)) of
     True  -> return $ Element elemName attrList elemValue
-    False -> fail   $ T.unpack  $ T.concat $ 
+    False -> fail   $ T.unpack  $ T.concat $
       ["parseElementWithRequiredAttributes parsed the following attributes: "] ++ [(T.intercalate ", " (map name attrList))] ++
       [", but requires the following attributes: "] ++ [(T.intercalate ", " requiredAttrs)] ++ ["."]
-    
+
 parseAttributes :: Parser Attribute
 parseAttributes = do
   _ <- many1 space
-  
+
   nameFirstLetter <- letter
   nameRest <- manyTill letter (char '=')
-  
+
   q <- char '\'' <|> char '"'
   attrVal <- takeTill (== q)
   _ <- char q
@@ -321,6 +320,6 @@ inputParser :: Parser Input
 inputParser = inputFromElement <$> parseElement "input"
     where
       inputFromElement (Element _ attrs elemVal) = Input (parseInputType (genericAttributeDecoder attrs) elemVal) (genericAttributeDecoder attrs)
-      
+
 
 
