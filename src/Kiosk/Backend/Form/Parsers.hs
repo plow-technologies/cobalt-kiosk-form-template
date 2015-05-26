@@ -56,12 +56,11 @@ parseOpenTagWithAttributes elemName = do
   return $ Element elemName attrList ""
 
 parseCloseTag :: T.Text -> Parser ()
-parseCloseTag elemName = do
-  _ <- char '<' <?> "parseCloseTag did not find opening angle '<'"
-  _ <- char '/' <?> "parseCloseTag did not find backslash '/'"
-  _ <- string elemName  <?> "parseCloseTag did not find elemName tag"
-  _ <- char '>' <?> "parseCloseTag did not find closing angle '>'"
-  return ()
+parseCloseTag elemName = (char '<' <?> "parseCloseTag did not find opening angle '<'") *>
+                         (char '/' <?> "parseCloseTag did not find backslash '/'") *>
+                         (string elemName  <?> "parseCloseTag did not find elemName tag") *>
+                         (char '>' <?> "parseCloseTag did not find closing angle '>'") *>
+                         pure ()
 
 
 -- parse path attribute
