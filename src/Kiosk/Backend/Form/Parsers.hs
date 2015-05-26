@@ -288,10 +288,10 @@ genericAttributeDecoder attrs = do
     attrs' -> attrs'
 
 parseInputType :: [InputAttribute] -> T.Text -> InputType
-parseInputType (InputType (InputTypeAttributeText      ):_) elemVal = InputTypeText      . InputText   $ elemVal
-parseInputType (InputType (InputTypeAttributeSignature ):_) elemVal = InputTypeSignature . Signature   $ elemVal
-parseInputType (InputType (InputTypeAttributeInt       ):_) elemVal = InputTypeInt       . InputInt    $ (read (T.unpack elemVal) :: Int)
-parseInputType (InputType (InputTypeAttributeDouble    ):_) elemVal = InputTypeDouble    . InputDouble $ (read (T.unpack elemVal) :: Double)
+parseInputType (InputType InputTypeAttributeText      :_) elemVal = InputTypeText      . InputText   $ elemVal
+parseInputType (InputType InputTypeAttributeSignature:_) elemVal = InputTypeSignature . Signature   $ elemVal
+parseInputType (InputType InputTypeAttributeInt:_) elemVal = InputTypeInt       . InputInt    $ (read (T.unpack elemVal) :: Int)
+parseInputType (InputType InputTypeAttributeDouble:_) elemVal = InputTypeDouble    . InputDouble $ (read (T.unpack elemVal) :: Double)
 parseInputType [] _ = InputTypeText . InputText $ ""
 parseInputType _  _ = InputTypeText . InputText $ ""
 
