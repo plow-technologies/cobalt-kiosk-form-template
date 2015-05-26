@@ -36,24 +36,46 @@ Right (Label {_getLabelText = "Legal Dest", _labelAttrib = [LabelWidth (WidthAtt
 -}
 main :: IO ()
 main = do
-	-- with indexable
-	-- index forces the type to be InputTypeText, value is lost
-	print $ parseOnly inputParser "<input type='double' indexable='True'>3.3</input>"
-	print $ parseOnly inputParser "<input type='text' indexable='True'>Plowtech</input>"
-	print $ parseOnly inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
-	print $ parseOnly inputParser "<input type='int' indexable='True'>1234</input>"
-	
-	-- without indexable
-	print $ parseOnly inputParser "<input type='double'>3.3</input>"
-	print $ parseOnly inputParser "<input type='text'>Plowtech</input>"
-	print $ parseOnly inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
-	print $ parseOnly inputParser "<input type='int'>1234</input>"
-	
-	-- button and label
-	print $ parseOnly buttonParser "<button width='12' action='sendJson'></button>"
-	print $ parseOnly labelParser "<label width='12'>Legal Dest</label>"
-	print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
-	exitFailure
+  -- with indexable
+  -- index forces the type to be InputTypeText, value is lost
+  print $ parseOnly inputParser "<input type='double' indexable='True'>3.3</input>"
+  print $ parseOnly inputParser "<input type='text' indexable='True'>Plowtech</input>"
+  print $ parseOnly inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
+  print $ parseOnly inputParser "<input type='int' indexable='True'>1234</input>"
+  
+  -- without indexable
+  print $ parseOnly inputParser "<input type='double'>3.3</input>"
+  print $ parseOnly inputParser "<input type='text'>Plowtech</input>"
+  print $ parseOnly inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
+  print $ parseOnly inputParser "<input type='int'>1234</input>"
+  print $ parseOnly inputParser "<input type='int'>1234</input>"
+  
+  -- button and label
+  print $ parseOnly buttonParser "<button width='12' action='sendJson'></button>"
+  print $ parseOnly labelParser "<label width='12'>Legal Dest</label>"
+  print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
+  
+  print $ parseOnly parseForm "<entry><form><address>Rockshore</address></form></entry>"
+  print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
+  --print $ parseOnly parseForm "<entry><form><company abc='1234'>Rockshore </company> </form></entry>"
+  print $ parseOnly (parseElement "company") "<company>Rockshore</company>"
+
+  print $ parseOnly parseCompanyElement "<company>Rockshore</company>"
+  print $ parseOnly parseCompanyElement "<company wrong='shouldbreak'>Rockshore</company>"
+  print $ parseOnly (parseElementWithRequiredAttributes "logo" ["path"]) "<logo path='home'></logo>"
+  print $ parseOnly (parseElementWithRequiredAttributes "logo" ["car"]) "<logo path='home'></logo>"
+  
+  print $ parseOnly parseRow "<row><item></item></row>"
+  print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
+  print $ parseOnly parseForm "<entry><form><company>Rockshore</company><company>Rockshore</company><address>72341234</address></form></entry>"
+  print $ parseOnly parseForm "<entry><form></form></entry>"
+  print $ parseOnly parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>"
+  
+  print $ parseOnly parseGeneralInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
+  print $ parseOnly parseSign "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
+  print $ parseOnly parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>"
+  
+  exitFailure
 
 
 --updateThisThing i n = post ("http://alarm.plowtech.net:2834/form/update?formid=" ++ (show i)) (encode.cobaltKioskForm $ n)
