@@ -4,6 +4,8 @@
 module Kiosk.Backend.Form.Parsers where
 
 import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Indexable
+import           Kiosk.Backend.Form.Attribute.Path
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element
 
@@ -15,53 +17,29 @@ import           Data.Either
 import           Data.List (sort)
 import qualified Data.Text                    as T
 
-{- form structure
-form
- logo
- company
- phone
- address
- constant
-
- row
-   item
-     label
-     input
- row
-   item
-     label
-
- row
-  item
-    radio
-      label
-      option
-      option-qualifier
-        label
-        input
-  row
-    item
-      signature
--}
-
 data Element = Element {
     element    :: T.Text
   , attributes :: [Attribute]
   , value      :: T.Text
 } deriving (Show)
 
-parseForm :: Parser Bool
+parseForm :: Parser Form
 parseForm = do 
   parseOpenTag "entry"
   parseOpenTag "form"
   
-  _ <- many' $ try $ parseCompanyElement <|> parseAddressElement
-
-  _ <- many' $ try $ parseRow
+  company <- parseCompanyElement
+  address <- parseAddressElement
+  logo    <- parseLogoElement
+  phone   <- parsePhoneElement
+  
+  constants <- many' $ try $ parseConstantElement
+  rows      <- many' $ try $ parseRow
 
   parseCloseTag "form"
   parseCloseTag "entry"
-  return True
+
+  return $ Form company address logo phone constants rows
 
 parseOpenTag :: T.Text -> Parser ()
 parseOpenTag elemName = do
@@ -88,22 +66,81 @@ parseCloseTag elemName = do
 
 
 -- parse path attribute
-parseLogoElement :: Parser Element
-parseLogoElement = parseElementWithRequiredAttributes "logo" ["path"]
+parseCompanyElement :: Parser Company
+parseCompanyElement = do
+  company <- parseElementWithoutAttributes "company"
+  return $ Company (value company) []
 
-parseCompanyElement :: Parser Element
-parseCompanyElement = parseElementWithoutAttributes "company"
+parseAddressElement :: Parser Address
+parseAddressElement = do
+  address <- parseElementWithoutAttributes "address"
+  return $ Address (value address) []
 
-parsePhoneElement :: Parser Element
-parsePhoneElement = parseElementWithoutAttributes "phone"
+parseLogoElement :: Parser Logo
+parseLogoElement = do
+  logo <- parseElementWithRequiredAttributes "logo" ["path"]
+  let logoAttribs = map (\x -> LogoPath . PathAttribute $ val x) $ filter (\x -> name x == "path") (attributes logo)
+  --let pathAttribs = filter (\x -> name x == "path") (attributes logo)
+  --let logoAttribs = map (\x -> LogoPath . PathAttribute $ val x) pathAttribs
+  return $ Logo (value logo) logoAttribs
 
-parseAddressElement :: Parser Element
-parseAddressElement = parseElementWithoutAttributes "address"
+parsePhoneElement :: Parser Phone
+parsePhoneElement = do
+  phone <- parseElementWithoutAttributes "phone"
+  return $ Phone (value phone) []
 
-parseConstantElement :: Parser Element
-parseConstantElement = parseElementWithRequiredAttributes "constant" ["type"]
+parseConstantElement :: Parser Constant
+parseConstantElement = do 
+  constant <- parseElementWithRequiredAttributes "constant" ["type","indexable"]
+  return $ Constant (value constant) (map parseConstantAttributeType $ attributes constant)
 
-parseRow :: Parser [Item]
+parseConstantAttributeType :: Attribute -> ConstantAttributes
+parseConstantAttributeType (Attribute "type"      v      ) = ConstantAttributeType v
+parseConstantAttributeType (Attribute "indexable" "True" ) = ConstantAttributeIndexable $ IndexableAttribute True
+parseConstantAttributeType (Attribute "indexable" "False") = ConstantAttributeIndexable $ IndexableAttribute False
+parseConstantAttributeType (Attribute _           _      ) = ConstantAttributeType ""
+
+
+{-
+instance AttributeClass ConstantAttributes where
+  toAttribute   (ConstantAttributeType t) = Attribute "type" t
+  toAttribute   (ConstantAttributeIndexable i) = toAttribute i
+  fromAttribute (Attribute "type" i) =  Right $ ConstantAttributeType $ i 
+  fromAttribute _ = Left "Not a valid button Attribute"
+
+genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
+genericAttributeDecoder attrs = do
+  let eAttrList = fromAttribute <$> attrs
+  case rights eAttrList of
+    [] -> []
+    attrs' -> attrs'
+
+parseInputType :: [InputAttribute] -> T.Text -> InputType
+parseInputType (InputType (InputTypeAttributeText      ):_) elemVal = InputTypeText      . InputText   $ elemVal
+parseInputType (InputType (InputTypeAttributeSignature ):_) elemVal = InputTypeSignature . Signature   $ elemVal
+parseInputType (InputType (InputTypeAttributeInt       ):_) elemVal = InputTypeInt       . InputInt    $ (read (T.unpack elemVal) :: Int)
+parseInputType (InputType (InputTypeAttributeDouble    ):_) elemVal = InputTypeDouble    . InputDouble $ (read (T.unpack elemVal) :: Double)
+parseInputType [] _ = InputTypeText . InputText $ ""
+parseInputType _  _ = InputTypeText . InputText $ ""
+
+-- | Element with Content Parser
+
+-- Button Parser
+buttonParser :: Parser Button
+buttonParser = buttonFromElement <$> parseElement "button"
+    where
+      buttonFromElement (Element _ attrs elemVal) = Button elemVal (genericAttributeDecoder attrs)
+
+
+defaultConstant :: Constant
+defaultConstant = Constant "Black Watch" [ ConstantAttributeType "'Company'", ConstantAttributeIndexable $ IndexableAttribute True ]
+
+data Row = Row {
+ _rowItem   :: [Item],
+ _rowAttrib :: [RowAttributes]
+} deriving (Show)
+-}
+parseRow :: Parser Row
 parseRow = do 
   parseOpenTag "row"
   
@@ -112,7 +149,7 @@ parseRow = do
 
   parseCloseTag "row"
 
-  return items
+  return $ Row items []
 
 parseInputOfType :: T.Text -> Parser Item
 parseInputOfType inputType = do

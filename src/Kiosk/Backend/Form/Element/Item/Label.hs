@@ -29,20 +29,3 @@ instance AttributeClass LabelAttributes where
 
 defaultLabel :: Label
 defaultLabel = Label "Legal Dest" [LabelWidth $ WidthAttribute (12::Int)]
-
-{-
-data Item = Item {
-  _item       :: [ItemType],
-  _itemAttrib :: [ItemAttributes]
-} deriving (Show)
-
--- Item Attributes
-data ItemAttributes = ItemWidth WidthAttribute deriving (Show)
-
-instance AttributeClass ItemAttributes where
-   toAttribute (ItemWidth a) = toAttribute a
-   fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
-                                              (Just w') -> Right (ItemWidth $ WidthAttribute w')
-                                              Nothing -> Left $ T.concat ["WidthAttribute value of ItemWidth not parsing -->",w]
-   fromAttribute _ = Left "Not a valid item attribute"
--}
