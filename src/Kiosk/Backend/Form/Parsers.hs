@@ -13,7 +13,7 @@ import           Control.Applicative.Permutation
 import           Data.Attoparsec.Text
 import           Data.Either
 
-import           Data.List                              (sort)
+import           Data.List                              ((\\))
 import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text)
 import qualified Data.Text                              as T
@@ -210,6 +210,8 @@ parseRadio = do
   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
 
+parseElementBody :: Parser Text
+parseElementBody = textOrNullParser
 
 textOrNullParser :: Parser T.Text
 textOrNullParser = takeTill (== '<')
@@ -217,23 +219,26 @@ textOrNullParser = takeTill (== '<')
 parseElement :: T.Text -> Parser Element
 parseElement elemName = Element elemName  <$>
                         (tagAttrs <$> parseOpenTag elemName) <*>
-                        textOrNullParser <* parseCloseTag elemName
-
+                        parseElementBody <* parseCloseTag elemName
+-- | Parser purposefully disgards any parsed elements
 parseElementWithoutAttributes :: T.Text -> Parser Element
 parseElementWithoutAttributes elemName = parseOpenTag elemName *>
-                       (Element elemName [] <$> textOrNullParser)
+                       (Element elemName [] <$> parseElementBody)
                        <* parseCloseTag elemName
 
+-- | Parser Fails unless given Attribute text are found
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
 parseElementWithRequiredAttributes elemName requiredAttrs = do
-  tag <- parseOpenTag elemName
-  elemValue <- textOrNullParser
-  _ <- parseCloseTag elemName
-  case sort requiredAttrs == sort (map name (tagAttrs tag)) of
-    True  -> return $ Element elemName (tagAttrs tag) elemValue
-    False -> fail   $ T.unpack  . T.concat $
-      ["parseElementWithRequiredAttributes parsed the following attributes: "] ++ [(T.intercalate ", " (map name (tagAttrs tag)))] ++
-      [", but requires the following attributes: "] ++ [(T.intercalate ", " requiredAttrs)] ++ ["."]
+  elem <- parseElement elemName
+  if null $ requiredAttrs \\ (fmap name . attributes $ elem)
+      then
+         return elem
+      else
+         fail   $ T.unpack  $
+      "parseElementWithRequiredAttributes parsed the following attributes: " <>
+      T.intercalate ", " (map name (attributes elem)) <>
+      ", but requires the following attributes: " <>
+      T.intercalate ", " requiredAttrs <> "."
 
 parseAttributes :: Parser Attribute
 parseAttributes = do
@@ -241,7 +246,7 @@ parseAttributes = do
   q <- char '\'' <|> char '"'
   attrVal <- takeTill (== q)
   _ <- char q
-  return $ Attribute (T.pack $ nameRest) attrVal
+  return $ Attribute (T.pack nameRest) attrVal
 
 
 genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
