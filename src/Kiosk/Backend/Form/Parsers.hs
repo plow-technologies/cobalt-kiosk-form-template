@@ -49,21 +49,6 @@ parseForm = do
   return $ Form company address logo phone constants rows
 
 
-parseOpenTagWithAttributes :: T.Text -> Parser Element
-parseOpenTagWithAttributes elemName = do
-  _ <- parseOpeningAngle
-  _ <- parseElemName elemName
-  attrList <- try $ many' parseAttributes
-  _ <- parseClosingAngle
-  return $ Element elemName attrList ""
-
--- parseCloseTag :: T.Text -> Parser ()
--- parseCloseTag elemName = parseOpeningAngle *>
---                          (char '/' <?> "parseCloseTag did not find backslash '/'") *>
---                          parseElemName elemName *>
---                          parseClosingAngle *>
---                          pure ()
-
 -- parse path attribute
 parseCompanyElement :: Parser Company
 parseCompanyElement = do
@@ -158,7 +143,7 @@ parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag
 parseInputOfType :: T.Text -> Parser Item
 parseInputOfType inputType = do
   -- look for width or break
-  _iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTag "item"
 
   labelElem <- parseElement "label"
   inputElem <- parseElement inputType
@@ -178,7 +163,7 @@ parseSignature = parseInputOfType "input"
 
 parseButton :: Parser Item
 parseButton = do
-  _iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTag "item"
 
   buttonElement <- parseElement "button"
   let b = Button (value buttonElement) (genericAttributeDecoder $ attributes buttonElement)
@@ -188,7 +173,7 @@ parseButton = do
 
 parseLabel :: Parser Item
 parseLabel = do
-  _iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTag "item"
 
   labelElem <- parseElement "label"
 
@@ -200,7 +185,7 @@ parseLabel = do
 -- used only by parseRadio
 parseOptionQualifier :: Parser OptionQualifier
 parseOptionQualifier = do
-  _iElem <- parseOpenTagWithAttributes "option-qualifier"
+  _iElem <- parseOpenTag "option-qualifier"
   labelElem <- parseElement "label"
   inputElem <- parseElement "input"
   -- look for width or break
@@ -211,7 +196,7 @@ parseOptionQualifier = do
 
 parseRadio :: Parser Item
 parseRadio = do
-  _iElem <- parseOpenTagWithAttributes "item" <?> "parseRadio: did not find item."
+  _iElem <- parseOpenTag "item" <?> "parseRadio: did not find item."
   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
   labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
@@ -230,20 +215,14 @@ textOrNullParser :: Parser T.Text
 textOrNullParser = takeTill (== '<')
 
 parseElement :: T.Text -> Parser Element
-parseElement elemName = do
-  tag <- parseOpenTag elemName
-  elemValue <- textOrNullParser
-  _ <- parseCloseTag elemName
-  return $ Element elemName (tagAttrs tag) elemValue
+parseElement elemName = Element elemName  <$>
+                        (tagAttrs <$> parseOpenTag elemName) <*>
+                        textOrNullParser <* parseCloseTag elemName
 
 parseElementWithoutAttributes :: T.Text -> Parser Element
-parseElementWithoutAttributes elemName = do
-  _ <- parseOpeningAngle
-  _ <- parseElemName elemName
-  _ <- parseClosingAngle
-  elemValue <- textOrNullParser
-  _ <- parseCloseTag elemName
-  return $ Element elemName [] elemValue
+parseElementWithoutAttributes elemName = parseOpenTag elemName *>
+                       (Element elemName [] <$> textOrNullParser)
+                       <* parseCloseTag elemName
 
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
 parseElementWithRequiredAttributes elemName requiredAttrs = do
@@ -323,10 +302,6 @@ parseClosingAngle = tokenChar '>'
 parseOpeningAngle :: Parser Char
 parseOpeningAngle = tokenChar '<'
                     <?> "parseOpenTag did not find opening angle '<'"
-
-parseElemName :: Text -> Parser Text
-parseElemName elemName = (token $ string elemName)
-                         <?> "parseElemName did not find '" <> T.unpack elemName <> "'"
 
 
 
