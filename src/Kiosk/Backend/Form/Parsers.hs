@@ -18,21 +18,6 @@ import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text)
 import qualified Data.Text                              as T
 
-data Element = Element {
-    element    :: T.Text
-  , attributes :: [Attribute]
-  , value      :: T.Text
-} deriving (Show)
-
-
--- | the combinators below permutate to give any available combination in a tag
--- so < name a1='v1' a2='v2' a3='v3'> val </name>
--- parses the same as < name a3='v3' a2='v2' a1='v1'> val </name>
--- and so on... this is important because many xml libs don't respect attr order
--- A sumtype and list is used to create this parsing style then at the end the
--- the element record is constructed from the list
--- lastly, the element that is created is validated
-
 
 parseForm :: Parser Form
 parseForm = do
@@ -64,8 +49,6 @@ parseLogoElement :: Parser Logo
 parseLogoElement = do
   logo <- parseElementWithRequiredAttributes "logo" ["path"]
   let logoAttribs = map (LogoPath . PathAttribute . val ) $ filter (\x -> name x == "path") (attributes logo)
-  --let pathAttribs = filter (\x -> name x == "path") (attributes logo)
-  --let logoAttribs = map (\x -> LogoPath . PathAttribute $ val x) pathAttribs
   return $ Logo (value logo) logoAttribs
 
 parsePhoneElement :: Parser Phone
@@ -83,49 +66,6 @@ parseConstantAttributeType (Attribute "type"      v      ) = ConstantAttributeTy
 parseConstantAttributeType (Attribute "indexable" "True" ) = ConstantAttributeIndexable $ IndexableAttribute True
 parseConstantAttributeType (Attribute "indexable" "False") = ConstantAttributeIndexable $ IndexableAttribute False
 parseConstantAttributeType (Attribute _           _      ) = ConstantAttributeType ""
-
-
-{-
-instance AttributeClass ConstantAttributes where
-  toAttribute   (ConstantAttributeType t) = Attribute "type" t
-  toAttribute   (ConstantAttributeIndexable i) = toAttribute i
-  fromAttribute (Attribute "type" i) =  Right $ ConstantAttributeType $ i
-  fromAttribute _ = Left "Not a valid button Attribute"
-
-genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
-genericAttributeDecoder attrs = do
-  let eAttrList = fromAttribute <$> attrs
-  case rights eAttrList of
-    [] -> []
-    attrs' -> attrs'
-
-parseInputType :: [InputAttribute] -> T.Text -> InputType
-parseInputType (InputType (InputTypeAttributeText      ):_) elemVal = InputTypeText      . InputText   $ elemVal
-parseInputType (InputType (InputTypeAttributeSignature ):_) elemVal = InputTypeSignature . Signature   $ elemVal
-parseInputType (InputType (InputTypeAttributeInt       ):_) elemVal = InputTypeInt       . InputInt    $ (read (T.unpack elemVal) :: Int)
-parseInputType (InputType (InputTypeAttributeDouble    ):_) elemVal = InputTypeDouble    . InputDouble $ (read (T.unpack elemVal) :: Double)
-parseInputType [] _ = InputTypeText . InputText $ ""
-parseInputType _  _ = InputTypeText . InputText $ ""
-
--- | Element with Content Parser
-
--- Button Parser
-buttonParser :: Parser Button
-buttonParser = buttonFromElement <$> parseElement "button"
-    where
-      buttonFromElement (Element _ attrs elemVal) = Button elemVal (genericAttributeDecoder attrs)
-
-
-defaultConstant :: Constant
-defaultConstant = Constant "Black Watch" [ ConstantAttributeType "'Company'", ConstantAttributeIndexable $ IndexableAttribute True ]
-
-data Row = Row {
- _rowItem   :: [Item],
- _rowAttrib :: [RowAttributes]
-} deriving (Show)
--}
-
-
 
 parseRow :: Parser Row
 parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag "row"
@@ -149,8 +89,10 @@ parseInputOfType inputType = do
   inputElem <- parseElement inputType
 
   -- look for width or break
-  let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
-  let itemInput = Input (parseInputType (genericAttributeDecoder $ attributes inputElem) (value inputElem)) (genericAttributeDecoder $ attributes inputElem)
+  let
+      itemLabel = Label (element labelElem) (decodeAttributeList . attributes $ labelElem)
+      itemInput = Input (parseInputType (decodeAttributeList . attributes $ inputElem) (value inputElem))
+                        (decodeAttributeList . attributes $ inputElem)
 
   parseCloseTag "item"
   return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
@@ -166,10 +108,11 @@ parseButton = do
   _iElem <- parseOpenTag "item"
 
   buttonElement <- parseElement "button"
-  let b = Button (value buttonElement) (genericAttributeDecoder $ attributes buttonElement)
+  let b = Button (value buttonElement) (decodeAttributeList $ attributes buttonElement)
 
   parseCloseTag "item"
-  return $ Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)] -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
+  return $ Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)]
+  -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
 
 parseLabel :: Parser Item
 parseLabel = do
@@ -177,8 +120,8 @@ parseLabel = do
 
   labelElem <- parseElement "label"
 
-  let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
-  -- Label elemVal (genericAttributeDecoder attrs)
+  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
+  -- Label elemVal (decodeAttributeList attrs)
 
   return $ Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
@@ -189,8 +132,8 @@ parseOptionQualifier = do
   labelElem <- parseElement "label"
   inputElem <- parseElement "input"
   -- look for width or break
-  let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
-  let itemInput = Input (parseInputType (genericAttributeDecoder $ attributes inputElem) (value inputElem)) (genericAttributeDecoder $ attributes inputElem)
+  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
+  let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
   parseCloseTag "item"
   return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
 
@@ -199,7 +142,7 @@ parseRadio = do
   _iElem <- parseOpenTag "item" <?> "parseRadio: did not find item."
   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
   labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
-  let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
+  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
 
   optionElements <- many1 $ parseElement "option"
   --Option "Pit Water" []
@@ -249,12 +192,11 @@ parseAttributes = do
   return $ Attribute (T.pack nameRest) attrVal
 
 
-genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
-genericAttributeDecoder attrs = do
-  let eAttrList = fromAttribute <$> attrs
-  case rights eAttrList of
-    [] -> []
-    attrs' -> attrs'
+
+-- | decode a list of attributes in a given type
+-- | just drop attributes that are left instances
+decodeAttributeList :: AttributeClass t => [Attribute] -> [t]
+decodeAttributeList = rights . fmap fromAttribute
 
 parseInputType :: [InputAttribute] -> T.Text -> InputType
 parseInputType (InputType InputTypeAttributeText      :_) elemVal = InputTypeText      . InputText   $ elemVal
@@ -272,32 +214,32 @@ parseInputType _  _ = InputTypeText . InputText $ ""
 buttonParser :: Parser Button
 buttonParser = buttonFromElement <$> parseElement "button"
     where
-      buttonFromElement (Element _ attrs elemVal) = Button elemVal (genericAttributeDecoder attrs)
+      buttonFromElement (Element _ attrs elemVal) = Button elemVal (decodeAttributeList attrs)
 
 -- Label Parser
 labelParser :: Parser Label
+
+
 labelParser = labelFromElement <$> parseElement "label"
     where
-      labelFromElement (Element _ attrs elemVal) = Label elemVal (genericAttributeDecoder attrs)
+      labelFromElement (Element _ attrs elemVal) = Label elemVal (decodeAttributeList attrs)
 
 inputParser :: Parser Input
 inputParser = inputFromElement <$> parseElement "input"
     where
-      inputFromElement (Element _ attrs elemVal) = Input (parseInputType (genericAttributeDecoder attrs) elemVal) (genericAttributeDecoder attrs)
+      inputFromElement (Element _ attrs elemVal) = Input (parseInputType (decodeAttributeList attrs) elemVal) (decodeAttributeList attrs)
 
 
 
--- | parse primitives
-{-
-parseOpenTagWithAttributes :: T.Text -> Parser Element
-parseOpenTagWithAttributes elemName = do
-  _ <- parseOpeningAngle
-  _ <- parseElemName elemName
-  attrList <- try $ many' parseAttributes
-  _ <- parseClosingAngle
-  return $ Element elemName attrList ""
--}
+-- | Parse primitives
 
+-- | the combinators below permutate to give any available combination in a tag
+-- so < name a1='v1' a2='v2' a3='v3'> val </name>
+-- parses the same as < name a3='v3' a2='v2' a1='v1'> val </name>
+-- and so on... this is important because many xml libs don't respect attr order
+-- A sumtype and list is used to create this parsing style then at the end the
+-- the element record is constructed from the list
+-- lastly, the element that is created is validated
 
 parseClosingAngle :: Parser Char
 parseClosingAngle = tokenChar '>'
@@ -314,9 +256,6 @@ parseOpeningAngle = tokenChar '<'
 -- | separates each part of the above into a sum type for alternative parser|
 
 
-data Tag = Tag { tagName  :: Text
-               , tagAttrs :: [Attribute] }
- deriving (Show)
 
 
 parseOpenTag :: Text -> Parser Tag
@@ -359,6 +298,26 @@ tokenString s = token (string s)
 token :: Parser a -> Parser a
 token a = a <* (someSpace <|> pure ())
 
-
 someSpace :: Parser ()
 someSpace = skipMany1 space
+
+
+
+-- |Types for parse assistant
+
+{-|
+a Tag is <tag>
+
+an element is (<tag> element body </tag>
+
+|-}
+
+data Element = Element {
+    element    :: T.Text
+  , attributes :: [Attribute]
+  , value      :: T.Text
+} deriving (Show)
+
+data Tag = Tag { tagName  :: Text
+               , tagAttrs :: [Attribute] }
+ deriving (Show)
