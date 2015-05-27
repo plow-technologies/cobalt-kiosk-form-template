@@ -12,7 +12,6 @@ module Kiosk.Backend.Form.Element.Item.Input ( Input(..)
                                              , InputTime(..)
                                              , InputAttribute(..)
                                              , InputTypeAttribute(..)
-                                             , _getInputDate
                                              , makeInputDate
                                              , defaultInput
                                              , defaultInputType
@@ -69,12 +68,14 @@ checkDateFormat itxt = case parseOnly testParser itxt of
                             Right _ -> Right itxt
                             Left  _ -> Left  "Failed"
 
+
+
 testParser :: Parser ()
-testParser = decimal  *>
+testParser = (decimal :: Parser Int)  *>
              char '/' *>
-             decimal  *>
+             (decimal :: Parser Int)  *>
              char '/' *>
-             decimal  *> endOfInput
+             (decimal :: Parser Int)  *> endOfInput
 
 -- Time Type :Just Text
 newtype InputTime = InputTime {

@@ -1,15 +1,15 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Attribute.Action (ActionAttribute(..)) where
 
-import Kiosk.Backend.Form.Attribute
-import qualified Data.Text as T
-import           GHC.Generics           (Generic)
-import Text.Read   (readMaybe)
+import qualified Data.Text                    as T
+import           GHC.Generics                 (Generic)
+import           Kiosk.Backend.Form.Attribute
 
-data ActionAttribute = ActionAttribute { 
-	_getFunctionName :: T.Text 
+
+data ActionAttribute = ActionAttribute {
+	_getFunctionName :: T.Text
 } deriving (Generic,Show,Ord,Eq)
 
 instance AttributeClass ActionAttribute where

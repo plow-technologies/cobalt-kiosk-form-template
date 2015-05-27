@@ -151,7 +151,7 @@ parseRow = do
 parseInputOfType :: T.Text -> Parser Item
 parseInputOfType inputType = do
   -- look for width or break
-  iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTagWithAttributes "item"
 
   labelElem <- parseElement "label"
   inputElem <- parseElement inputType
@@ -171,7 +171,7 @@ parseSignature = parseInputOfType "input"
 
 parseButton :: Parser Item
 parseButton = do
-  iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTagWithAttributes "item"
 
   buttonElement <- parseElement "button"
   let b = Button (value buttonElement) (genericAttributeDecoder $ attributes buttonElement)
@@ -181,7 +181,7 @@ parseButton = do
 
 parseLabel :: Parser Item
 parseLabel = do
-  iElem <- parseOpenTagWithAttributes "item"
+  _iElem <- parseOpenTagWithAttributes "item"
 
   labelElem <- parseElement "label"
 
@@ -193,7 +193,7 @@ parseLabel = do
 -- used only by parseRadio
 parseOptionQualifier :: Parser OptionQualifier
 parseOptionQualifier = do
-  iElem <- parseOpenTagWithAttributes "option-qualifier"
+  _iElem <- parseOpenTagWithAttributes "option-qualifier"
 
   labelElem <- parseElement "label"
   inputElem <- parseElement "input"
@@ -208,7 +208,7 @@ parseOptionQualifier = do
 
 parseRadio :: Parser Item
 parseRadio = do
-  iElem <- parseOpenTagWithAttributes "item" <?> "parseRadio: did not find item."
+  _iElem <- parseOpenTagWithAttributes "item" <?> "parseRadio: did not find item."
   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
   labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
   let itemLabel = Label (element labelElem) (genericAttributeDecoder $ attributes labelElem)
