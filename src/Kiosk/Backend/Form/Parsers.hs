@@ -36,14 +36,15 @@ parseForm = do
 
 -- parse path attribute
 parseCompanyElement :: Parser Company
-parseCompanyElement = do
-  company <- parseElementWithoutAttributes "company"
-  return $ Company (value company) []
-
+parseCompanyElement = parseElement "company" parseCompanyFromAttrs
+  where
+   parseCompanyFromAttrs _attrs =  flip Company  [] <$>
+                                   parseElementBodyAsText
 parseAddressElement :: Parser Address
-parseAddressElement = do
-  address <- parseElementWithoutAttributes "address"
-  return $ Address (value address) []
+parseAddressElement = parseElement "address" parseAddressFromAttrs
+ where
+  parseAddressFromAttrs _attrs =  flip Address [] <$>
+                                  parseElementBodyAsText
 
 parseLogoElement :: Parser Logo
 parseLogoElement = do
@@ -52,9 +53,11 @@ parseLogoElement = do
   return $ Logo (value logo) logoAttribs
 
 parsePhoneElement :: Parser Phone
-parsePhoneElement = do
-  phone <- parseElementWithoutAttributes "phone"
-  return $ Phone (value phone) []
+parsePhoneElement = parseElement "phone" parsePhoneFromAttrs
+ where
+  parsePhoneFromAttrs _attrs = flip Phone [] <$>
+                               parseElementBodyAsText
+
 
 parseConstantElement :: Parser Constant
 parseConstantElement = do
@@ -93,6 +96,7 @@ parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag
 --   parseCloseTag "item"
 --   return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
 
+itemParser :: Parser Item
 itemParser = parseElement "item" itemFromAttrs
   where
    itemFromAttrs _attrs = parseItemInput <|>
@@ -118,36 +122,41 @@ parseItemLabel = makeItemLabel <$> labelParser
   makeItemLabel itemLabel = Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
 
+
 parseItemRadio :: Parser Item
-parseItemRadio = undefined -- do
---   _iElem <- parseOpenTag "item" <?> "parseRadio: did not find item."
---   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
--- --  labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
--- --  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
---   itemLabel <- labelParser
---   optionElements <- many1 $ parseElement "option"
---   --Option "Pit Water" []
---   -- currently not using option attributes
---   let ops = map (\x -> Option (value x ) []) optionElements
---   opqs <- many' parseOptionQualifier
---   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
---   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
---   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
---    where
---     parseOptionQualifier :: Parser OptionQualifier
---     parseOptionQualifier = do
---       _iElem <- parseOpenTag "option-qualifier"
---       labelElem <- parseElement "label"
---       inputElem <- parseElement "input"
---       -- look for width or break
---       let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
---       let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
---       parseCloseTag "item"
---       return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
+parseItemRadio = undefined
+
+radioParser = parseElement "radio" radioParserFromAttrs
+  where
+    radioParserFromAttrs attrs = do
+     itemLabel <- labelParser
+     options <- many1 optionParser <?> "missing at least 1 option"
+     optionQualifiers <- many' optionQualifierParser
+     --Option "Pit Water" []
+     -- currently not using option attributes
+     return $ Item [ItemRadio $ Radio itemLabel options optionQualifiers] [ItemWidth $ WidthAttribute (12::Int)]
 
 
 
 
+-- Option Parser
+optionParser :: Parser Option
+optionParser = parseElement "option" optionFromAttrs
+  where                      -- Option has no attrs right now
+   optionFromAttrs _attrs = flip Option [] <$>
+                            parseElementBodyAsText
+
+-- Option Qualifier Parser
+optionQualifierParser :: Parser OptionQualifier
+optionQualifierParser = parseElement "option-qualifier" qualifierFromAttrs
+  where
+    qualifierFromAttrs _attrs = flip OptionQualifier [] <$>
+                                many' qualifierChoices
+
+    qualifierChoices = parseOptChoiceLabel <|> parseOptChoiceInput
+
+    parseOptChoiceLabel = QualifierLabel <$> labelParser
+    parseOptChoiceInput = QualifierInput <$> inputParser
 
 
 
@@ -162,6 +171,8 @@ buttonParser = parseElement "button" buttonFromAttrs
      where
        buttonFromAttrs attrs  = flip Button (decodeAttributeList attrs) <$>
                                 parseElementBodyAsText
+
+
 
 -- Label Parser
 labelParser :: Parser Label
@@ -202,11 +213,6 @@ parseElement elemName attrsParser = do
   _ <- parseCloseTag elemName
   return rslt
 
--- | Parser purposefully disgards any parsed elements
-parseElementWithoutAttributes :: T.Text -> Parser Element
-parseElementWithoutAttributes elemName = undefined --do
---                         elem <- parseElement elemName
---                         return $ elem {attributes= []}
 
 -- | Parser Fails unless given Attribute text are found
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
@@ -253,6 +259,7 @@ parseOpeningAngle = tokenChar '<'
 -- > mainParser  = sum <$ whiteSpace <*> many (token digit) <* eof
 -- | separates each part of the above into a sum type for alternative parser|
 
+parseElementBodyAsText :: Parser Text
 parseElementBodyAsText = takeTill (== '<')
 
 parseOpenTag :: Text -> Parser Tag
