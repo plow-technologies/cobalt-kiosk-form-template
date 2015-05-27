@@ -18,6 +18,7 @@ import           Data.List                              (sort)
 import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text)
 import qualified Data.Text                              as T
+
 data Element = Element {
     element    :: T.Text
   , attributes :: [Attribute]
@@ -231,8 +232,8 @@ textOrNullParser = takeTill (== '<')
 parseElement :: T.Text -> Parser Element
 parseElement elemName = do
   _ <- parseOpeningAngle
-  _ <- string elemName  <?> "parseElement did not find elemName tag"
-  attrList <- try $ many' parseAttributes
+  _ <- parseElemName elemName
+  attrList <- try . many' $ parseAttributes
   _ <- parseClosingAngle
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
@@ -242,25 +243,20 @@ parseElement elemName = do
 parseElementWithoutAttributes :: T.Text -> Parser Element
 parseElementWithoutAttributes elemName = do
   _ <- parseOpeningAngle
-
-  _ <- parseElement elemName
+  _ <- parseElemName elemName
   _ <- parseClosingAngle
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
-
   return $ Element elemName [] elemValue
 
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
 parseElementWithRequiredAttributes elemName requiredAttrs = do
   _ <- parseOpeningAngle
-
-  _ <- parseElement elemName
+  _ <- parseElemName elemName
   attrList <- try $ many' parseAttributes
   _ <- parseClosingAngle
-
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
-
   case sort requiredAttrs == sort (map name attrList) of
     True  -> return $ Element elemName attrList elemValue
     False -> fail   $ T.unpack  . T.concat $
@@ -270,14 +266,11 @@ parseElementWithRequiredAttributes elemName requiredAttrs = do
 parseAttributes :: Parser Attribute
 parseAttributes = do
   _ <- many1 space
-
   nameFirstLetter <- letter
   nameRest <- manyTill letter (char '=')
-
   q <- char '\'' <|> char '"'
   attrVal <- takeTill (== q)
   _ <- char q
-
   return $ Attribute (T.pack $ nameFirstLetter:nameRest) attrVal
 
 genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
@@ -313,7 +306,6 @@ inputParser :: Parser Input
 inputParser = inputFromElement <$> parseElement "input"
     where
       inputFromElement (Element _ attrs elemVal) = Input (parseInputType (genericAttributeDecoder attrs) elemVal) (genericAttributeDecoder attrs)
-
 
 
 
