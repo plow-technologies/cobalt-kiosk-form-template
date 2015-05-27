@@ -1,39 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+
 module Main where
 
-import Kiosk.Backend.Form
-import Kiosk.Backend.Form.Generator.Cobalt
-import Kiosk.Backend.Form.Generator.RockShore
+import           Kiosk.Backend.Form
+import           Kiosk.Backend.Form.Generator.Cobalt
+import           Kiosk.Backend.Form.Generator.RockShore
 
-import Control.Applicative
-import Data.Attoparsec.Text
-import System.Exit (exitFailure) 
+import           Control.Applicative
+import           Data.Attoparsec.Text
+import           System.Exit                            (exitFailure)
 
-import qualified Data.Text as T
-import Data.Traversable
-
--- I found this commented out in the old version
--- not sure if it is still supposed to look like this
--- "<input type='double' indexable='True'>0.0</input>"
--- expectedInputDouble :: Input
--- expectedInputDouble = Input {_getInput = InputTypeText (InputText {_getInputText = ""}), _inputAttrib = [InputType (InputTypeAttribute {_getTypeName = InputTypeDouble (InputDouble {_getInputDouble = 0.0})}),InputIndexable (IndexableAttribute {_getIndexable = True})]}
+import qualified Data.Text                              as T
+import           Data.Traversable
+import           Regex.Genex
+import           Test.Hspec
+import           Test.QuickCheck
 
 
-{- current output, does this look right?
-Right (Input {_getInput = InputTypeDouble (InputDouble {_getInputDouble = 3.3}), _inputAttrib = [InputType InputTypeAttributeDouble,InputIndexable (IndexableAttribute {_getIndexable = True})]})
-Right (Input {_getInput = InputTypeText (InputText {_getInputText = "Plowtech"}), _inputAttrib = [InputType InputTypeAttributeText,InputIndexable (IndexableAttribute {_getIndexable = True})]})
-Right (Input {_getInput = InputTypeSignature (Signature {_signature = "as9d8j2l3kfaoiu1239h"}), _inputAttrib = [InputType InputTypeAttributeSignature,InputIndexable (IndexableAttribute {_getIndexable = True})]})
-Right (Input {_getInput = InputTypeInt (InputInt {_getInputInt = 1234}), _inputAttrib = [InputType InputTypeAttributeInt,InputIndexable (IndexableAttribute {_getIndexable = True})]})
-
-Right (Input {_getInput = InputTypeDouble (InputDouble {_getInputDouble = 3.3}), _inputAttrib = [InputType InputTypeAttributeDouble]})
-Right (Input {_getInput = InputTypeText (InputText {_getInputText = "Plowtech"}), _inputAttrib = [InputType InputTypeAttributeText]})
-Right (Input {_getInput = InputTypeSignature (Signature {_signature = "as9d8j2l3kfaoiu1239h"}), _inputAttrib = [InputType InputTypeAttributeSignature]})
-Right (Input {_getInput = InputTypeInt (InputInt {_getInputInt = 1234}), _inputAttrib = [InputType InputTypeAttributeInt]})
-
-Right (Button {_getButtonText = "", _buttonAttrib = [ButtonWidth (WidthAttribute {_getWidth = 12}),ButtonAction (ActionAttribute {_getFunctionName = "sendJson"})]})
-Right (Label {_getLabelText = "Legal Dest", _labelAttrib = [LabelWidth (WidthAttribute {_getWidth = 12})]})
--}
 main :: IO ()
 main = do
   -- with indexable
@@ -42,19 +26,19 @@ main = do
   print $ parseOnly inputParser "<input type='text' indexable='True'>Plowtech</input>"
   print $ parseOnly inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
   print $ parseOnly inputParser "<input type='int' indexable='True'>1234</input>"
-  
+
   -- without indexable
   print $ parseOnly inputParser "<input type='double'>3.3</input>"
   print $ parseOnly inputParser "<input type='text'>Plowtech</input>"
   print $ parseOnly inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
   print $ parseOnly inputParser "<input type='int'>1234</input>"
   print $ parseOnly inputParser "<input type='int'>1234</input>"
-  
+
   -- button and label
   print $ parseOnly buttonParser "<button width='12' action='sendJson'></button>"
   print $ parseOnly labelParser "<label width='12'>Legal Dest</label>"
   print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
-  
+
   print $ parseOnly parseForm "<entry><form><address>Rockshore</address></form></entry>"
   print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
   --print $ parseOnly parseForm "<entry><form><company abc='1234'>Rockshore </company> </form></entry>"
@@ -64,19 +48,19 @@ main = do
   print $ parseOnly parseCompanyElement "<company wrong='shouldbreak'>Rockshore</company>"
   print $ parseOnly (parseElementWithRequiredAttributes "logo" ["path"]) "<logo path='home'></logo>"
   print $ parseOnly (parseElementWithRequiredAttributes "logo" ["car"]) "<logo path='home'></logo>"
-  
+
   print $ parseOnly parseRow "<row><item></item></row>"
   print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
   print $ parseOnly parseForm "<entry><form><company>Rockshore</company><company>Rockshore</company><address>72341234</address></form></entry>"
   print $ parseOnly parseForm "<entry><form></form></entry>"
   print $ parseOnly parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>"
-  
+
   print $ parseOnly parseInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
   print $ parseOnly parseSignature "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
   print $ parseOnly parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>"
-  
+
   print $ parseOnly parseRadio "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>"
-  
+
   print $ parseOnly parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>"
   exitFailure
 
@@ -85,7 +69,7 @@ main = do
 --updateAllFormsForAllCompanies = traverse (uncurry updateThisThing)   currentForms
 --expectedString
 --   where
---    expectedString = "<form><company width='12'>Cobalt Environmental Solutions LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><logo path='Cobalt.png'></logo><phone width='12'>580-229-0067</phone><constant type='Water Hauling Company' indexable='True'>Black Watch</constant><row ><item ><label width='12'>Truck #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Water Hauling Permit #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Lease Information</label></item></row> <row ><item ><label width='12'>Name of Lease Operator</label> <input type='text' indexable='True'></input></item></row> <row ><item ><radio><label width='12'>Type of Water Hauled</label><option >Produced Water</option> <option >Pit Water</option> <option >Fresh Water</option> <option >Flowback Water</option><option-qualifier ><label >Amount</label> <input type='double' indexable='True' mind='0.0' maxd='150.0'>0.0</input></option-qualifier></radio></item></row> <row ><item ><label width='12'>Date</label> <input type='date'></input></item></row> <row ><item ><label width='12'>Time In</label> <input type='time'></input></item></row> <row ><item ><label width='12'>Driver Signature</label> <input type='signature'></input></item></row></form>" 
+--    expectedString = "<form><company width='12'>Cobalt Environmental Solutions LLC</company><address width='12'>PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\nAnswering Service 580-220-9936</address><logo path='Cobalt.png'></logo><phone width='12'>580-229-0067</phone><constant type='Water Hauling Company' indexable='True'>Black Watch</constant><row ><item ><label width='12'>Truck #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Water Hauling Permit #</label> <input type='text' indexable='True'></input></item></row> <row ><item ><label width='12'>Lease Information</label></item></row> <row ><item ><label width='12'>Name of Lease Operator</label> <input type='text' indexable='True'></input></item></row> <row ><item ><radio><label width='12'>Type of Water Hauled</label><option >Produced Water</option> <option >Pit Water</option> <option >Fresh Water</option> <option >Flowback Water</option><option-qualifier ><label >Amount</label> <input type='double' indexable='True' mind='0.0' maxd='150.0'>0.0</input></option-qualifier></radio></item></row> <row ><item ><label width='12'>Date</label> <input type='date'></input></item></row> <row ><item ><label width='12'>Time In</label> <input type='time'></input></item></row> <row ><item ><label width='12'>Driver Signature</label> <input type='signature'></input></item></row></form>"
 
 currentForms = [(0,"Big Star Trucking")
                ,(1,"Bullet Energy Services")
@@ -117,19 +101,19 @@ cobaltAddress= Address "PO Box 130 Wilson, Oklahoma 73463\n886-849-5483\n" [Addr
 
 createWaterHauler :: T.Text -> Constant
 createWaterHauler hauler = Constant hauler  [ ConstantAttributeType "'Water Hauling Company'"
-                                            , ConstantAttributeIndexable $ IndexableAttribute True ]                   
+                                            , ConstantAttributeIndexable $ IndexableAttribute True ]
 cobaltFormBody :: [Row]
 cobaltFormBody = [ truckNumberRow
                  , permitNumberRow
                  , customerTicketNumberRow
                  , leaseInfoRow
                  , leaseOperatorRow
-                 , leaseNameRow 
+                 , leaseNameRow
                  , waterTypeAndAmountRow
                  , dateRow
                  , timeInRow
                  , signatureRow]
-  where 
+  where
     truckNumberRow  = generateInputRowText "Truck #"
     permitNumberRow  = generateInputRowText "Water Hauling Permit #"
     customerTicketNumberRow = generateInputRowText "Customer Ticket #"
@@ -149,12 +133,12 @@ cobaltFormBody = [ truckNumberRow
 
 
 
-waterTypeRadioRow :: Row 
-waterTypeRadioRow = Row [waterTypeRadio] []            
+waterTypeRadioRow :: Row
+waterTypeRadioRow = Row [waterTypeRadio] []
 
 
 waterTypeRadio :: Item
-waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []                     
+waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []
    where
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
@@ -162,7 +146,7 @@ waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ optio
                ,generateOption "Flowback Water" ]
 
 generateLabelRow :: T.Text -> Row
-generateLabelRow labelText = Row [generateLabelItem labelText] []                   
+generateLabelRow labelText = Row [generateLabelItem labelText] []
 
 generateLabelItem :: T.Text -> Item
 generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] []
@@ -227,7 +211,7 @@ fullDefaultInputTypeSignature = InputTypeSignature $ Signature ""
 
 fullDefaultInputAttributesList :: [InputAttribute]
 fullDefaultInputAttributesList = [tAttr, ixAttr]
-              where 
+              where
                 ixAttr = InputIndexable $ IndexableAttribute True
                 tAttr = InputType $ InputTypeAttributeText
 -- | Radio
@@ -242,11 +226,11 @@ fullDefaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
 
 fullDefaultQualifierInput :: Input
 fullDefaultQualifierInput = Input dit dia
- where 
+ where
    dit = InputTypeDouble . InputDouble $ 0.0
    dia = [tAttr, ixAttr,minAttr,maxAttr]
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
-   maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
+   maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
    ixAttr = InputIndexable $ IndexableAttribute True
    tAttr = InputType $ InputTypeAttributeDouble
 
@@ -256,5 +240,5 @@ generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)
 generateRadio :: T.Text -> [Option] -> Radio
 generateRadio labelText options = Radio (generateLabel labelText) options [fullDefaultOptionQualifier]
 
-generateOption :: T.Text -> Option 
+generateOption :: T.Text -> Option
 generateOption optionText = Option optionText []

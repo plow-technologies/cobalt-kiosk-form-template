@@ -2,44 +2,9 @@
 {-# LANGUAGE OverloadedStrings          #-}
 module Kiosk.Backend.Form.Generator.Cobalt (currentCobaltForms) where
 
+import           Data.String        (IsString)
+import qualified Data.Text          as T
 import           Kiosk.Backend.Form
-import           Data.String          (IsString)
-import qualified Data.Text as T
-{-
-module Kiosk.Backend.Form.Generator.Cobalt (insertThisFormInCobalt,
-                                            updateThisFormInCobalt,
-                                            currentCobaltForms) where
-
-import           Data.Aeson
-import           Network.Wreq         (Response, post)
-import           Data.Monoid          ((<>))
-import           Data.Text            (Text, pack)
-import           Data.ByteString.Lazy (ByteString)
-
-
-
-insertThisFormInCobalt :: String -> String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
-insertThisFormInCobalt url port whc@(CobaltWaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
-                                                                                                    url  <>
-                                                                                                    ":"  <>
-                                                                                                    port <>
-                                                                                                    "/form/add") (encode  [convertToKioskForm $ whc])
-insertThisFormInCobalt _url _port (CobaltWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"
-
-
-updateThisFormInCobalt :: String -> String -> CobaltWaterHaulingCompany -> IO (Either Text (Response ByteString))
-updateThisFormInCobalt url port whc@(CobaltWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <>
-                                                                                               url <>
-                                                                                               ":" <>
-                                                                                               port <>
-                                                                                               "/form/update?formid=" <>
-                                                                                               (show i)) (encode.convertToKioskForm $ whc)
-updateThisFormInCobalt _url _port whc@(CobaltWaterHaulingCompany Nothing _wc _u) = return $ Left "Can't update form w/o id"
-
-postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4600/user/key/join/insert" (toJSON (uuid,username,formId) )
-postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4600/user/key/join/delete" (toJSON (uuid,username) )
-
--}
 
 cobaltEnvironmentalSolutions :: Company
 cobaltEnvironmentalSolutions  = Company "Cobalt Environmental Solutions LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
@@ -184,7 +149,7 @@ fullDefaultQualifierInput = Input dit dia
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)
    ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttributeDouble
+   tAttr = InputType InputTypeAttributeDouble
 
 generateLabel :: T.Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]
@@ -199,21 +164,21 @@ generateOption optionText = Option optionText []
 convertToKioskForm :: CobaltWaterHaulingCompany -> Form
 convertToKioskForm waterHaulingCompany = Form cobaltEnvironmentalSolutions cobaltAddress defaultLogo defaultPhone [createWaterHauler waterHaulingName] cobaltFormBody
   where
-    waterHaulingName = _whcCompanyName $ waterHaulingCompany
+    waterHaulingName = _whcCompanyName waterHaulingCompany
 
 
 
-data CobaltWaterHaulingCompany = CobaltWaterHaulingCompany { 
+data CobaltWaterHaulingCompany = CobaltWaterHaulingCompany {
    _whcFormId      :: Maybe FormId
  , _whcCompanyName :: CompanyName
- , _whcGetUUID     :: UUID 
+ , _whcGetUUID     :: UUID
 } deriving (Eq,Ord)
 
 newtype FormId = FormId {
   _getFormId :: Integer
 } deriving (Read,Eq,Show,Num,Ord)
 
-newtype UUID = UUID { 
+newtype UUID = UUID {
   _getUUID :: T.Text
 } deriving (Read,Eq,Show,IsString,Ord)
 

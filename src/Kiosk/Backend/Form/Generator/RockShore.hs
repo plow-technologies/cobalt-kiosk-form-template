@@ -6,42 +6,6 @@ import Kiosk.Backend.Form
 import qualified Data.Text as T
 import Data.String (IsString)
 
-{-
-module Kiosk.Backend.Form.Generator.RockShore ( insertThisFormInRockShore
-                                              , updateThisFormInRockShore
-                                              , currentRockshoreForms) where
-
-import Network.Wreq (Response,post)
-import Data.Aeson
-import Data.Monoid ((<>))
-import Data.ByteString.Lazy (ByteString)
-import Data.Traversable (traverse)
-
--- travsere printForm currentRockshoreForms for debugging
-printForm :: RockShoreWaterHaulingCompany -> IO ()
-printForm whc@(RockShoreWaterHaulingCompany Nothing _ _) = print $ convertToKioskForm $ whc
-printForm (RockShoreWaterHaulingCompany (Just _) _ _) = print ("Could not print" :: String)
-
-insertThisFormInRockShore :: String -> String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
-insertThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany Nothing _ _) = fmap Right $ post ("http://" <>
-                                                                                                    url  <>
-                                                                                                    ":"  <>
-                                                                                                    port <>
-                                                                                                    "/form/add") (encode  [convertToKioskForm $ whc])
-insertThisFormInRockShore _url _port (RockShoreWaterHaulingCompany (Just _) _ _)  = return $ Left "can't insert form that already has Id"                                                                            
-
-updateThisFormInRockShore :: String -> String -> RockShoreWaterHaulingCompany -> IO (Either Text (Response ByteString))
-updateThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany (Just i) _wc _u) = fmap Right $ post ("http://" <> 
-                                                                                                    url <>
-                                                                                                    ":" <>
-                                                                                                    port <> "/form/update?formid=" <>
-                                                                                                    (show i)) (encode.convertToKioskForm $ whc)                                                                                       
-updateThisFormInRockShore _url _port (RockShoreWaterHaulingCompany _ _ _) = return $ Left "Can't update form w/o id"
-
-
-postToUserAndIdInsert uuid username formId = post "http://alarm.plowtech.net:4500/user/key/join/insert" (toJSON (uuid,username,formId) )
-postToUserAndIdDelete uuid username  = post "http://alarm.plowtech.net:4500/user/key/join/delete" (toJSON (uuid,username) ) 
--}
 rockShoreEnergy :: Company
 rockShoreEnergy  = Company "Rock Shore Energy, LLC" [CompanyWidth $ WidthAttribute (12::Int) ]
 
@@ -124,7 +88,7 @@ fullDefaultInputDate :: Input
 fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
 
 fullDefaultInputTypeDate :: InputType
-fullDefaultInputTypeDate = InputTypeDate $ (InputDate "")
+fullDefaultInputTypeDate = InputTypeDate  (InputDate "")
 
 -- Input Time
 generateInputRowTime :: T.Text -> Row
@@ -138,7 +102,7 @@ fullDefaultInputTime :: Input
 fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
 
 fullDefaultInputTypeTime :: InputType
-fullDefaultInputTypeTime = InputTypeTime $ (InputTime "")
+fullDefaultInputTypeTime = InputTypeTime  (InputTime "")
 
 -- Input Signature
 
@@ -159,7 +123,7 @@ fullDefaultInputAttributesList :: [InputAttribute]
 fullDefaultInputAttributesList = [tAttr, ixAttr]
               where 
                 ixAttr = InputIndexable $ IndexableAttribute True
-                tAttr = InputType $ InputTypeAttributeText
+                tAttr = InputType InputTypeAttributeText
 -- | Radio
 
 
@@ -178,7 +142,7 @@ fullDefaultQualifierInput = Input dit dia
    minAttr = InputMinDouble $ MinAttributeDouble (0.0::Double)
    maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0::Double)   
    ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttributeDouble
+   tAttr = InputType InputTypeAttributeDouble
 
 generateLabel :: T.Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]
@@ -192,7 +156,7 @@ generateOption optionText = Option optionText []
 convertToKioskForm :: RockShoreWaterHaulingCompany -> Form
 convertToKioskForm waterHaulingCompany = Form rockShoreEnergy rockShoreAddress rockShoreLogo defaultPhone [createWaterHauler waterHaulingName] rockShoreFormBody
   where 
-    waterHaulingName = _whcCompanyName $ waterHaulingCompany
+    waterHaulingName = _whcCompanyName waterHaulingCompany
 
 
 

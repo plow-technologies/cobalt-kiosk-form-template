@@ -9,11 +9,12 @@ import           Kiosk.Backend.Form.Attribute.Path
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element
 
-
 import           Control.Applicative
-
+import           Control.Applicative.Permutation
+import           Control.Monad
 import           Data.Attoparsec.Text
 import           Data.Either
+
 import           Data.List                              (sort)
 import           Data.Monoid                            ((<>))
 import           Data.Text                              (Text)
@@ -24,6 +25,38 @@ data Element = Element {
   , attributes :: [Attribute]
   , value      :: T.Text
 } deriving (Show)
+
+-- | separates each part of the above into a sum type for alternative parser
+data TagParts = TagName Text |
+                TagAttribute  Attribute |
+                TagValue Text
+  deriving (Show)
+
+-- | the combinators below permutate to give any available combination in a tag
+-- so < name a1='v1' a2='v2' a3='v3'> val </name>
+-- parses the same as < name a3='v3' a2='v2' a1='v1'> val </name>
+-- and so on... this is important because many xml libs don't respect attr order
+-- A sumtype and list is used to create this parsing style then at the end the
+-- the element record is constructed from the list
+-- lastly, the element that is created is validated
+
+elementFromTagParts :: [TagParts] -> Parser Element
+elementFromTagParts = validate . foldr createTagParts emptyElement
+  where
+     emptyElement :: Element
+     emptyElement = Element "" [] ""
+     createTagParts :: TagParts -> Element -> Element
+     createTagParts (TagName t) elem
+       |T.null . element $ elem = elem {element=t}
+       |otherwise = elem
+     createTagParts (TagValue v) elem
+       |T.null . value $ elem = elem {value=v}
+       |otherwise = elem
+     createTagParts (TagAttribute a) elem@(Element{attributes=attrLst}) =
+                    elem{attributes=a:attrLst}
+     validate :: Element -> Parser Element
+     validate elem = (guard . T.null . element $ elem ) >> return elem <?>
+                     "Error Element contains no name"
 
 parseForm :: Parser Form
 parseForm = do
@@ -229,16 +262,28 @@ parseRadio = do
 textOrNullParser :: Parser T.Text
 textOrNullParser = takeTill (== '<')
 
-parseElement :: T.Text -> Parser Element
-parseElement elemName = do
-  _ <- parseOpeningAngle
-  _ <- parseElemName elemName
-  attrList <- try . many' $ parseAttributes
-  _ <- parseClosingAngle
-  elemValue <- textOrNullParser
-  _ <- parseCloseTag elemName
+-- parseElement :: T.Text -> Parser Element
+-- parseElement elemName = do
+--   _ <- parseOpeningAngle
+--   _ <- parseElemName elemName
+--   attrList <- try . many' $ parseAttributes
+--   _ <- parseClosingAngle
+--   elemValue <- textOrNullParser
+--   _ <- parseCloseTag elemName
 
-  return $ Element elemName attrList elemValue
+--   return $ Element elemName attrList elemValue
+
+
+
+parseElement elemName = angles parseInternal
+  where
+    parseInternal = do
+       _ <- parseElemName elemName
+       attrList <- (try . many' $ parseAttributes)
+       elemValue <- textOrNullParser
+       return $ Element elemName attrList elemValue
+
+
 
 parseElementWithoutAttributes :: T.Text -> Parser Element
 parseElementWithoutAttributes elemName = do
@@ -313,14 +358,39 @@ inputParser = inputFromElement <$> parseElement "input"
 -- | parse primitives
 
 parseClosingAngle :: Parser Char
-parseClosingAngle = char '>'
+parseClosingAngle = tokenChar '>'
                     <?> "Did not find closing angle '>'"
 
 
 parseOpeningAngle :: Parser Char
-parseOpeningAngle = char '<'
+parseOpeningAngle = tokenChar '<'
                     <?> "parseOpenTag did not find opening angle '<'"
 
 parseElemName :: Text -> Parser Text
-parseElemName elemName = string elemName
+parseElemName elemName = (token $ string elemName)
                          <?> "parseElemName did not find '" <> T.unpack elemName <> "'"
+
+
+
+-- > mainParser  = sum <$ whiteSpace <*> many (token digit) <* eof
+
+angles :: Parser middle -> Parser middle
+angles = between (tokenChar '<') (tokenString "/>")
+
+between :: Parser leftBracket
+        -> Parser rightBracket
+        -> Parser middle -> Parser middle
+between pi pf pMiddle = pi *> pMiddle <* pf
+
+
+
+tokenChar :: Char -> Parser Char
+tokenChar c = token (char c)
+
+tokenString s = token (string s)
+token :: Parser a -> Parser a
+token a = a <* (someSpace <|> pure ())
+
+-- someSpace :: m ()
+someSpace :: Parser ()
+someSpace = skipMany1 space
