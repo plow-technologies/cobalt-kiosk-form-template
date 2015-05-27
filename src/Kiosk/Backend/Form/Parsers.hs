@@ -71,121 +71,156 @@ parseRow :: Parser Row
 parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag "row"
   where
      buildRow = flip Row []
-     possibleItems = many.try $ parseInput <|>
-                                parseSignature <|>
-                                parseButton <|>
-                                parseRadio <|>
-                                parseLabel
+     possibleItems = many.try $ itemParser
 
 
 
+-- parseInputOfType :: T.Text -> Parser Item
+-- parseInputOfType = undefined
+-- parseInputOfType inputType = do
+--   -- look for width or break
+--   _iElem <- parseOpenTag "item"
 
-parseInputOfType :: T.Text -> Parser Item
-parseInputOfType inputType = do
-  -- look for width or break
-  _iElem <- parseOpenTag "item"
+--   itemLabel <- labelParser
+--   inputElem <- parseElement inputType
 
-  labelElem <- parseElement "label"
-  inputElem <- parseElement inputType
+--   -- look for width or break
+--   let
+--       itemLabel = Label (element labelElem) (decodeAttributeList . attributes $ labelElem)
+--       itemInput = Input (parseInputType (decodeAttributeList . attributes $ inputElem) (value inputElem))
+--                         (decodeAttributeList . attributes $ inputElem)
 
-  -- look for width or break
-  let
-      itemLabel = Label (element labelElem) (decodeAttributeList . attributes $ labelElem)
-      itemInput = Input (parseInputType (decodeAttributeList . attributes $ inputElem) (value inputElem))
-                        (decodeAttributeList . attributes $ inputElem)
+--   parseCloseTag "item"
+--   return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
 
-  parseCloseTag "item"
-  return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
+itemParser = parseElement "item" itemFromAttrs
+  where
+   itemFromAttrs _attrs = parseItemInput <|>
+                          parseItemButton <|>
+                          parseItemRadio <|>
+                          parseItemLabel
+parseItemInput = do
+      itemLabel <- labelParser
+      itemInput <- inputParser
+      return $ Item [ ItemLabel itemLabel
+                    , ItemInput itemInput]
+                    [ItemWidth $ WidthAttribute (12::Int)]
 
-parseInput :: Parser Item
-parseInput = parseInputOfType "input"
-
-parseSignature :: Parser Item
-parseSignature = parseInputOfType "input"
-
-parseButton :: Parser Item
-parseButton = do
-  _iElem <- parseOpenTag "item"
-
-  buttonElement <- parseElement "button"
-  let b = Button (value buttonElement) (decodeAttributeList $ attributes buttonElement)
-
-  parseCloseTag "item"
-  return $ Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)]
   -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
+parseItemButton :: Parser Item
+parseItemButton = makeItemButton <$> buttonParser
+  where
+   makeItemButton b = Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)]
 
-parseLabel :: Parser Item
-parseLabel = do
-  _iElem <- parseOpenTag "item"
-
-  labelElem <- parseElement "label"
-
-  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
-  return $ Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
-
-
-parseRadio :: Parser Item
-parseRadio = do
-  _iElem <- parseOpenTag "item" <?> "parseRadio: did not find item."
-  _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
-  labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
-  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
-
-  optionElements <- many1 $ parseElement "option"
-  --Option "Pit Water" []
-  -- currently not using option attributes
-  let ops = map (\x -> Option (value x ) []) optionElements
-  opqs <- many' parseOptionQualifier
-  _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
-  _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
-  return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
-   where
-    parseOptionQualifier :: Parser OptionQualifier
-    parseOptionQualifier = do
-      _iElem <- parseOpenTag "option-qualifier"
-      labelElem <- parseElement "label"
-      inputElem <- parseElement "input"
-      -- look for width or break
-      let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
-      let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
-      parseCloseTag "item"
-      return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
+parseItemLabel :: Parser Item
+parseItemLabel = makeItemLabel <$> labelParser
+  where
+  makeItemLabel itemLabel = Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
 
+parseItemRadio :: Parser Item
+parseItemRadio = undefined -- do
+--   _iElem <- parseOpenTag "item" <?> "parseRadio: did not find item."
+--   _ <- parseOpenTag "radio" <?> "parseRadio: did not find radio."
+-- --  labelElem <- parseElement "label"　<?> "parseRadio: did not find label."
+-- --  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
+--   itemLabel <- labelParser
+--   optionElements <- many1 $ parseElement "option"
+--   --Option "Pit Water" []
+--   -- currently not using option attributes
+--   let ops = map (\x -> Option (value x ) []) optionElements
+--   opqs <- many' parseOptionQualifier
+--   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
+--   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
+--   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
+--    where
+--     parseOptionQualifier :: Parser OptionQualifier
+--     parseOptionQualifier = do
+--       _iElem <- parseOpenTag "option-qualifier"
+--       labelElem <- parseElement "label"
+--       inputElem <- parseElement "input"
+--       -- look for width or break
+--       let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
+--       let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
+--       parseCloseTag "item"
+--       return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
 
 
 
+
+
+
+
+
+
+-- | Element with Content Parser
+
+
+-- Button Parser
+buttonParser :: Parser Button
+buttonParser = parseElement "button" buttonFromAttrs
+     where
+       buttonFromAttrs attrs  = flip Button (decodeAttributeList attrs) <$>
+                                parseElementBodyAsText
+
+-- Label Parser
+labelParser :: Parser Label
+labelParser = parseElement "label" makeLabel
+    where
+      makeLabel attrs =  flip Label (decodeAttributeList attrs) <$>
+                         parseElementBodyAsText
+
+inputParser :: Parser Input
+inputParser = parseElement "input" inputFromAttrs
+     where
+       inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
+                              parseInputType (decodeAttributeList attrs)
+
+
+parseInputType :: [InputAttribute]  -> Parser InputType
+parseInputType (InputType InputTypeAttributeInt:_)         = InputTypeInt       . InputInt    <$> signed decimal
+parseInputType (InputType InputTypeAttributeDouble:_)      = InputTypeDouble    . InputDouble <$> signed double
+parseInputType (InputType InputTypeAttributeText      :_)  = InputTypeText      . InputText   <$> parseElementBodyAsText
+parseInputType (InputType InputTypeAttributeSignature:_)   = InputTypeSignature . Signature   <$> parseElementBodyAsText
+parseInputType _                                                 = return $ InputTypeText . InputText $ ""
+
+
+
+-- | Parse primitives
+
+
+-- | decode a list of attributes in a given type
+-- | just drop attributes that are left instances
+decodeAttributeList :: AttributeClass t => [Attribute] -> [t]
+decodeAttributeList = rights . fmap fromAttribute
 
 -- | Parse a complete element from opening tag to closing tag
-parseElement :: T.Text -> Parser Element
-parseElement elemName = Element elemName  <$>
-                        (tagAttrs <$> parseOpenTag elemName) <*>
-                        parseElementBody <* parseCloseTag elemName
 
-        where
-             parseElementBody :: Parser Text
-             parseElementBody = takeTill (== '<')
-
+parseElement elemName attrsParser = do
+  tag <- parseOpenTag elemName
+  rslt <- attrsParser . tagAttrs $ tag
+  _ <- parseCloseTag elemName
+  return rslt
 
 -- | Parser purposefully disgards any parsed elements
 parseElementWithoutAttributes :: T.Text -> Parser Element
-parseElementWithoutAttributes elemName = do
-                         elem <- parseElement elemName
-                         return $ elem {attributes= []}
+parseElementWithoutAttributes elemName = undefined --do
+--                         elem <- parseElement elemName
+--                         return $ elem {attributes= []}
 
 -- | Parser Fails unless given Attribute text are found
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
-parseElementWithRequiredAttributes elemName requiredAttrs = do
-  elem <- parseElement elemName
-  if null $ requiredAttrs \\ (fmap name . attributes $ elem)
-      then
-         return elem
-      else
-         fail   $ T.unpack  $
-      "parseElementWithRequiredAttributes parsed the following attributes: " <>
-      T.intercalate ", " (map name (attributes elem)) <>
-      ", but requires the following attributes: " <>
-      T.intercalate ", " requiredAttrs <> "."
+parseElementWithRequiredAttributes elemName requiredAttrs = undefined -- do
+  -- elem <- parseElement elemName
+  -- if null $ requiredAttrs \\ (fmap name . attributes $ elem)
+  --     then
+  --        return elem
+  --     else
+  --        fail   $ T.unpack  $
+  --     "parseElementWithRequiredAttributes parsed the following attributes: " <>
+  --     T.intercalate ", " (map name (attributes elem)) <>
+  --     ", but requires the following attributes: " <>
+  --     T.intercalate ", " requiredAttrs <> "."
 
 parseAttributes :: Parser Attribute
 parseAttributes = do
@@ -195,47 +230,6 @@ parseAttributes = do
   _ <- char q
   return $ Attribute (T.pack nameRest) attrVal
 
-
-
--- | decode a list of attributes in a given type
--- | just drop attributes that are left instances
-decodeAttributeList :: AttributeClass t => [Attribute] -> [t]
-decodeAttributeList = rights . fmap fromAttribute
-
-parseInputType :: [InputAttribute] -> T.Text -> InputType
-parseInputType (InputType InputTypeAttributeText      :_) elemVal = InputTypeText      . InputText   $ elemVal
-parseInputType (InputType InputTypeAttributeSignature:_) elemVal = InputTypeSignature . Signature   $ elemVal
-parseInputType (InputType InputTypeAttributeInt:_) elemVal = InputTypeInt       . InputInt    $ (read (T.unpack elemVal) :: Int)
-parseInputType (InputType InputTypeAttributeDouble:_) elemVal = InputTypeDouble    . InputDouble $ (read (T.unpack elemVal) :: Double)
-parseInputType [] _ = InputTypeText . InputText $ ""
-parseInputType _  _ = InputTypeText . InputText $ ""
-
-
-
-
--- | Element with Content Parser
--- Button Parser
-buttonParser :: Parser Button
-buttonParser = buttonFromElement <$> parseElement "button"
-    where
-      buttonFromElement (Element _ attrs elemVal) = Button elemVal (decodeAttributeList attrs)
-
--- Label Parser
-labelParser :: Parser Label
-
-
-labelParser = labelFromElement <$> parseElement "label"
-    where
-      labelFromElement (Element _ attrs elemVal) = Label elemVal (decodeAttributeList attrs)
-
-inputParser :: Parser Input
-inputParser = inputFromElement <$> parseElement "input"
-    where
-      inputFromElement (Element _ attrs elemVal) = Input (parseInputType (decodeAttributeList attrs) elemVal) (decodeAttributeList attrs)
-
-
-
--- | Parse primitives
 
 -- | the combinators below permutate to give any available combination in a tag
 -- so < name a1='v1' a2='v2' a3='v3'> val </name>
@@ -259,8 +253,7 @@ parseOpeningAngle = tokenChar '<'
 -- > mainParser  = sum <$ whiteSpace <*> many (token digit) <* eof
 -- | separates each part of the above into a sum type for alternative parser|
 
-
-
+parseElementBodyAsText = takeTill (== '<')
 
 parseOpenTag :: Text -> Parser Tag
 parseOpenTag tname = angles (parseTagParts tname)
