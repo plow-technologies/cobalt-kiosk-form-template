@@ -36,8 +36,8 @@ data Element = Element {
 
 parseForm :: Parser Form
 parseForm = do
-  parseOpenTag "entry"
-  parseOpenTag "form"
+  _ <- parseOpenTag "entry"
+  _ <- parseOpenTag "form"
   company <- parseCompanyElement
   address <- parseAddressElement
   logo    <- parseLogoElement
@@ -46,7 +46,6 @@ parseForm = do
   rows      <- many' $ try parseRow
   parseCloseTag "form"
   parseCloseTag "entry"
-
   return $ Form company address logo phone constants rows
 
 
@@ -58,15 +57,12 @@ parseOpenTagWithAttributes elemName = do
   _ <- parseClosingAngle
   return $ Element elemName attrList ""
 
-
-
 -- parseCloseTag :: T.Text -> Parser ()
 -- parseCloseTag elemName = parseOpeningAngle *>
 --                          (char '/' <?> "parseCloseTag did not find backslash '/'") *>
 --                          parseElemName elemName *>
 --                          parseClosingAngle *>
 --                          pure ()
-
 
 -- parse path attribute
 parseCompanyElement :: Parser Company
@@ -143,16 +139,21 @@ data Row = Row {
  _rowAttrib :: [RowAttributes]
 } deriving (Show)
 -}
+
+
+
 parseRow :: Parser Row
-parseRow = do
-  parseOpenTag "row"
+parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag "row"
+  where
+     buildRow = flip Row []
+     possibleItems = many.try $ parseInput <|>
+                                parseSignature <|>
+                                parseButton <|>
+                                parseRadio <|>
+                                parseLabel
 
-  -- all of these parses return Item
-  items <- many $ try $ parseInput <|> parseSignature <|> parseButton <|> parseRadio <|> parseLabel
 
-  parseCloseTag "row"
 
-  return $ Row items []
 
 parseInputOfType :: T.Text -> Parser Item
 parseInputOfType inputType = do
@@ -219,40 +220,21 @@ parseRadio = do
   --Option "Pit Water" []
   -- currently not using option attributes
   let ops = map (\x -> Option (value x ) []) optionElements
-
   opqs <- many' parseOptionQualifier
-
   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
-
   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
 
 
 textOrNullParser :: Parser T.Text
 textOrNullParser = takeTill (== '<')
 
--- parseElement :: T.Text -> Parser Element
--- parseElement elemName = do
---   _ <- parseOpeningAngle
---   _ <- parseElemName elemName
---   attrList <- try . many' $ parseAttributes
---   _ <- parseClosingAngle
---   elemValue <- textOrNullParser
---   _ <- parseCloseTag elemName
-
---   return $ Element elemName attrList elemValue
-
-
-parseElement :: Text -> Parser Element
-parseElement elemName = angles parseInternal
-  where
-    parseInternal = do
-       _ <- parseElemName elemName
-       attrList <- (try . many' $ parseAttributes)
-       elemValue <- textOrNullParser
-       return $ Element elemName attrList elemValue
-
-
+parseElement :: T.Text -> Parser Element
+parseElement elemName = do
+  tag <- parseOpenTag elemName
+  elemValue <- textOrNullParser
+  _ <- parseCloseTag elemName
+  return $ Element elemName (tagAttrs tag) elemValue
 
 parseElementWithoutAttributes :: T.Text -> Parser Element
 parseElementWithoutAttributes elemName = do
@@ -265,16 +247,13 @@ parseElementWithoutAttributes elemName = do
 
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
 parseElementWithRequiredAttributes elemName requiredAttrs = do
-  _ <- parseOpeningAngle
-  _ <- parseElemName elemName
-  attrList <- try $ many' parseAttributes
-  _ <- parseClosingAngle
+  tag <- parseOpenTag elemName
   elemValue <- textOrNullParser
   _ <- parseCloseTag elemName
-  case sort requiredAttrs == sort (map name attrList) of
-    True  -> return $ Element elemName attrList elemValue
+  case sort requiredAttrs == sort (map name (tagAttrs tag)) of
+    True  -> return $ Element elemName (tagAttrs tag) elemValue
     False -> fail   $ T.unpack  . T.concat $
-      ["parseElementWithRequiredAttributes parsed the following attributes: "] ++ [(T.intercalate ", " (map name attrList))] ++
+      ["parseElementWithRequiredAttributes parsed the following attributes: "] ++ [(T.intercalate ", " (map name (tagAttrs tag)))] ++
       [", but requires the following attributes: "] ++ [(T.intercalate ", " requiredAttrs)] ++ ["."]
 
 parseAttributes :: Parser Attribute
@@ -284,6 +263,7 @@ parseAttributes = do
   attrVal <- takeTill (== q)
   _ <- char q
   return $ Attribute (T.pack $ nameRest) attrVal
+
 
 genericAttributeDecoder :: AttributeClass t => [Attribute] -> [t]
 genericAttributeDecoder attrs = do
@@ -300,8 +280,10 @@ parseInputType (InputType InputTypeAttributeDouble:_) elemVal = InputTypeDouble 
 parseInputType [] _ = InputTypeText . InputText $ ""
 parseInputType _  _ = InputTypeText . InputText $ ""
 
--- | Element with Content Parser
 
+
+
+-- | Element with Content Parser
 -- Button Parser
 buttonParser :: Parser Button
 buttonParser = buttonFromElement <$> parseElement "button"
@@ -365,11 +347,9 @@ parseOpenTag tname = angles (parseTagParts tname)
                           atom (parseTagName tname') <*>
                           atom parseAttributeToken
 
-
-
-parseCloseTag :: Text -> Parser Tag
-parseCloseTag tname = (flip Tag []) <$>
-                      closingAngles (parseTagName tname)
+parseCloseTag :: Text -> Parser ()
+parseCloseTag tname = (flip Tag []  <$>
+                      closingAngles (parseTagName tname)) >> return ()
 
 parseTagName :: Text -> Parser Text
 parseTagName tname = token  (string tname) <?>
