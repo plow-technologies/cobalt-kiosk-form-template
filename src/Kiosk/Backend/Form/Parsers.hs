@@ -121,21 +121,8 @@ parseLabel = do
   labelElem <- parseElement "label"
 
   let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
-  -- Label elemVal (decodeAttributeList attrs)
-
   return $ Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
--- used only by parseRadio
-parseOptionQualifier :: Parser OptionQualifier
-parseOptionQualifier = do
-  _iElem <- parseOpenTag "option-qualifier"
-  labelElem <- parseElement "label"
-  inputElem <- parseElement "input"
-  -- look for width or break
-  let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
-  let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
-  parseCloseTag "item"
-  return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
 
 parseRadio :: Parser Item
 parseRadio = do
@@ -152,22 +139,39 @@ parseRadio = do
   _ <- parseCloseTag "radio" <?> "parseRadio: did not find radio close tag."
   _ <- parseCloseTag "item" <?> "parseRadio: did not find item close tag."
   return $ Item [ItemRadio $ Radio itemLabel ops opqs] [ItemWidth $ WidthAttribute (12::Int)]
+   where
+    parseOptionQualifier :: Parser OptionQualifier
+    parseOptionQualifier = do
+      _iElem <- parseOpenTag "option-qualifier"
+      labelElem <- parseElement "label"
+      inputElem <- parseElement "input"
+      -- look for width or break
+      let itemLabel = Label (element labelElem) (decodeAttributeList $ attributes labelElem)
+      let itemInput = Input (parseInputType (decodeAttributeList $ attributes inputElem) (value inputElem)) (decodeAttributeList $ attributes inputElem)
+      parseCloseTag "item"
+      return $ OptionQualifier [QualifierLabel itemLabel, QualifierInput itemInput] []
 
-parseElementBody :: Parser Text
-parseElementBody = textOrNullParser
 
-textOrNullParser :: Parser T.Text
-textOrNullParser = takeTill (== '<')
 
+
+
+
+-- | Parse a complete element from opening tag to closing tag
 parseElement :: T.Text -> Parser Element
 parseElement elemName = Element elemName  <$>
                         (tagAttrs <$> parseOpenTag elemName) <*>
                         parseElementBody <* parseCloseTag elemName
+
+        where
+             parseElementBody :: Parser Text
+             parseElementBody = takeTill (== '<')
+
+
 -- | Parser purposefully disgards any parsed elements
 parseElementWithoutAttributes :: T.Text -> Parser Element
-parseElementWithoutAttributes elemName = parseOpenTag elemName *>
-                       (Element elemName [] <$> parseElementBody)
-                       <* parseCloseTag elemName
+parseElementWithoutAttributes elemName = do
+                         elem <- parseElement elemName
+                         return $ elem {attributes= []}
 
 -- | Parser Fails unless given Attribute text are found
 parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
