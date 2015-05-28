@@ -1,6 +1,6 @@
 # cobalt-kiosk-form-template 
 [![Circle CI](https://circleci.com/gh/plow-technologies/cobalt-kiosk-form-template.svg?style=svg)](https://circleci.com/gh/plow-technologies/cobalt-kiosk-form-template)
-TODO: Write description here
+TODO: The basis for rendering kiosk forms to IPAD
 
 ## Add forms to Cobal Kiosk Backend
 
