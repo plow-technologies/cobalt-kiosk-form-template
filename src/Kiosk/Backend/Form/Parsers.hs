@@ -47,10 +47,11 @@ parseAddressElement = parseElement "address" parseAddressFromAttrs
                                   parseElementBodyAsText
 
 parseLogoElement :: Parser Logo
-parseLogoElement = do
-  logo <- parseElementWithRequiredAttributes "logo" ["path"]
-  let logoAttribs = map (LogoPath . PathAttribute . val ) $ filter (\x -> name x == "path") (attributes logo)
-  return $ Logo (value logo) logoAttribs
+parseLogoElement = parseElementWithRequiredAttributes "logo" ["path"] parseLogoFromAttrs
+ where
+  logoAttribs = rights . fmap fromAttribute
+  parseLogoFromAttrs attrs = flip Logo (logoAttribs attrs) <$>
+                              parseElementBodyAsText
 
 parsePhoneElement :: Parser Phone
 parsePhoneElement = parseElement "phone" parsePhoneFromAttrs
@@ -58,11 +59,12 @@ parsePhoneElement = parseElement "phone" parsePhoneFromAttrs
   parsePhoneFromAttrs _attrs = flip Phone [] <$>
                                parseElementBodyAsText
 
-
 parseConstantElement :: Parser Constant
-parseConstantElement = do
-  constant <- parseElementWithRequiredAttributes "constant" ["type","indexable"]
-  return $ Constant (value constant) (map parseConstantAttributeType $ attributes constant)
+parseConstantElement = parseElementWithRequiredAttributes "constant" ["type","indexable"] parseConstantFromAttrs
+ where
+  constantAttribs = rights . fmap fromAttribute
+  parseConstantFromAttrs attrs = flip Constant (constantAttribs attrs) <$>
+                                 parseElementBodyAsText
 
 parseConstantAttributeType :: Attribute -> ConstantAttributes
 parseConstantAttributeType (Attribute "type"      v      ) = ConstantAttributeType v
@@ -215,18 +217,18 @@ parseElement elemName attrsParser = do
 
 
 -- | Parser Fails unless given Attribute text are found
-parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
-parseElementWithRequiredAttributes elemName requiredAttrs = undefined -- do
-  -- elem <- parseElement elemName
-  -- if null $ requiredAttrs \\ (fmap name . attributes $ elem)
-  --     then
-  --        return elem
-  --     else
-  --        fail   $ T.unpack  $
-  --     "parseElementWithRequiredAttributes parsed the following attributes: " <>
-  --     T.intercalate ", " (map name (attributes elem)) <>
-  --     ", but requires the following attributes: " <>
-  --     T.intercalate ", " requiredAttrs <> "."
+-- parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
+parseElementWithRequiredAttributes elemName requiredAttrs p = parseElement elemName checkAgainstAttrs
+ where
+    checkAgainstAttrs attrs = if null $ requiredAttrs \\ (name <$> attrs)
+                              then
+                                p attrs
+                              else
+                                fail   $ T.unpack  $
+                                 "parseElementWithRequiredAttributes parsed the following attributes: " <>
+                                 T.intercalate ", " (name <$> attrs ) <>
+                                 ", but requires the following attributes: " <>
+                                 T.intercalate ", " requiredAttrs <> "."
 
 parseAttributes :: Parser Attribute
 parseAttributes = do
