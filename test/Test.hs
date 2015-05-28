@@ -129,7 +129,14 @@ main = hspec $ do
     testParser itemParser "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>"
       (\i -> i ^.. item.traverse._ItemRadio.getRadioOptions.traverse.getOptionText <&> (== "1") & andNotNull)
 
-    testParser parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>" (const True)
+    testParser parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>"
+                         (\i -> i ^.. row.traverse.
+                                          rowItem.
+                                          traverse.
+                                          item.
+                                          traverse.
+                                          _ItemInput.getInput._InputTypeSignature . signature
+                                          <&> T.null & andNotNull)
 
 
 -- <option>2</option><option>3</option>
