@@ -25,14 +25,12 @@ parseForm :: Parser Form
 parseForm = parseElement "entry" (const $ parseElement "form" parseFormWithAttrs)
   where
     parseFormWithAttrs _attrs = do
-     _ <- parseOpenTag "entry"
-     _ <- parseOpenTag "form"
      company <- parseCompanyElement <?> "Company must be present"
      address <- parseAddressElement <?> "Address must be present"
      logo    <- parseLogoElement    <?> "Logo must be present"
      phone   <- parsePhoneElement   <?> "Phone Must be present"
-     constants <- many' $ try parseConstantElement
-     rows      <- many' $ try parseRow
+     constants <- many' parseConstantElement
+     rows      <- many' parseRow
      return $ Form company address logo phone constants rows
 
 
@@ -75,13 +73,11 @@ parseConstantAttributeType (Attribute "indexable" "False") = ConstantAttributeIn
 parseConstantAttributeType (Attribute _           _      ) = ConstantAttributeType ""
 
 parseRow :: Parser Row
-parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag "row"
+parseRow = parseElement "row"  buildRow
   where
-     buildRow = flip Row []
-     possibleItems = many.try $ itemParser
-
-
-
+     buildRow _ = flip Row [] <$>
+                   possibleItems
+     possibleItems = many' itemParser
 -- parseInputOfType :: T.Text -> Parser Item
 -- parseInputOfType inputType = do
 --   -- look for width or break
@@ -106,6 +102,7 @@ itemParser = parseElement "item" itemFromAttrs
                           parseItemButton <|>
                           parseItemRadio <|>
                           parseItemLabel
+
 
 
 parseItemInput :: Parser Item
