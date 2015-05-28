@@ -3,8 +3,6 @@ module Kiosk.Backend.Form.Parsers where
 
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Indexable
--- import           Kiosk.Backend.Form.Attribute.Path
-import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element
 
 import           Control.Applicative
@@ -81,55 +79,55 @@ parseRow = parseElement "row"  buildRow
 itemParser :: Parser Item
 itemParser = parseElement "item" itemFromAttrs
   where
-   itemFromAttrs _attrs = parseItemInput <|>
-                          parseItemAutoInput <|>
-                          parseItemButton <|>
-                          parseItemRadio <|>
-                          parseItemLabel
+   itemFromAttrs attrs =  (parseItemInput attrs )<|>
+                          (parseItemAutoInput attrs) <|>
+                          (parseItemButton attrs) <|>
+                          (parseItemRadio attrs) <|>
+                          (parseItemLabel attrs)
 
 
 -- | <item><auto-input> Parser
-parseItemAutoInput :: Parser Item
-parseItemAutoInput = do
+parseItemAutoInput
+  :: [Attribute] ->  Parser Item
+parseItemAutoInput attrs = do
       itemLabel <- labelParser
       itemAutoInput <- autoInputParser
       return $ Item [ ItemLabel itemLabel
                     , ItemAutoInput itemAutoInput]
-                    [ItemWidth $ WidthAttribute (12::Int)]
-
+                    (rights . fmap fromAttribute $ attrs)
 -- | <item><input> Parser
-parseItemInput :: Parser Item
-parseItemInput = do
+parseItemInput :: [Attribute] -> Parser Item
+parseItemInput attrs = do
       itemLabel <- labelParser
       itemInput <- inputParser
       return $ Item [ ItemLabel itemLabel
                     , ItemInput itemInput]
-                    [ItemWidth $ WidthAttribute (12::Int)]
+                    (rights . fmap fromAttribute $ attrs)
 
   -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
 -- | <item><button> Parser
-parseItemButton :: Parser Item
-parseItemButton = makeItemButton <$> buttonParser
+parseItemButton :: [Attribute] -> Parser Item
+parseItemButton attrs = makeItemButton <$> buttonParser
   where
-   makeItemButton b = Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)]
+   makeItemButton b = Item [ItemButton b] (rights . fmap fromAttribute $ attrs)
 
 
 -- | <item><label> Parser
-parseItemLabel :: Parser Item
-parseItemLabel = makeItemLabel <$> labelParser
+parseItemLabel :: [Attribute] -> Parser Item
+parseItemLabel attrs = makeItemLabel <$> labelParser
   where
-  makeItemLabel itemLabel = Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
+  makeItemLabel itemLabel = Item [ItemLabel itemLabel] (rights . fmap fromAttribute $ attrs)
 
 
 -- | <item><radio> Parser
-parseItemRadio :: Parser Item
-parseItemRadio = makeItemRadio <$> radioParser
+parseItemRadio :: [Attribute] -> Parser Item
+parseItemRadio attrs = makeItemRadio <$> radioParser
   where
-     makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] [ItemWidth $ WidthAttribute (12::Int)]
+     makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] (rights . fmap fromAttribute $ attrs)
 
 -- <radio> Parser
 radioParser :: Parser Radio
-radioParser = parseElement "radio" radioParserFromAttrs
+radioParser  = parseElement "radio" radioParserFromAttrs
   where
     radioParserFromAttrs _attrs = do
      itemLabel <- labelParser
