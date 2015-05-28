@@ -23,10 +23,12 @@ import           Test.QuickCheck
 
 makeLenses ''Input
 makeLenses ''InputDouble
+makeLenses ''InputInt
+makeLenses ''InputText
+makeLenses ''Signature
 makePrisms ''InputType
 makePrisms ''InputAttribute
 makeLenses ''IndexableAttribute
-makeLenses ''InputText
 
 testParser  :: Show a => Parser a ->
                T.Text ->
@@ -38,6 +40,8 @@ testParser parser inputText validator = runValidator
 
 testInputTypeDouble = InputTypeDouble
 
+andNotNull lst = and lst && (not.null $ lst)
+
 
 main :: IO ()
 main = hspec $ do
@@ -46,16 +50,19 @@ main = hspec $ do
   -- index forces the type to be InputTypeText, value is lost
     testParser inputParser "<input type='double' indexable='True'>3.3</input>"
                            (\i -> (i ^.. getInput._InputTypeDouble & null & not) &&
-                                  (i ^.. getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & and ) &&
-                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
+                                  (i ^.. getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & andNotNull ) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
 
     testParser inputParser "<input type='text' indexable='True'>Plowtech</input>"
                            (\i -> (i ^.. getInput._InputTypeText & null & not) &&
-                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
+                                  (i ^.. getInput._InputTypeText.getInputText <&> (== "Plowtech") & andNotNull ) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
     testParser inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
-                           (\i -> (i ^.. getInput._InputTypeSignature & null & not) &&
-                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
-    testParser inputParser "<input type='int' indexable='True'>1234</input>" (const True)
+                           (\i -> (i ^.. getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+    testParser inputParser "<input type='int' indexable='True'>1234</input>"
+                           (\i -> (i ^.. getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
   it "should parse various input types correctly" $ do
   -- without indexable
     testParser inputParser "<input type='double'>3.3</input>" (const True)
