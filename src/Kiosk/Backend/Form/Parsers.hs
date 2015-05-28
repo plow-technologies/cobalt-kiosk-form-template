@@ -19,19 +19,21 @@ import           Data.Text                              (Text)
 import qualified Data.Text                              as T
 
 
+
+
 parseForm :: Parser Form
-parseForm = do
-  _ <- parseOpenTag "entry"
-  _ <- parseOpenTag "form"
-  company <- parseCompanyElement
-  address <- parseAddressElement
-  logo    <- parseLogoElement
-  phone   <- parsePhoneElement
-  constants <- many' $ try parseConstantElement
-  rows      <- many' $ try parseRow
-  parseCloseTag "form"
-  parseCloseTag "entry"
-  return $ Form company address logo phone constants rows
+parseForm = parseElement "entry" (const $ parseElement "form" parseFormWithAttrs)
+  where
+    parseFormWithAttrs _attrs = do
+     _ <- parseOpenTag "entry"
+     _ <- parseOpenTag "form"
+     company <- parseCompanyElement <?> "Company must be present"
+     address <- parseAddressElement <?> "Address must be present"
+     logo    <- parseLogoElement    <?> "Logo must be present"
+     phone   <- parsePhoneElement   <?> "Phone Must be present"
+     constants <- many' $ try parseConstantElement
+     rows      <- many' $ try parseRow
+     return $ Form company address logo phone constants rows
 
 
 -- parse path attribute
