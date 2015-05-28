@@ -81,7 +81,6 @@ parseRow = parseOpenTag "row" *> (buildRow <$> possibleItems)   <* parseCloseTag
 
 
 -- parseInputOfType :: T.Text -> Parser Item
--- parseInputOfType = undefined
 -- parseInputOfType inputType = do
 --   -- look for width or break
 --   _iElem <- parseOpenTag "item"
@@ -127,21 +126,23 @@ parseItemLabel = makeItemLabel <$> labelParser
   makeItemLabel itemLabel = Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
 
-
+-- | Parser Radio
 parseItemRadio :: Parser Item
-parseItemRadio = undefined
+parseItemRadio = makeItemRadio <$> radioParser
+  where
+     makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] [ItemWidth $ WidthAttribute (12::Int)]
 
-
-radioParser :: Parser Item
+radioParser :: Parser Radio
 radioParser = parseElement "radio" radioParserFromAttrs
   where
     radioParserFromAttrs _attrs = do
      itemLabel <- labelParser
      options <- many1 optionParser <?> "missing at least 1 option"
      optionQualifiers <- many' optionQualifierParser
+     return $ Radio itemLabel options optionQualifiers
      --Option "Pit Water" []
      -- currently not using option attributes
-     return $ Item [ItemRadio $ Radio itemLabel options optionQualifiers] [ItemWidth $ WidthAttribute (12::Int)]
+
 
 
 
