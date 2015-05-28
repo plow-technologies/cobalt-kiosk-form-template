@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Main where
 
@@ -11,6 +11,7 @@ import           Control.Applicative
 import           Data.Attoparsec.Text
 import           System.Exit                            (exitFailure)
 
+import           Control.Lens
 import qualified Data.Text                              as T
 import           Data.Traversable
 import           Regex.Genex
@@ -18,51 +19,79 @@ import           Test.Hspec
 import           Test.QuickCheck
 
 
+-- Lenses to make things easier for testing
+
+makeLenses ''Input
+makeLenses ''InputDouble
+makePrisms ''InputType
+makePrisms ''InputAttribute
+makeLenses ''IndexableAttribute
+makeLenses ''InputText
+
+testParser  :: Show a => Parser a ->
+               T.Text ->
+               (a -> Bool) -> Expectation
+testParser parser inputText validator = runValidator
+  where
+      (Right rslt) = parseOnly parser inputText
+      runValidator = shouldSatisfy rslt validator
+
+testInputTypeDouble = InputTypeDouble
+
+
 main :: IO ()
-main = do
-  -- with indexable
+main = hspec $ do
+ describe "inputParser" $ do
+  it "should parse various indexable types correctly" $ do
   -- index forces the type to be InputTypeText, value is lost
-  print $ parseOnly inputParser "<input type='double' indexable='True'>3.3</input>"
-  print $ parseOnly inputParser "<input type='text' indexable='True'>Plowtech</input>"
-  print $ parseOnly inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
-  print $ parseOnly inputParser "<input type='int' indexable='True'>1234</input>"
+    testParser inputParser "<input type='double' indexable='True'>3.3</input>"
+                           (\i -> (i ^.. getInput._InputTypeDouble & null & not) &&
+                                  (i ^.. getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & and ) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
 
+    testParser inputParser "<input type='text' indexable='True'>Plowtech</input>"
+                           (\i -> (i ^.. getInput._InputTypeText & null & not) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
+    testParser inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
+                           (\i -> (i ^.. getInput._InputTypeSignature & null & not) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & and))
+    testParser inputParser "<input type='int' indexable='True'>1234</input>" (const True)
+  it "should parse various input types correctly" $ do
   -- without indexable
-  print $ parseOnly inputParser "<input type='double'>3.3</input>"
-  print $ parseOnly inputParser "<input type='text'>Plowtech</input>"
-  print $ parseOnly inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
-  print $ parseOnly inputParser "<input type='int'>1234</input>"
-  print $ parseOnly inputParser "<input type='int'>1234</input>"
-
+    testParser inputParser "<input type='double'>3.3</input>" (const True)
+    testParser inputParser "<input type='text'>Plowtech</input>" (const True)
+    testParser inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>" (const True)
+    testParser inputParser "<input type='int'>1234</input>" (const True)
+    testParser inputParser "<input type='int'>1234</input>" (const True)
+  it "should parse various buttons and labels" $ do
   -- button and label
-  print $ parseOnly buttonParser "<button width='12' action='sendJson'></button>"
-  print $ parseOnly labelParser "<label width='12'>Legal Dest</label>"
-  print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
+    testParser buttonParser "<button w(const True)th='12' action='sendJson'></button>" (const True)
+    testParser labelParser "<label w(const True)th='12'>Legal Dest</label>" (const True)
+--    print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
+  it "should parse various form address logo company stuff" $ do
+    testParser parseForm "<entry><form><address>Rockshore</address></form></entry>" (const True)
+    testParser parseForm "<entry><form><company>Rockshore</company></form></entry>" (const True)
+    testParser parseForm "<entry><form><company abc='1234'>Rockshore </company> </form></entry>" (const True)
+    testParser parseCompanyElement "<company>Rockshore</company>" (const True)
 
-  print $ parseOnly parseForm "<entry><form><address>Rockshore</address></form></entry>"
-  print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
-  --print $ parseOnly parseForm "<entry><form><company abc='1234'>Rockshore </company> </form></entry>"
-  print $ parseOnly (parseElement "company") "<company>Rockshore</company>"
+    testParser parseCompanyElement "<company>Rockshore</company>" (const True)
+    testParser parseCompanyElement "<company wrong='shouldbreak'>Rockshore</company>" (const True)
+    testParser parseLogoElement "<logo path='home'></logo>" (const True)
+    testParser parseLogoElement "<logo path='home'></logo>" (const True)
+  it "should parse a row and entry correctly" $ do
+    testParser parseRow "<row><item></item></row>" (const True)
+    testParser parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>" (const True)
+    testParser parseForm "<entry><form><company>Rockshore</company></form></entry>" (const True)
+    testParser parseForm "<entry><form><company>Rockshore</company><company>Rockshore</company><address>72341234</address></form></entry>" (const True)
+    testParser parseForm "<entry><form></form></entry>" (const True)
+    testParser parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>" (const True)
+  it "should parse items of various kinds " $ do
+    testParser parseItemInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>" (const True)
+    testParser parseItemInput "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>" (const True)
+    testParser parseItemRadio "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>" (const True)
 
-  print $ parseOnly parseCompanyElement "<company>Rockshore</company>"
-  print $ parseOnly parseCompanyElement "<company wrong='shouldbreak'>Rockshore</company>"
-  print $ parseOnly (parseElementWithRequiredAttributes "logo" ["path"]) "<logo path='home'></logo>"
-  print $ parseOnly (parseElementWithRequiredAttributes "logo" ["car"]) "<logo path='home'></logo>"
+    testParser parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>" (const True)
 
-  print $ parseOnly parseRow "<row><item></item></row>"
-  print $ parseOnly parseForm "<entry><form><company>Rockshore</company></form></entry>"
-  print $ parseOnly parseForm "<entry><form><company>Rockshore</company><company>Rockshore</company><address>72341234</address></form></entry>"
-  print $ parseOnly parseForm "<entry><form></form></entry>"
-  print $ parseOnly parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>"
-
-  print $ parseOnly parseInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
-  print $ parseOnly parseSignature "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
-  print $ parseOnly parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>"
-
-  print $ parseOnly parseRadio "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>"
-
-  print $ parseOnly parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>"
-  exitFailure
 
 -- <option>2</option><option>3</option>
 --updateThisThing i n = post ("http://alarm.plowtech.net:2834/form/update?formid=" ++ (show i)) (encode.cobaltKioskForm $ n)
