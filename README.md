@@ -1,5 +1,5 @@
-lt-kiosk-data-template [![Circle CI](https://circleci.com/gh/plow-technologies/cobalt-kiosk-data-template.svg?style=shield)](https://circleci.com/gh/plow-technologies/cobalt-kiosk-data-template)
-
+lt-kiosk-data-template 
+[![Circle CI](https://circleci.com/gh/plow-technologies/cobalt-kiosk-form-template.svg?style=svg)](https://circleci.com/gh/plow-technologies/cobalt-kiosk-form-template)
 TODO: Write description here
 
 ## Installation
