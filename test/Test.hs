@@ -29,6 +29,8 @@ makeLenses ''Logo
 makePrisms ''LogoAttributes
 makeLenses ''Phone
 makeLenses ''Constant
+-- AutoInput Lens
+makeLenses ''AutoInput
 -- Input Lenses
 makeLenses ''Input
 makeLenses ''InputDouble
@@ -110,6 +112,34 @@ main = hspec $ do
                             (\i -> i ^.. getButtonText <&> T.null & andNotNull)
     testParser labelParser "<label width='12'>Legal Dest</label>"
                            (\i -> i ^.. getLabelText <&> (== "Legal Dest") & andNotNull)
+  it "should parse various indexable auto input types correctly" $ do
+  -- index forces the type to be InputTypeText, value is lost
+    testParser autoInputParser "<auto-input type='double' indexable='True'>3.3</auto-input>"
+                           (\i -> (i ^.. getAutoInput.getInput._InputTypeDouble & null & not) &&
+                                  (i ^.. getAutoInput.getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & andNotNull ) &&
+                                  (i ^.. getAutoInput.inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+    testParser autoInputParser "<auto-input type='text' indexable='True'>Plowtech</auto-input>"
+                           (\i -> (i ^.. getAutoInput.getInput._InputTypeText & null & not) &&
+                                  (i ^.. getAutoInput.getInput._InputTypeText.getInputText <&> (== "Plowtech") & andNotNull ) &&
+                                  (i ^.. getAutoInput.inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+    testParser autoInputParser "<auto-input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</auto-input>"
+                           (\i -> (i ^.. getAutoInput.getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull) &&
+                                  (i ^.. getAutoInput.inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+    testParser autoInputParser "<auto-input type='int' indexable='True'>1234</auto-input>"
+                           (\i -> (i ^.. getAutoInput.getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull) &&
+                                  (i ^.. getAutoInput.inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+  it "should parse various auto input types correctly" $ do
+  -- without indexable
+    testParser autoInputParser "<auto-input type='double'>3.3</auto-input>"
+                (\i -> (i ^.. getAutoInput.getInput._InputTypeDouble & null & not) &&
+                       (i ^.. getAutoInput.getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & andNotNull ) )
+    testParser autoInputParser "<auto-input type='text'>Plowtech</auto-input>"
+                (\i -> (i ^.. getAutoInput.getInput._InputTypeText & null & not) &&
+                       (i ^.. getAutoInput.getInput._InputTypeText.getInputText <&> (== "Plowtech") & andNotNull ) )
+    testParser autoInputParser "<auto-input type='signature'>as9d8j2l3kfaoiu1239h</auto-input>"
+                (\i -> i ^.. getAutoInput.getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull )
+    testParser autoInputParser "<auto-input type='int'>1234</auto-input>"
+                (\i -> i ^.. getAutoInput.getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull)
 --    print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
   it "should parse various form address logo company stuff" $ do
     testParser parseAddressElement "<address>Rockshore</address>"

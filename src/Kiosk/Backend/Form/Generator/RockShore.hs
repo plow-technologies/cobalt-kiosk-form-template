@@ -82,7 +82,7 @@ generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
 
 generateInputItemDate :: T.Text -> Item
 generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
-                                                    , ItemAutoInput fullDefaultInputDate] []
+                                                    , ItemAutoInput . AutoInput $ fullDefaultInputDate] []
 
 fullDefaultInputDate :: Input
 fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
@@ -96,7 +96,7 @@ generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
 
 generateInputItemTime :: T.Text -> Item
 generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
-                                                    , ItemAutoInput fullDefaultInputTime] []
+                                                    , ItemAutoInput . AutoInput $ fullDefaultInputTime] []
 
 fullDefaultInputTime :: Input
 fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
