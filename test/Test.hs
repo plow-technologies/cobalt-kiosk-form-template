@@ -14,7 +14,6 @@ import           System.Exit                            (exitFailure)
 import           Control.Lens
 import qualified Data.Text                              as T
 import           Data.Traversable
-import           Regex.Genex
 import           Test.Hspec
 import           Test.QuickCheck
 
