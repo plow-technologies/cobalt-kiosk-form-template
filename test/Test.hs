@@ -21,6 +21,15 @@ import           Test.QuickCheck
 
 -- Lenses to make things easier for testing
 
+
+-- Form Lenses
+makeLenses ''Form
+makeLenses ''Company
+makeLenses ''Address
+makeLenses ''Logo
+makePrisms ''LogoAttributes
+makeLenses ''Phone
+makeLenses ''Constant
 -- Input Lenses
 makeLenses ''Input
 makeLenses ''InputDouble
@@ -36,6 +45,19 @@ makeLenses ''Button
 
 -- Label Lenses
 makeLenses ''Label
+
+-- Row Lenses
+makeLenses ''Row
+
+-- Item Lenses
+makeLenses ''Item
+makePrisms ''ItemType
+
+
+-- Radio Lenses
+makeLenses ''Radio
+makeLenses ''Option
+makeLenses ''OptionQualifier
 
 
 testParser  :: Show a => Parser a ->
@@ -91,26 +113,21 @@ main = hspec $ do
                            (\i -> i ^.. getLabelText <&> (== "Legal Dest") & andNotNull)
 --    print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
   it "should parse various form address logo company stuff" $ do
-    testParser parseForm "<entry><form><address>Rockshore</address></form></entry>" (const True)
-    testParser parseForm "<entry><form><company>Rockshore</company></form></entry>" (const True)
-    testParser parseForm "<entry><form><company abc='1234'>Rockshore </company> </form></entry>" (const True)
-    testParser parseCompanyElement "<company>Rockshore</company>" (const True)
-
-    testParser parseCompanyElement "<company>Rockshore</company>" (const True)
-    testParser parseCompanyElement "<company wrong='shouldbreak'>Rockshore</company>" (const True)
-    testParser parseLogoElement "<logo path='home'></logo>" (const True)
-    testParser parseLogoElement "<logo path='home'></logo>" (const True)
+    testParser parseAddressElement "<address>Rockshore</address>"
+      (\i -> i ^.. getAddressText <&> (== "Rockshore") & andNotNull)
+    testParser parseCompanyElement "<company>Rockshore</company>"
+      (\i -> i ^.. getCompanyText <&> (== "Rockshore") & andNotNull )
+    testParser parseLogoElement "<logo path='home'></logo>"
+      (\i -> i ^.. logoAttrib . traverse. _LogoPath & not.null)
   it "should parse a row and entry correctly" $ do
-    testParser parseRow "<row><item></item></row>" (const True)
-    testParser parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>" (const True)
-    testParser parseForm "<entry><form><company>Rockshore</company></form></entry>" (const True)
-    testParser parseForm "<entry><form><company>Rockshore</company><company>Rockshore</company><address>72341234</address></form></entry>" (const True)
-    testParser parseForm "<entry><form></form></entry>" (const True)
-    testParser parseForm "<entry><form><row><item><label>Just a label</label></item></row></form></entry>" (const True)
+    testParser parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>" (\i -> i ^.. rowItem . traverse. item & not.null)
   it "should parse items of various kinds " $ do
-    testParser parseItemInput "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>" (const True)
-    testParser parseItemInput "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>" (const True)
-    testParser parseItemRadio "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>" (const True)
+    testParser itemParser "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
+      (\i -> i ^.. item. traverse._ItemLabel.getLabelText <&> (== "Well Amount")  & andNotNull)
+    testParser itemParser "<item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item>"
+      (\i -> i ^.. item.traverse._ItemInput.getInput._InputTypeSignature.signature <&> T.null & andNotNull)
+    testParser itemParser "<item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item>"
+      (\i -> i ^.. item.traverse._ItemRadio.getRadioOptions.traverse.getOptionText <&> (== "1") & andNotNull)
 
     testParser parseForm "<entry><form><company>Rockshore</company><address>72341234</address><logo path='logo.png'></logo><phone>918-918-9188</phone><row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row><row><item width='12'><radio><label width='12'>Choices</label><option>1</option></radio></item></row></form></entry>" (const True)
 
