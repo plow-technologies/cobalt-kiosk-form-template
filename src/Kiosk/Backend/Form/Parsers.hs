@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-
 module Kiosk.Backend.Form.Parsers where
 
 import           Kiosk.Backend.Form.Attribute
@@ -188,6 +187,13 @@ labelParser = parseElement "label" makeLabel
       makeLabel attrs =  flip Label (decodeAttributeList attrs) <$>
                          parseElementBodyAsText
 
+-- <auto-input> parser
+autoInputParser :: Parser AutoInput
+autoInputParser = parseElement "auto-input" inputFromAttrs
+     where
+       inputFromAttrs attrs = AutoInput . flip Input  (decodeAttributeList attrs) <$>
+                              parseInputType (decodeAttributeList attrs)
+-- <input> parser
 inputParser :: Parser Input
 inputParser = parseElement "input" inputFromAttrs
      where
