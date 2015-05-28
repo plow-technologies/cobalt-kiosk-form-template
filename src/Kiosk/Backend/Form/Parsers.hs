@@ -4,7 +4,7 @@ module Kiosk.Backend.Form.Parsers where
 
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Indexable
-import           Kiosk.Backend.Form.Attribute.Path
+-- import           Kiosk.Backend.Form.Attribute.Path
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element
 
@@ -105,6 +105,9 @@ itemParser = parseElement "item" itemFromAttrs
                           parseItemButton <|>
                           parseItemRadio <|>
                           parseItemLabel
+
+
+parseItemInput :: Parser Item
 parseItemInput = do
       itemLabel <- labelParser
       itemInput <- inputParser
@@ -128,9 +131,11 @@ parseItemLabel = makeItemLabel <$> labelParser
 parseItemRadio :: Parser Item
 parseItemRadio = undefined
 
+
+radioParser :: Parser Item
 radioParser = parseElement "radio" radioParserFromAttrs
   where
-    radioParserFromAttrs attrs = do
+    radioParserFromAttrs _attrs = do
      itemLabel <- labelParser
      options <- many1 optionParser <?> "missing at least 1 option"
      optionQualifiers <- many' optionQualifierParser
@@ -208,7 +213,10 @@ decodeAttributeList :: AttributeClass t => [Attribute] -> [t]
 decodeAttributeList = rights . fmap fromAttribute
 
 -- | Parse a complete element from opening tag to closing tag
-
+parseElement
+  :: Text
+     -> ([Attribute] -> Parser b)
+     -> Parser  b
 parseElement elemName attrsParser = do
   tag <- parseOpenTag elemName
   rslt <- attrsParser . tagAttrs $ tag
@@ -218,6 +226,12 @@ parseElement elemName attrsParser = do
 
 -- | Parser Fails unless given Attribute text are found
 -- parseElementWithRequiredAttributes :: T.Text -> [T.Text] -> Parser Element
+
+parseElementWithRequiredAttributes
+  :: Text
+     -> [Text]
+     -> ([Attribute] -> Parser b)
+     -> Parser  b
 parseElementWithRequiredAttributes elemName requiredAttrs p = parseElement elemName checkAgainstAttrs
  where
     checkAgainstAttrs attrs = if null $ requiredAttrs \\ (name <$> attrs)
