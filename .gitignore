@@ -43,3 +43,5 @@ tramp
 
 # cask packages
 .cask/
+/test/flycheck_Test.hs
+/TAGS
