@@ -21,6 +21,7 @@ import           Test.QuickCheck
 
 -- Lenses to make things easier for testing
 
+-- Input Lenses
 makeLenses ''Input
 makeLenses ''InputDouble
 makeLenses ''InputInt
@@ -29,6 +30,13 @@ makeLenses ''Signature
 makePrisms ''InputType
 makePrisms ''InputAttribute
 makeLenses ''IndexableAttribute
+
+-- Button Lenses
+makeLenses ''Button
+
+-- Label Lenses
+makeLenses ''Label
+
 
 testParser  :: Show a => Parser a ->
                T.Text ->
@@ -45,7 +53,7 @@ andNotNull lst = and lst && (not.null $ lst)
 
 main :: IO ()
 main = hspec $ do
- describe "inputParser" $ do
+ describe "FormParser" $ do
   it "should parse various indexable types correctly" $ do
   -- index forces the type to be InputTypeText, value is lost
     testParser inputParser "<input type='double' indexable='True'>3.3</input>"
@@ -65,15 +73,22 @@ main = hspec $ do
                                   (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
   it "should parse various input types correctly" $ do
   -- without indexable
-    testParser inputParser "<input type='double'>3.3</input>" (const True)
-    testParser inputParser "<input type='text'>Plowtech</input>" (const True)
-    testParser inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>" (const True)
-    testParser inputParser "<input type='int'>1234</input>" (const True)
-    testParser inputParser "<input type='int'>1234</input>" (const True)
+    testParser inputParser "<input type='double'>3.3</input>"
+                (\i -> (i ^.. getInput._InputTypeDouble & null & not) &&
+                       (i ^.. getInput._InputTypeDouble.getInputDouble <&> (== 3.3) & andNotNull ) )
+    testParser inputParser "<input type='text'>Plowtech</input>"
+                (\i -> (i ^.. getInput._InputTypeText & null & not) &&
+                       (i ^.. getInput._InputTypeText.getInputText <&> (== "Plowtech") & andNotNull ) )
+    testParser inputParser "<input type='signature'>as9d8j2l3kfaoiu1239h</input>"
+                (\i -> i ^.. getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull )
+    testParser inputParser "<input type='int'>1234</input>"
+                (\i -> i ^.. getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull)
   it "should parse various buttons and labels" $ do
   -- button and label
-    testParser buttonParser "<button w(const True)th='12' action='sendJson'></button>" (const True)
-    testParser labelParser "<label w(const True)th='12'>Legal Dest</label>" (const True)
+    testParser buttonParser "<button width='12' action='sendJson'></button>"
+                            (\i -> i ^.. getButtonText <&> T.null & andNotNull)
+    testParser labelParser "<label width='12'>Legal Dest</label>"
+                           (\i -> i ^.. getLabelText <&> (== "Legal Dest") & andNotNull)
 --    print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
   it "should parse various form address logo company stuff" $ do
     testParser parseForm "<entry><form><address>Rockshore</address></form></entry>" (const True)
