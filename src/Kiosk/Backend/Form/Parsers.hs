@@ -77,33 +77,27 @@ parseRow = parseElement "row"  buildRow
      buildRow _ = flip Row [] <$>
                    possibleItems
      possibleItems = many' itemParser
--- parseInputOfType :: T.Text -> Parser Item
--- parseInputOfType inputType = do
---   -- look for width or break
---   _iElem <- parseOpenTag "item"
-
---   itemLabel <- labelParser
---   inputElem <- parseElement inputType
-
---   -- look for width or break
---   let
---       itemLabel = Label (element labelElem) (decodeAttributeList . attributes $ labelElem)
---       itemInput = Input (parseInputType (decodeAttributeList . attributes $ inputElem) (value inputElem))
---                         (decodeAttributeList . attributes $ inputElem)
-
---   parseCloseTag "item"
---   return $ Item [ItemLabel itemLabel, ItemInput itemInput] [ItemWidth $ WidthAttribute (12::Int)]
 
 itemParser :: Parser Item
 itemParser = parseElement "item" itemFromAttrs
   where
    itemFromAttrs _attrs = parseItemInput <|>
+                          parseItemAutoInput <|>
                           parseItemButton <|>
                           parseItemRadio <|>
                           parseItemLabel
 
 
+-- | <item><auto-input> Parser
+parseItemAutoInput :: Parser Item
+parseItemAutoInput = do
+      itemLabel <- labelParser
+      itemAutoInput <- autoInputParser
+      return $ Item [ ItemLabel itemLabel
+                    , ItemAutoInput itemAutoInput]
+                    [ItemWidth $ WidthAttribute (12::Int)]
 
+-- | <item><input> Parser
 parseItemInput :: Parser Item
 parseItemInput = do
       itemLabel <- labelParser
@@ -113,23 +107,27 @@ parseItemInput = do
                     [ItemWidth $ WidthAttribute (12::Int)]
 
   -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
+-- | <item><button> Parser
 parseItemButton :: Parser Item
 parseItemButton = makeItemButton <$> buttonParser
   where
    makeItemButton b = Item [ItemButton b] [ItemWidth $ WidthAttribute (12::Int)]
 
+
+-- | <item><label> Parser
 parseItemLabel :: Parser Item
 parseItemLabel = makeItemLabel <$> labelParser
   where
   makeItemLabel itemLabel = Item [ItemLabel itemLabel] [ItemWidth $ WidthAttribute (12::Int)]
 
 
--- | Parser Radio
+-- | <item><radio> Parser
 parseItemRadio :: Parser Item
 parseItemRadio = makeItemRadio <$> radioParser
   where
      makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] [ItemWidth $ WidthAttribute (12::Int)]
 
+-- <radio> Parser
 radioParser :: Parser Radio
 radioParser = parseElement "radio" radioParserFromAttrs
   where
@@ -145,14 +143,14 @@ radioParser = parseElement "radio" radioParserFromAttrs
 
 
 
--- Option Parser
+-- <option> Parser
 optionParser :: Parser Option
 optionParser = parseElement "option" optionFromAttrs
   where                      -- Option has no attrs right now
    optionFromAttrs _attrs = flip Option [] <$>
                             parseElementBodyAsText
 
--- Option Qualifier Parser
+-- <option-qualifier> Parser
 optionQualifierParser :: Parser OptionQualifier
 optionQualifierParser = parseElement "option-qualifier" qualifierFromAttrs
   where
@@ -171,16 +169,14 @@ optionQualifierParser = parseElement "option-qualifier" qualifierFromAttrs
 -- | Element with Content Parser
 
 
--- Button Parser
+-- <button> Parser
 buttonParser :: Parser Button
 buttonParser = parseElement "button" buttonFromAttrs
      where
        buttonFromAttrs attrs  = flip Button (decodeAttributeList attrs) <$>
                                 parseElementBodyAsText
 
-
-
--- Label Parser
+-- <label> Parser
 labelParser :: Parser Label
 labelParser = parseElement "label" makeLabel
     where

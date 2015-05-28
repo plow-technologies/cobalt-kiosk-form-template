@@ -12,6 +12,7 @@ module Kiosk.Backend.Form.Element.Item ( Item(..)
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Width
 
+import           Kiosk.Backend.Form.Element.Item.AutoInput
 import           Kiosk.Backend.Form.Element.Item.Button
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock
 import           Kiosk.Backend.Form.Element.Item.Input
@@ -20,9 +21,9 @@ import           Kiosk.Backend.Form.Element.Item.Radio
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
 
-import GHC.Generics (Generic)
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import qualified Data.Text                                       as T
+import           GHC.Generics                                    (Generic)
+import           Text.Read                                       (readMaybe)
 
 -- A Item containing different item type and its attirbutes
 data Item = Item {
@@ -42,13 +43,13 @@ instance AttributeClass ItemAttributes where
 
 data ItemType = ItemLabel Label
               | ItemInput Input
-              | ItemAutoInput Input
+              | ItemAutoInput AutoInput
               | ItemButton Button
-              | ItemRadio Radio 
+              | ItemRadio Radio
               | ItemEmptyBlock EmptyBlock
               | ItemTableTopHeader TableTopHeader
-              | ItemTableLeftHeader TableLeftHeader  
-    deriving (Generic, Show)                                            
+              | ItemTableLeftHeader TableLeftHeader
+    deriving (Generic, Show)
 
 defaultItem :: Item
 defaultItem = defaultInputItem
