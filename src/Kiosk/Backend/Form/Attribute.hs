@@ -11,8 +11,8 @@ import           GHC.Generics (Generic)
 
 data Attribute = Attribute {
 	  name :: Text
-	, val  :: Text }
-                  deriving (Generic, Show)
+	, val  :: Text 
+} deriving (Generic, Show)
 
 -- Type Class for Attributes
 class AttributeClass a where
