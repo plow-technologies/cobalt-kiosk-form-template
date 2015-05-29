@@ -104,7 +104,7 @@ parseItemInput attrs = do
                     , ItemInput itemInput]
                     (rights . fmap fromAttribute $ attrs)
 
-  -- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
+-- $ Item [ItemButton (Button (value buttonElement) (attributes buttonElement))] [ItemWidth $ WidthAttribute (12::Int)]
 -- | <item><button> Parser
 parseItemButton :: [Attribute] -> Parser Item
 parseItemButton attrs = makeItemButton <$> buttonParser

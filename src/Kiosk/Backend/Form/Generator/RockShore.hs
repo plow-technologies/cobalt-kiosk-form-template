@@ -257,7 +257,7 @@ currentRockshoreForms = [ RockShoreWaterHaulingCompany (Just 0)  BigStarTrucking
                         , RockShoreWaterHaulingCompany (Just 23)    BigMacTrucking exampleUUID]
 
   
-  -- | Use this to pretend everything is new                        
+-- | Use this to pretend everything is new                        
 currentRockshoreFormsNothingMode (RockShoreWaterHaulingCompany _ c e) = RockShoreWaterHaulingCompany Nothing c e
 
 rockShoreLogo :: Logo
