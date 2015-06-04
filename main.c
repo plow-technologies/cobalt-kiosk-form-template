@@ -32,7 +32,14 @@ int main(int argc, char *argv[]) {
   free_HaskellPtr(a->name);
   free_HaskellPtr(a->val);
   free(a);
+
+  widthattribute *w;
+  w = malloc(sizeof(widthattribute));
+
+  setWidthAttribute(w);
+  printf("%d\n", w->width);
   
+  free(w);
   hs_exit();
 }
 
