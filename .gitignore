@@ -45,3 +45,5 @@ tramp
 .cask/
 /test/flycheck_Test.hs
 /TAGS
+
+/src/Kiosk/Backend/Form/Rendering/CStruct.hs
