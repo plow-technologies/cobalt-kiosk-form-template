@@ -68,18 +68,18 @@ haskellTypeToC (t       ,i) = "  " ++ (map toLower t) ++ " *" ++ (map toLower i)
 
 -- mistake in here, not always ToC
 haskellTypeToMarshall :: String -> String
-haskellTypeToMarshall "String" = "CString"
-haskellTypeToMarshall "Text"   = "CString"
-haskellTypeToMarshall "Int"    = "Int"
-haskellTypeToMarshall "Double" = "Double"
-haskellTypeToMarshall "Bool"   = "Bool"
-haskellTypeToMarshall "[String" = "[CString]"
-haskellTypeToMarshall "[Text"   = "[CString]"
-haskellTypeToMarshall "[Int"    = "[Int]"
-haskellTypeToMarshall "[Double" = "[Double]"
-haskellTypeToMarshall "[Bool"   = "[Bool]"
-haskellTypeToMarshall ('[':t)   = "[Ptr " ++ t ++ "ToC]"
-haskellTypeToMarshall t        = "Ptr " ++ t ++ "ToC"
+haskellTypeToMarshall "String"  = "CString"
+haskellTypeToMarshall "Text"    = "CString"
+haskellTypeToMarshall "Int"     = "Int"
+haskellTypeToMarshall "Double"  = "Double"
+haskellTypeToMarshall "Bool"    = "Bool"
+haskellTypeToMarshall "[String" = "Ptr CString"
+haskellTypeToMarshall "[Text"   = "Ptr CString"
+haskellTypeToMarshall "[Int"    = "Ptr Int"
+haskellTypeToMarshall "[Double" = "Ptr Double"
+haskellTypeToMarshall "[Bool"   = "Ptr Bool"
+haskellTypeToMarshall ('[':t)   = "Ptr " ++ t ++ "ToC"
+haskellTypeToMarshall t         = "Ptr " ++ t ++ "ToC"
 
 -- first one needs to be without a comma
 defineHeadRecord :: [(String,String)] -> String
