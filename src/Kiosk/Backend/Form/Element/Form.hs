@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {- |
 Module      :  Kiosk.Backend.Element.Form
 Description :  Form Element Types for Kiosk
@@ -14,6 +15,7 @@ Portability :  portable
 module Kiosk.Backend.Form.Element.Form ( Form (..)
                                        , defaultForm) where
 
+import           GHC.Generics
 import           Kiosk.Backend.Form.Element.Address
 import           Kiosk.Backend.Form.Element.Company
 import           Kiosk.Backend.Form.Element.Constant
@@ -29,7 +31,7 @@ data Form = Form {
   , _getPhone     :: Phone
   , _getConstants :: [Constant]
   , _row          :: [Row]
-} deriving (Show)
+} deriving (Show,Generic)
 
 defaultForm :: Form
 defaultForm = Form defaultCompany defaultAddress defaultLogo defaultPhone [defaultConstant] defaultRows
