@@ -11,9 +11,13 @@ vals = [ $(getTypeAndRecords ''Attribute)
        , $(getTypeAndRecords ''MaxAttributeDouble)
        , $(getTypeAndRecords ''MinAttributeDouble)
        , $(getTypeAndRecords ''PathAttribute)
-       , $(getTypeAndRecords ''WidthAttribute)]
+       , $(getTypeAndRecords ''WidthAttribute)
+       , $(getTypeAndRecords ''AddressAttributes)
+       , $(getTypeAndRecords ''Address)
+       ]
 
 x = $(getTypeAndRecords ''Address)
+z = $(getTypeAndRecords ''AddressAttributes)
 
 main :: IO ()
 main = do
@@ -21,6 +25,8 @@ main = do
   -- cbits/bar.c
   -- src/Kiosk/Backend/Form/Rendering/HsBar.hsc
   createHeaderAndHSC "bar" "HsBar" "Kiosk.Backend.Form.Rendering.HsBar" vals
-  print vals
+  -- print vals
   print x
-  print "Hello from main"
+
+  -- print "Hello from main"
+  print z

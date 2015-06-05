@@ -15,6 +15,10 @@ extractFirst (a,_,_) = a
 extractThird :: (a, b, c) -> c
 extractThird (_,_,c) = c
 
+firstToLower :: String -> String
+firstToLower (x:xs) = [toLower x] ++ xs
+firstToLower _      = ""
+
 -- AppT ListT
 {-
 (ConT c)
@@ -35,12 +39,16 @@ getTypeAndRecords t = do
     returnAsTupleList pairs = ListE $ map (\(x,y) -> TupE [LitE $ StringL x, LitE $ StringL y]) pairs
     getTypeNameAndRecordName r = case r of
       (RecC    name fields) -> returnAsTupleList $ map (\x -> ((getTypeName . extractThird) x, (nameBase . extractFirst) x)) fields
-      (NormalC name fields) -> ListE $ map (LitE . StringL) $ map (\x -> (getTypeName . snd) x) fields
+      (NormalC name fields) -> returnAsTupleList $ map (\x -> ((getTypeName . snd) x, (firstToLower $ nameBase name))) fields
+
+      --ListE $ map (LitE . StringL) $ map (\x -> (getTypeName . snd) x_) fields
       _ -> ListE []
     flatten l = case l of 
       (x:xs) -> x
       _ -> ListE []
     -- getRecordNames (RecC name fields) = ListE $ map (\(x,y) -> TupE [LitE $ StringL x, LitE $ StringL y]) $ map (\x -> ((getTypeName . extractThird) x, (nameBase . extractFirst) x)) fields
+
+
 
 -- List of items is a pointer
 -- List of Ptrs is a double pointer
@@ -70,7 +78,7 @@ haskellTypeToMarshall "[Text"   = "[CString]"
 haskellTypeToMarshall "[Int"    = "[Int]"
 haskellTypeToMarshall "[Double" = "[Double]"
 haskellTypeToMarshall "[Bool"   = "[Bool]"
-haskellTypeToMarshall '[':t     = "[Ptr " ++ t ++ "ToC]"
+haskellTypeToMarshall ('[':t)   = "[Ptr " ++ t ++ "ToC]"
 haskellTypeToMarshall t        = "Ptr " ++ t ++ "ToC"
 
 -- first one needs to be without a comma
