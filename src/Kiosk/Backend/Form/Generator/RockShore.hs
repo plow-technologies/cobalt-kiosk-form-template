@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}  
-module Kiosk.Backend.Form.Generator.RockShore ( currentRockshoreForms) where
-                                              
+module Kiosk.Backend.Form.Generator.RockShore  where
+
 import Kiosk.Backend.Form
 import qualified Data.Text as T
 import Data.String (IsString)
