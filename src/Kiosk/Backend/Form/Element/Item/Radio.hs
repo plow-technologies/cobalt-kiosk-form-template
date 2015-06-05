@@ -5,63 +5,65 @@
 
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
                                               , Option(..)
+                                              , OptionAttributes(..)
                                               , OptionQualifier(..)
+                                              , OptionQualifierAttributes(..)
                                               , QualifierChoices (..)
                                               , defaultRadio) where
 
-import GHC.Generics (Generic)
-import qualified Data.Text as T
-import Kiosk.Backend.Form.Element.Item.Label ( Label(..)
-                                             , defaultLabel)
-import Kiosk.Backend.Form.Element.Item.Input 
-import Kiosk.Backend.Form.Attribute ( AttributeClass(..)
-                                    , Attribute(..) )
+import qualified Data.Text                              as T
+import           GHC.Generics                           (Generic)
+import           Kiosk.Backend.Form.Attribute           (Attribute (..),
+                                                         AttributeClass (..))
+import           Kiosk.Backend.Form.Element.Item.Input
+import           Kiosk.Backend.Form.Element.Item.Label  (Label (..),
+                                                         defaultLabel)
 
-import Kiosk.Backend.Form.Attribute.Width 
-import Kiosk.Backend.Form.Attribute.Indexable
+import           Kiosk.Backend.Form.Attribute.Indexable
+import           Kiosk.Backend.Form.Attribute.Width
 
 -- A Radio button is a circular, singular selector
 -- Our radio buttons come preloaded with Options!
 
 
 -- |Radio Button parent element
-data Radio = Radio { 
-    _getRadioLabel :: Label
-  , _getRadioOptions :: [Option]
+data Radio = Radio {
+    _getRadioLabel     :: Label
+  , _getRadioOptions   :: [Option]
   , _getRadioQualifier :: [OptionQualifier]
-} deriving (Generic, Show)                                 
+} deriving (Generic, Show)
 
-data Option = Option { 
+data Option = Option {
     _getOptionText :: T.Text
-  , _optionAttrib :: [OptionAttributes]                   
+  , _optionAttrib  :: [OptionAttributes]
 } deriving (Generic, Show)
 
-data OptionAttributes = OptionNull deriving (Show)
+data OptionAttributes = OptionNull deriving (Show,Generic)
 
 
-instance AttributeClass OptionAttributes where 
+instance AttributeClass OptionAttributes where
 	toAttribute (OptionNull) = Attribute "" ""
-	fromAttribute _ = Right OptionNull   
+	fromAttribute _ = Right OptionNull
 
 
-data OptionQualifier = OptionQualifier { 
+data OptionQualifier = OptionQualifier {
     _getOptionQualifierText :: [QualifierChoices]
-  , _optionQualifierAttrib :: [OptionQualifierAttributes]                   
-} deriving (Generic, Show)
+  , _optionQualifierAttrib  :: [OptionQualifierAttributes]
+} deriving (Generic, Show )
 
-data OptionQualifierAttributes = OptionQualifierNull deriving (Show)
+data OptionQualifierAttributes = OptionQualifierNull deriving (Show,Generic)
 
-instance AttributeClass OptionQualifierAttributes where 
+instance AttributeClass OptionQualifierAttributes where
 	toAttribute (OptionQualifierNull) = Attribute "" ""
-	fromAttribute _ = Right OptionQualifierNull                  
+	fromAttribute _ = Right OptionQualifierNull
 
-data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Show)
+data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Show,Generic)
 
 
 defaultRadio :: Radio
 defaultRadio = Radio defaultLabel [defaultOption] [defaultOptionQualifier]
 
-defaultOption :: Option 
+defaultOption :: Option
 defaultOption = Option "Pit Water" []
 
 defaultOptionQualifier :: OptionQualifier
@@ -73,9 +75,9 @@ defaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
 
 defaultQualifierInput :: Input
 defaultQualifierInput = Input dit dia
- where 
-   dit = InputTypeText . InputText $ "" 
+ where
+   dit = InputTypeText . InputText $ ""
    dia = [wAttr, tAttr, ixAttr]
    wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttributeText 
+   tAttr = InputType $ InputTypeAttributeText

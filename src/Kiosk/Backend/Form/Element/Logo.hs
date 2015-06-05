@@ -1,20 +1,21 @@
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Element.Logo( Logo(..)
                                       , LogoAttributes (..)
-                                      , defaultLogo) where 
-
-import Kiosk.Backend.Form.Attribute
-import Kiosk.Backend.Form.Attribute.Path
-import qualified Data.Text as T
+                                      , defaultLogo) where
+import qualified Data.Text                         as T
+import           GHC.Generics
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Path
 
 -- A Logo mainly is the Name of the Logo
 data Logo = Logo {
   _getLogoText :: T.Text,
   _logoAttrib  :: [LogoAttributes]
-} deriving (Show)
+} deriving (Show,Generic)
 
-data LogoAttributes = LogoPath PathAttribute deriving (Show, Ord, Eq)
+data LogoAttributes = LogoPath PathAttribute deriving (Show, Ord, Eq,Generic)
 
 instance AttributeClass LogoAttributes where
    toAttribute (LogoPath a) = toAttribute a

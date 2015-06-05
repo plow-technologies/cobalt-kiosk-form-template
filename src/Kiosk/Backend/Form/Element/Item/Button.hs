@@ -2,15 +2,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Element.Item.Button ( Button (..)
+                                                  , ButtonAttributes (..)
 	                                          , defaultButton
 	                                          , defaultButtonAttributeList) where
 
-import           Kiosk.Backend.Form.Attribute       
+import qualified Data.Text                           as T
+import           GHC.Generics                        (Generic)
+import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Action
 import           Kiosk.Backend.Form.Attribute.Width
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
-import           GHC.Generics                        (Generic)
+import           Text.Read                           (readMaybe)
 
 -- Button is Text with set of attributes
 data Button = Button {
@@ -18,7 +19,7 @@ data Button = Button {
    _buttonAttrib  :: [ButtonAttributes]
 } deriving (Generic, Show)
 
-data ButtonAttributes = ButtonWidth WidthAttribute | ButtonAction ActionAttribute deriving (Show)
+data ButtonAttributes = ButtonWidth WidthAttribute | ButtonAction ActionAttribute deriving (Show,Generic)
 
 
 instance AttributeClass ButtonAttributes where

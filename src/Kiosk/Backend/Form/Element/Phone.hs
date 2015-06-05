@@ -1,22 +1,23 @@
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Element.Phone ( Phone(..)
                                         , PhoneAttributes (..)
-                                        , defaultPhone) where 
+                                        , defaultPhone) where
 
-import Kiosk.Backend.Form.Attribute
-import Kiosk.Backend.Form.Attribute.Width
-
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import qualified Data.Text                          as T
+import           GHC.Generics
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Width
+import           Text.Read                          (readMaybe)
 
 data Phone = Phone {
   _getPhoneText :: T.Text,
   _phoneAttrib  :: [PhoneAttributes]
-} deriving (Show, Ord, Eq)
+} deriving (Show, Ord, Eq,Generic)
 
 -- Phone Attributes
-data PhoneAttributes = PhoneWidth WidthAttribute deriving (Show, Ord, Eq)
+data PhoneAttributes = PhoneWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
 
 instance AttributeClass PhoneAttributes where
   toAttribute (PhoneWidth a) = toAttribute a

@@ -4,11 +4,11 @@
 module Kiosk.Backend.Form.Element.Item.Label( Label (..)
                                             , LabelAttributes(..)
                                             , defaultLabel) where
-import Kiosk.Backend.Form.Attribute.Width
-import Kiosk.Backend.Form.Attribute
-import qualified Data.Text as T
-import Text.Read (readMaybe)
-import GHC.Generics (Generic)
+import qualified Data.Text                          as T
+import           GHC.Generics                       (Generic)
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Width
+import           Text.Read                          (readMaybe)
 
 -- A label is a text with set of attributes
 data Label = Label {
@@ -17,7 +17,7 @@ data Label = Label {
 } deriving (Generic, Show)
 
 -- Label Attributes
-data LabelAttributes = LabelWidth WidthAttribute deriving (Show, Ord, Eq)
+data LabelAttributes = LabelWidth WidthAttribute deriving (Show, Ord, Eq, Generic)
 
 instance AttributeClass LabelAttributes where
     toAttribute (LabelWidth a) = toAttribute a

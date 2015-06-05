@@ -1,25 +1,26 @@
-{-# LANGUAGE OverloadedStrings  #-}
-
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Kiosk.Backend.Form.Element.Address( Address(..)
                                          , AddressAttributes (..)
-                                         , defaultAddress) where 
+                                         , defaultAddress) where
 
-import Kiosk.Backend.Form.Attribute
-import Kiosk.Backend.Form.Attribute.Width
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import qualified Data.Text                          as T
+import           GHC.Generics
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Width
+import           Text.Read                          (readMaybe)
 
 -- A Address contain address information of the Company
 data Address = Address {
   _getAddressText :: T.Text,
   _addressAttrib  :: [AddressAttributes]
-} deriving (Show, Ord, Eq)
+} deriving (Show, Ord, Eq,Generic)
 
-data AddressAttributes = AddressWidth WidthAttribute deriving (Show, Ord, Eq)
+data AddressAttributes = AddressWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
 
 
 instance AttributeClass AddressAttributes where
-  toAttribute (AddressWidth a) = toAttribute a  
+  toAttribute (AddressWidth a) = toAttribute a
   fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
                                     (Just w') -> Right (AddressWidth (WidthAttribute w'))
                                     Nothing -> Left $ T.concat ["AddressAttributes value not parsing -->",w]

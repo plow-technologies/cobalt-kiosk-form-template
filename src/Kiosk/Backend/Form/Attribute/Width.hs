@@ -1,14 +1,15 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Attribute.Width (WidthAttribute(..)) where
-
-import Kiosk.Backend.Form.Attribute
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import qualified Data.Text                    as T
+import           GHC.Generics
+import           Kiosk.Backend.Form.Attribute
+import           Text.Read                    (readMaybe)
 
 data WidthAttribute = WidthAttribute {
-    _getWidth  :: Int
-} deriving (Show, Ord, Eq)
+    _getWidth :: Int
+} deriving (Show, Ord, Eq,Generic)
 
 instance AttributeClass WidthAttribute where
    toAttribute (WidthAttribute a) = Attribute "width" (T.pack ("'" ++ show a ++ "'"))

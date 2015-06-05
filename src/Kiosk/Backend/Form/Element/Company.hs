@@ -1,25 +1,26 @@
-{-# LANGUAGE OverloadedStrings  #-}
-
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Kiosk.Backend.Form.Element.Company( Company(..)
                                          , CompanyAttributes (..)
-                                         , defaultCompany) where 
+                                         , defaultCompany) where
 
-import Kiosk.Backend.Form.Attribute
-import Kiosk.Backend.Form.Attribute.Width
-import qualified Data.Text as T
-import Text.Read   (readMaybe)
+import qualified Data.Text                          as T
+import           GHC.Generics
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Width
+import           Text.Read                          (readMaybe)
 
 -- A Company contain address information of the Company
 data Company = Company {
   _getCompanyText :: T.Text,
   _companyAttrib  :: [CompanyAttributes]
-} deriving (Show, Ord, Eq)
+} deriving (Show, Ord, Eq,Generic)
 
-data CompanyAttributes = CompanyWidth WidthAttribute deriving (Show, Ord, Eq)
+data CompanyAttributes = CompanyWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
 
 
 instance AttributeClass CompanyAttributes where
-  toAttribute (CompanyWidth a) = toAttribute a  
+  toAttribute (CompanyWidth a) = toAttribute a
   fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
                                     (Just w') -> Right (CompanyWidth (WidthAttribute w'))
                                     Nothing -> Left $ T.concat ["CompanyAttributes value not parsing -->",w]
