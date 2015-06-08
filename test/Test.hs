@@ -4,8 +4,8 @@
 module Main where
 
 import           Kiosk.Backend.Form
-import           Kiosk.Backend.Form.Generator.Cobalt
-import           Kiosk.Backend.Form.Generator.RockShore
+import qualified Kiosk.Backend.Form.Generator.Cobalt    as Cobalt
+import qualified Kiosk.Backend.Form.Generator.RockShore as Rock
 
 import           Control.Applicative
 import           Data.Attoparsec.Text
