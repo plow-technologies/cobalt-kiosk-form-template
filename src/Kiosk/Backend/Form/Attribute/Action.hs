@@ -3,14 +3,17 @@
 
 module Kiosk.Backend.Form.Attribute.Action (ActionAttribute(..)) where
 
+import           Data.Aeson                   (FromJSON, ToJSON)
 import qualified Data.Text                    as T
 import           GHC.Generics                 (Generic)
 import           Kiosk.Backend.Form.Attribute
 
-
 data ActionAttribute = ActionAttribute {
 	_getFunctionName :: T.Text
 } deriving (Generic,Show,Ord,Eq)
+
+instance ToJSON ActionAttribute where
+instance FromJSON ActionAttribute where
 
 instance AttributeClass ActionAttribute where
   toAttribute (ActionAttribute a) = Attribute "action" (T.pack ("'" ++ show a ++ "'"))
