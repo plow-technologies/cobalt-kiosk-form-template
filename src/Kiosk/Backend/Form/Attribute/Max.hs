@@ -6,14 +6,18 @@ module Kiosk.Backend.Form.Attribute.Max (MaxAttributeDouble(..)) where
 
 import           Kiosk.Backend.Form.Attribute
 
+import           Data.Aeson                   (FromJSON, ToJSON)
 import qualified Data.Text                    as T
 import           GHC.Generics                 (Generic)
 import           Text.Read                    (readMaybe)
 
-
 data MaxAttributeDouble = MaxAttributeDouble {
 	_getGenericMaxAmt :: Double
 } deriving (Show,Eq,Ord,Generic)
+
+
+instance ToJSON MaxAttributeDouble where
+instance FromJSON MaxAttributeDouble where
 
 instance AttributeClass MaxAttributeDouble where
   toAttribute (MaxAttributeDouble d) = Attribute "width" (T.pack ("'" ++ show d ++ "'"))
