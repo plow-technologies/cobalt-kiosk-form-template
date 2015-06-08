@@ -4,20 +4,28 @@ module Kiosk.Backend.Form.Element.Address( Address(..)
                                          , AddressAttributes (..)
                                          , defaultAddress) where
 
+import           Data.Aeson                         (FromJSON, ToJSON)
 import qualified Data.Text                          as T
 import           GHC.Generics
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Width
 import           Text.Read                          (readMaybe)
-
 -- A Address contain address information of the Company
 data Address = Address {
   _getAddressText :: T.Text,
   _addressAttrib  :: [AddressAttributes]
 } deriving (Show, Ord, Eq,Generic)
 
+
+
+instance ToJSON Address where
+instance FromJSON Address where
+
 data AddressAttributes = AddressWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
 
+
+instance ToJSON AddressAttributes where
+instance FromJSON AddressAttributes where
 
 instance AttributeClass AddressAttributes where
   toAttribute (AddressWidth a) = toAttribute a

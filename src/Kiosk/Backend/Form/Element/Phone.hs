@@ -5,19 +5,26 @@ module Kiosk.Backend.Form.Element.Phone ( Phone(..)
                                         , PhoneAttributes (..)
                                         , defaultPhone) where
 
+import           Data.Aeson                         (FromJSON, ToJSON)
 import qualified Data.Text                          as T
 import           GHC.Generics
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Width
 import           Text.Read                          (readMaybe)
-
 data Phone = Phone {
   _getPhoneText :: T.Text,
   _phoneAttrib  :: [PhoneAttributes]
 } deriving (Show, Ord, Eq,Generic)
 
+
+instance ToJSON Phone where
+instance FromJSON Phone where
+
 -- Phone Attributes
 data PhoneAttributes = PhoneWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
+
+instance ToJSON PhoneAttributes where
+instance FromJSON PhoneAttributes where
 
 instance AttributeClass PhoneAttributes where
   toAttribute (PhoneWidth a) = toAttribute a
