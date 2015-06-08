@@ -101,6 +101,7 @@ executable onping
                    , blaze-html >= 0.7.0.3 && < 0.9
                    , template-haskell
                    , cobalt-kiosk-form-template
+                   , aeson
 
   default-language:     Haskell2010                      
   ghc-options:       -threaded -O2 -rtsopts -Wall
@@ -124,5 +125,6 @@ test-suite test
                      , lens >= 4.9
                      , bytestring 
                      , blaze-html
+                     , aeson
                      , action-permutations >= 0.0.0.1 
 
