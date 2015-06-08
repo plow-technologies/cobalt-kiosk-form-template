@@ -5,15 +5,17 @@ module Kiosk.Backend.Form.Attribute ( AttributeClass(..)
                                     , Attribute(..)
                                     , wrongAttrResponse) where
 
+import           Data.Aeson   (FromJSON, ToJSON)
 import           Data.Text    (Text)
 import qualified Data.Text    as T
 import           GHC.Generics (Generic)
-
 data Attribute = Attribute {
 	  name :: Text
-	, val  :: Text 
+	, val  :: Text
 } deriving (Generic, Show)
 
+instance ToJSON Attribute where
+instance FromJSON Attribute where
 -- Type Class for Attributes
 class AttributeClass a where
   toAttribute :: a -> Attribute
