@@ -15,6 +15,7 @@ Portability :  portable
 module Kiosk.Backend.Form.Element.Form ( Form (..)
                                        , defaultForm) where
 
+import           Data.Aeson                          (FromJSON, ToJSON)
 import           GHC.Generics
 import           Kiosk.Backend.Form.Element.Address
 import           Kiosk.Backend.Form.Element.Company
@@ -22,7 +23,6 @@ import           Kiosk.Backend.Form.Element.Constant
 import           Kiosk.Backend.Form.Element.Logo
 import           Kiosk.Backend.Form.Element.Phone
 import           Kiosk.Backend.Form.Element.Row
-
 -- A form is a list of Rows
 data Form = Form {
     _getCompany   :: Company
@@ -32,6 +32,10 @@ data Form = Form {
   , _getConstants :: [Constant]
   , _row          :: [Row]
 } deriving (Show,Generic)
+
+
+instance ToJSON Form where
+instance FromJSON Form where
 
 defaultForm :: Form
 defaultForm = Form defaultCompany defaultAddress defaultLogo defaultPhone [defaultConstant] defaultRows

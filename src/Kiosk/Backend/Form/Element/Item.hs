@@ -32,6 +32,9 @@ data Item = Item {
   _itemAttrib :: [ItemAttributes]
 } deriving (Generic, Show)
 
+
+instance ToJSON Item where
+instance FromJSON Item where
 -- Item Attributes
 data ItemAttributes = ItemWidth WidthAttribute deriving (Generic, Show)
 
