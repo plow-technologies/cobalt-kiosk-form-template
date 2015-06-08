@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
-module Kiosk.Backend.Form.Generator.RockShore ( insertThisFormInRockShore
+module Kiosk.Backend.Form.Generator.RockShoreFull ( insertThisFormInRockShore
                                               , updateThisFormInRockShore
                                               , currentRockshoreForms) where
 
@@ -12,6 +12,10 @@ import           Data.Text            (Text, pack)
 import           Data.Traversable     (traverse)
 import           Kiosk.Backend.Form
 import           Network.Wreq         (Response, post)
+
+import           Kiosk.Backend.Form.Attribute
+import           Kiosk.Backend.Form.Attribute.Indexable
+import           Kiosk.Backend.Form.Element
 
 -- travsere printForm currentRockshoreForms for debugging
 printForm :: RockShoreWaterHaulingCompany -> IO ()
@@ -31,7 +35,7 @@ updateThisFormInRockShore url port whc@(RockShoreWaterHaulingCompany (Just i) _w
                                                                                                     url <>
                                                                                                     ":" <>
                                                                                                     port <> "/form/update?formid=" <>
-                                                                                                    (show i)) (encode.convertToKioskForm $ whc)
+                                                                                                    (show $ _getFormId i)) (encode.convertToKioskForm $ whc)
 updateThisFormInRockShore _url _port (RockShoreWaterHaulingCompany _ _ _) = return $ Left "Can't update form w/o id"
 
 rockShoreEnergy :: Company
@@ -117,7 +121,7 @@ generateInputRowDate labelDate = Row [generateInputItemDate labelDate] []
 
 generateInputItemDate :: Text -> Item
 generateInputItemDate  labelDate = Item [ItemLabel . generateLabel $ labelDate
-                                                    , ItemAutoInput fullDefaultInputDate] []
+                                                    , ItemInput fullDefaultInputDate] []
 
 fullDefaultInputDate :: Input
 fullDefaultInputDate = Input fullDefaultInputTypeDate [InputType InputTypeAttributeDate]
@@ -131,7 +135,7 @@ generateInputRowTime labelTime = Row [generateInputItemTime labelTime] []
 
 generateInputItemTime :: Text -> Item
 generateInputItemTime  labelTime = Item [ItemLabel . generateLabel $ labelTime
-                                                    , ItemAutoInput fullDefaultInputTime] []
+                                                    , ItemInput fullDefaultInputTime] []
 
 fullDefaultInputTime :: Input
 fullDefaultInputTime = Input fullDefaultInputTypeTime [InputType InputTypeAttributeTime]
@@ -237,7 +241,7 @@ data CompanyName = BigStarTrucking
           deriving (Eq,Ord)
 
 instance Show CompanyName where
-  show (BigStarTrucking) = "Big Star Trucking"
+  show (BigStarTrucking) = "I Hate Trucking"
   show (BulletEnergyServices) = "Bullet Energy Services"
   show (Advantage) = "Advantage"
   show (ArkomaTanks) = "Arkoma Tanks LLC"
