@@ -12,6 +12,10 @@ module Kiosk.Backend.Form.Element.Item ( Item(..)
 import           Kiosk.Backend.Form.Attribute
 import           Kiosk.Backend.Form.Attribute.Width
 
+import           Data.Aeson                                      (FromJSON,
+                                                                  ToJSON)
+import qualified Data.Text                                       as T
+import           GHC.Generics                                    (Generic)
 import           Kiosk.Backend.Form.Element.Item.AutoInput
 import           Kiosk.Backend.Form.Element.Item.Button
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock
@@ -20,9 +24,6 @@ import           Kiosk.Backend.Form.Element.Item.Label
 import           Kiosk.Backend.Form.Element.Item.Radio
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader
-
-import qualified Data.Text                                       as T
-import           GHC.Generics                                    (Generic)
 import           Text.Read                                       (readMaybe)
 
 -- A Item containing different item type and its attirbutes
@@ -34,6 +35,8 @@ data Item = Item {
 -- Item Attributes
 data ItemAttributes = ItemWidth WidthAttribute deriving (Generic, Show)
 
+instance ToJSON ItemAttributes where
+instance FromJSON ItemAttributes where
 instance AttributeClass ItemAttributes where
    toAttribute (ItemWidth a) = toAttribute a
    fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
@@ -50,6 +53,9 @@ data ItemType = ItemLabel Label
               | ItemTableTopHeader TableTopHeader
               | ItemTableLeftHeader TableLeftHeader
     deriving (Generic, Show)
+
+instance ToJSON ItemType where
+instance FromJSON ItemType where
 
 defaultItem :: Item
 defaultItem = defaultInputItem

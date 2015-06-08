@@ -6,6 +6,7 @@ module Kiosk.Backend.Form.Element.Item.Button ( Button (..)
 	                                          , defaultButton
 	                                          , defaultButtonAttributeList) where
 
+import           Data.Aeson                          (FromJSON, ToJSON)
 import qualified Data.Text                           as T
 import           GHC.Generics                        (Generic)
 import           Kiosk.Backend.Form.Attribute
@@ -19,8 +20,13 @@ data Button = Button {
    _buttonAttrib  :: [ButtonAttributes]
 } deriving (Generic, Show)
 
+instance ToJSON Button where
+instance FromJSON Button where
+
 data ButtonAttributes = ButtonWidth WidthAttribute | ButtonAction ActionAttribute deriving (Show,Generic)
 
+instance ToJSON ButtonAttributes where
+instance FromJSON ButtonAttributes where
 
 instance AttributeClass ButtonAttributes where
    toAttribute (ButtonWidth w) = toAttribute w

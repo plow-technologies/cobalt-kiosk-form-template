@@ -20,9 +20,12 @@ identical to other labels
 
 module Kiosk.Backend.Form.Element.Item.AutoInput (AutoInput(..)) where
 
+import           Data.Aeson                            (FromJSON, ToJSON)
 import           Data.Typeable                         (Typeable)
 import           GHC.Generics                          (Generic)
 import           Kiosk.Backend.Form.Element.Item.Input (Input)
-
 newtype AutoInput = AutoInput{_getAutoInput :: Input}
   deriving (Generic,Show,Ord,Eq,Typeable)
+
+instance ToJSON AutoInput where
+instance FromJSON AutoInput where
