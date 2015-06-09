@@ -23,4 +23,4 @@ instance AttributeClass LogoAttributes where
    fromAttribute _ = Left "Not a valid button Attribute"
 
 defaultLogo :: Logo
-defaultLogo = Logo "" [LogoPath . PathAttribute $ "'Cobalt.png'"]
+defaultLogo = Logo "" [LogoPath . PathAttribute $ "Cobalt.png"]
