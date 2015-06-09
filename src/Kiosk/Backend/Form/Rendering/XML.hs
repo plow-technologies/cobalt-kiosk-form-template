@@ -47,6 +47,7 @@ renderDropdown (Dropdown lbl opts maybeIn) = "<dropdown>"
                                                     <> renderLabel lbl
                                                     <> renderOptionList opts
                                                     <> maybe "" renderInput maybeIn
+                                                    <> "</dropdown>"
 -- Render Option Tag
 renderOptionList :: [Option] -> Text
 renderOptionList = renderList renderOption
