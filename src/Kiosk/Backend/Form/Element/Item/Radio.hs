@@ -4,11 +4,6 @@
 
 
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
-                                              , Option(..)
-                                              , OptionAttributes(..)
-                                              , OptionQualifier(..)
-                                              , OptionQualifierAttributes(..)
-                                              , QualifierChoices (..)
                                               , defaultRadio) where
 
 import qualified Data.Text                              as T
@@ -43,21 +38,3 @@ instance FromJSON Radio where
 defaultRadio :: Radio
 defaultRadio = Radio defaultLabel [defaultOption] [defaultOptionQualifier]
 
-defaultOption :: Option
-defaultOption = Option "Pit Water" []
-
-defaultOptionQualifier :: OptionQualifier
-defaultOptionQualifier = OptionQualifier defaultQualifierChoices []
-
-defaultQualifierChoices :: [QualifierChoices]
-defaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
-                          , QualifierInput defaultQualifierInput]
-
-defaultQualifierInput :: Input
-defaultQualifierInput = Input dit dia
- where
-   dit = InputTypeText . InputText $ ""
-   dia = [wAttr, tAttr, ixAttr]
-   wAttr = InputWidth $ WidthAttribute (12::Int)
-   ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttributeText
