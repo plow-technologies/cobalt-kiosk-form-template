@@ -22,6 +22,7 @@ import           Kiosk.Backend.Form.Element.Item.Label  (Label (..),
 import           Data.Aeson                             (FromJSON, ToJSON)
 import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Width
+
 -- A Radio button is a circular, singular selector
 -- Our radio buttons come preloaded with Options!
 

@@ -17,4 +17,3 @@ Dropdown button with text input
 
 module Kiosk.Backend.Form.Element.Item.Dropdown where
 
-
