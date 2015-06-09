@@ -20,7 +20,9 @@ import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element.Item.Option (Option (..),
                                                          OptionAttributes (..),
                                                          OptionQualifier (..), OptionQualifierAttributes (..),
-                                                         QualifierChoices (..))
+                                                         QualifierChoices (..),
+                                                         defaultOption,
+                                                         defaultOptionQualifier)
 -- A Radio button is a circular, singular selector
 -- Our radio buttons come preloaded with Options!
 
