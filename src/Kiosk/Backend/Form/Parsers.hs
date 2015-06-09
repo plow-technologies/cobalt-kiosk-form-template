@@ -125,6 +125,24 @@ parseItemRadio attrs = makeItemRadio <$> radioParser
   where
      makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] (rights . fmap fromAttribute $ attrs)
 
+
+-- <dropdown> Parser
+dropdownParser :: Parser Dropdown
+dropdownParser = parseElement "dropdown" dropdownParserFromAttrs
+  where
+     dropdownParserFromAttrs _attrs = do
+       itemLabel <- labelParser
+       subins <- (Just <$> substituteInput) <|> (pure Nothing)
+       options <- many1 optionParser <?> "missing at least 1 option"
+       return $ Dropdown itemLabel options subins
+
+substituteInput :: Parser Input
+substituteInput = parseElement "input" inputFromAttrs
+  where
+   inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
+                           parseInputType (decodeAttributeList attrs)
+
+
 -- <radio> Parser
 radioParser :: Parser Radio
 radioParser  = parseElement "radio" radioParserFromAttrs
@@ -136,8 +154,6 @@ radioParser  = parseElement "radio" radioParserFromAttrs
      return $ Radio itemLabel options optionQualifiers
      --Option "Pit Water" []
      -- currently not using option attributes
-
-
 
 
 

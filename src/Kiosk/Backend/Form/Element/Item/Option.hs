@@ -27,8 +27,7 @@ import           Kiosk.Backend.Form.Attribute           (Attribute (..),
 import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element.Item.Input
-import           Kiosk.Backend.Form.Element.Item.Label  (Label (..),
-                                                         defaultLabel)
+import           Kiosk.Backend.Form.Element.Item.Label  (Label (..))
 data Option = Option {
     _getOptionText :: T.Text
   , _optionAttrib  :: [OptionAttributes]

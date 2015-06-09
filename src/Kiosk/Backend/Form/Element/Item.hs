@@ -22,7 +22,6 @@ import           Kiosk.Backend.Form.Element.Item.Dropdown
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock
 import           Kiosk.Backend.Form.Element.Item.Input
 import           Kiosk.Backend.Form.Element.Item.Label
-import           Kiosk.Backend.Form.Element.Item.Option
 import           Kiosk.Backend.Form.Element.Item.Radio
 import           Kiosk.Backend.Form.Element.Item.TableLeftHeader
 import           Kiosk.Backend.Form.Element.Item.TableTopHeader

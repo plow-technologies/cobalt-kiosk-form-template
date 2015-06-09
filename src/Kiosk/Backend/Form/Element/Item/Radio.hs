@@ -6,21 +6,18 @@
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
                                               , defaultRadio) where
 
-import qualified Data.Text                              as T
+
 import           GHC.Generics                           (Generic)
-import           Kiosk.Backend.Form.Attribute           (Attribute (..),
-                                                         AttributeClass (..))
-import           Kiosk.Backend.Form.Element.Item.Input
+
+
 import           Kiosk.Backend.Form.Element.Item.Label  (Label (..),
                                                          defaultLabel)
 
 import           Data.Aeson                             (FromJSON, ToJSON)
-import           Kiosk.Backend.Form.Attribute.Indexable
-import           Kiosk.Backend.Form.Attribute.Width
+
+
 import           Kiosk.Backend.Form.Element.Item.Option (Option (..),
-                                                         OptionAttributes (..),
-                                                         OptionQualifier (..), OptionQualifierAttributes (..),
-                                                         QualifierChoices (..),
+                                                         OptionQualifier (..),
                                                          defaultOption,
                                                          defaultOptionQualifier)
 -- A Radio button is a circular, singular selector
