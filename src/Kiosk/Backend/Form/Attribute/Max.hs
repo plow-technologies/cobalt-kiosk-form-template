@@ -16,7 +16,7 @@ data MaxAttributeDouble = MaxAttributeDouble {
 } deriving (Show,Eq,Ord,Generic)
 
 instance AttributeClass MaxAttributeDouble where
-  toAttribute (MaxAttributeDouble d) = Attribute "width" (T.pack ("'" ++ show d ++ "'"))
+  toAttribute (MaxAttributeDouble d) = Attribute "maxd" (T.pack ("'" ++ show d ++ "'"))
   fromAttribute (Attribute "maxd" m) = case readMaybe (T.unpack m) of
   									        (Just m') -> Right (MaxAttributeDouble m')
   									        Nothing -> Left $ T.concat ["MaxAttribute value not parsing -->",m]
