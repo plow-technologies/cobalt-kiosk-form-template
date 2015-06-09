@@ -125,6 +125,12 @@ parseItemRadio attrs = makeItemRadio <$> radioParser
   where
      makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] (rights . fmap fromAttribute $ attrs)
 
+-- | <item><radio> Parser
+parseItemDropdown :: [Attribute] -> Parser Item
+parseItemDropdown attrs = makeItemDropdown <$> dropdownParser
+  where
+     makeItemDropdown itemDropdown = Item [ItemDropdown  itemDropdown ] (rights . fmap fromAttribute $ attrs)
+
 
 -- <dropdown> Parser
 dropdownParser :: Parser Dropdown
@@ -132,12 +138,12 @@ dropdownParser = parseElement "dropdown" dropdownParserFromAttrs
   where
      dropdownParserFromAttrs _attrs = do
        itemLabel <- labelParser
-       subins <- (Just <$> substituteInput) <|> (pure Nothing)
+--       subins <- substituteInput
        options <- many1 optionParser <?> "missing at least 1 option"
-       return $ Dropdown itemLabel options subins
+       return $ Dropdown itemLabel options Nothing
 
-substituteInput :: Parser Input
-substituteInput = parseElement "input" inputFromAttrs
+substituteInput :: Parser (Maybe Input)
+substituteInput = (Just <$> parseElement "input" inputFromAttrs ) <|> (pure Nothing)
   where
    inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
                            parseInputType (decodeAttributeList attrs)

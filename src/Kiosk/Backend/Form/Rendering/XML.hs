@@ -40,6 +40,13 @@ renderRadio (Radio labl opts qualifiers) = "<radio>"
                                             <> renderOptionList opts
                                             <> renderOptionQualifierList qualifiers
                                             <> "</radio>"
+
+-- Render Dropdown Tag
+renderDropdown :: Dropdown -> Text
+renderDropdown (Dropdown lbl opts maybeIn) = "<dropdown>"
+                                                    <> renderLabel lbl
+                                                    <> renderOptionList opts
+                                                    <> maybe "" renderInput maybeIn
 -- Render Option Tag
 renderOptionList :: [Option] -> Text
 renderOptionList = renderList renderOption
@@ -157,6 +164,7 @@ renderItemType it =
        (ItemButton b)           -> renderButton b
        (ItemEmptyBlock e)       -> renderEmptyBlock e
        (ItemRadio r)            -> renderRadio r
+       (ItemDropdown d)            -> renderDropdown d
        (ItemTableLeftHeader lh) -> renderTableLeftHeader lh
        (ItemTableTopHeader th)  -> renderTableTopHeader th
 
