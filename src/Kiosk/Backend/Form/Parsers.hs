@@ -83,6 +83,7 @@ itemParser = parseElement "item" itemFromAttrs
                           (parseItemAutoInput attrs) <|>
                           (parseItemButton attrs) <|>
                           (parseItemRadio attrs) <|>
+                          (parseItemDropdown attrs) <|>
                           (parseItemLabel attrs)
 
 
