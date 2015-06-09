@@ -1,3 +1,5 @@
+# Version 1.5.1
+Added dropdown
 # Version 1.5.0
 ADded aeson back in since we moved away from llvm-ghc
 # Version 1.4.1
