@@ -30,14 +30,18 @@ import           Data.Attoparsec.Text
 import           Data.Typeable                          (Typeable)
 import           GHC.Generics                           (Generic)
 
+import           Data.Aeson                             (FromJSON, ToJSON)
 import qualified Data.Text                              as T
 import           Text.Read                              (readMaybe)
-
 -- Input Type
 data Input = Input {
   _getInput    :: InputType,
   _inputAttrib :: [InputAttribute]
 } deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON Input where
+instance FromJSON Input where
 
 -- Input type can be Text input or Signature input
 data InputType =  InputTypeText InputText
@@ -47,15 +51,24 @@ data InputType =  InputTypeText InputText
                 | InputTypeTime InputTime
                 | InputTypeDouble InputDouble deriving (Generic, Show, Ord, Eq, Typeable)
 
+instance ToJSON InputType where
+instance FromJSON InputType where
 -- Text Type Input
 newtype InputText = InputText {
     _getInputText :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
+
+instance ToJSON InputText where
+instance FromJSON InputText where
 -- Date Type :Just Text
 newtype InputDate = InputDate {
     _getInputDate :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON InputDate where
+instance FromJSON InputDate where
 
 makeInputDate :: T.Text -> Either T.Text InputDate
 makeInputDate itxt = InputDate <$> checkDateFormat itxt
@@ -82,20 +95,35 @@ newtype InputTime = InputTime {
     _getInputTime :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
+
+instance ToJSON InputTime where
+instance FromJSON InputTime where
+
 -- Signature Type Input store as base64 encode Bytestring
 newtype Signature = Signature {
   _signature :: T.Text
 } deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON Signature where
+instance FromJSON Signature where
 
 -- Number Type Input
 newtype InputInt = InputInt {
     _getInputInt::Int
 } deriving (Generic, Show, Ord, Eq, Typeable)
 
+instance ToJSON InputInt where
+instance FromJSON InputInt where
+
 -- Number Type Double
 newtype InputDouble = InputDouble {
     _getInputDouble::Double
 } deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON InputDouble where
+instance FromJSON InputDouble where
 
 -- Input Attributes
 data InputAttribute = InputWidth WidthAttribute
@@ -105,6 +133,9 @@ data InputAttribute = InputWidth WidthAttribute
                     | InputMinDouble MinAttributeDouble
                    deriving (Generic, Show, Ord, Eq, Typeable)
 
+
+instance ToJSON InputAttribute where
+instance FromJSON InputAttribute where
 
 instance AttributeClass InputAttribute where
   toAttribute (InputWidth a) = toAttribute a
@@ -144,6 +175,10 @@ data InputTypeAttribute = InputTypeAttributeDouble
                         | InputTypeAttributeDate
                         | InputTypeAttributeTime
    deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON InputTypeAttribute where
+instance FromJSON InputTypeAttribute where
 
 -- instance AttributeClass InputType where
 

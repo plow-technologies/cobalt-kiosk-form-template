@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Kiosk.Backend.Form.Attribute.Width (WidthAttribute(..)) where
+import           Data.Aeson                   (FromJSON, ToJSON)
 import qualified Data.Text                    as T
 import           GHC.Generics
 import           Kiosk.Backend.Form.Attribute
@@ -11,6 +12,8 @@ data WidthAttribute = WidthAttribute {
     _getWidth :: Int
 } deriving (Show, Ord, Eq,Generic)
 
+instance ToJSON WidthAttribute where
+instance FromJSON WidthAttribute where
 instance AttributeClass WidthAttribute where
    toAttribute (WidthAttribute a) = Attribute "width" (T.pack ("'" ++ show a ++ "'"))
    fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of

@@ -1,15 +1,20 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Kiosk.Backend.Form.Attribute.Indexable (IndexableAttribute(..)) where
 
-import Kiosk.Backend.Form.Attribute
-import qualified Data.Text as T
-import           GHC.Generics           (Generic)
-import Text.Read   (readMaybe)
-
-data IndexableAttribute = IndexableAttribute { 
+import           Data.Aeson                   (FromJSON, ToJSON)
+import qualified Data.Text                    as T
+import           GHC.Generics                 (Generic)
+import           Kiosk.Backend.Form.Attribute
+import           Text.Read                    (readMaybe)
+data IndexableAttribute = IndexableAttribute {
 	_getIndexable :: Bool
 } deriving (Generic,Show,Eq,Ord)
+
+
+
+instance ToJSON IndexableAttribute where
+instance FromJSON IndexableAttribute where
 
 instance AttributeClass IndexableAttribute where
   toAttribute (IndexableAttribute a) = Attribute "indexable" (T.pack ("'" ++ show a ++ "'"))

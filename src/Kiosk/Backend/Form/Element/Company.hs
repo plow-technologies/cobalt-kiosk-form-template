@@ -4,6 +4,7 @@ module Kiosk.Backend.Form.Element.Company( Company(..)
                                          , CompanyAttributes (..)
                                          , defaultCompany) where
 
+import           Data.Aeson                         (FromJSON, ToJSON)
 import qualified Data.Text                          as T
 import           GHC.Generics
 import           Kiosk.Backend.Form.Attribute
@@ -16,8 +17,15 @@ data Company = Company {
   _companyAttrib  :: [CompanyAttributes]
 } deriving (Show, Ord, Eq,Generic)
 
+
+instance ToJSON Company where
+instance FromJSON Company where
+
 data CompanyAttributes = CompanyWidth WidthAttribute deriving (Show, Ord, Eq,Generic)
 
+
+instance ToJSON CompanyAttributes where
+instance FromJSON CompanyAttributes where
 
 instance AttributeClass CompanyAttributes where
   toAttribute (CompanyWidth a) = toAttribute a

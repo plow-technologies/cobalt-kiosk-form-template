@@ -1,27 +1,25 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE OverloadedStrings  #-}
+
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 
 module Kiosk.Backend.Form.Element.Item.Radio  ( Radio(..)
-                                              , Option(..)
-                                              , OptionAttributes(..)
-                                              , OptionQualifier(..)
-                                              , OptionQualifierAttributes(..)
-                                              , QualifierChoices (..)
                                               , defaultRadio) where
 
-import qualified Data.Text                              as T
+
 import           GHC.Generics                           (Generic)
-import           Kiosk.Backend.Form.Attribute           (Attribute (..),
-                                                         AttributeClass (..))
-import           Kiosk.Backend.Form.Element.Item.Input
+
+
 import           Kiosk.Backend.Form.Element.Item.Label  (Label (..),
                                                          defaultLabel)
 
-import           Kiosk.Backend.Form.Attribute.Indexable
-import           Kiosk.Backend.Form.Attribute.Width
+import           Data.Aeson                             (FromJSON, ToJSON)
 
+
+import           Kiosk.Backend.Form.Element.Item.Option (Option (..),
+                                                         OptionQualifier (..),
+                                                         defaultOption,
+                                                         defaultOptionQualifier)
 -- A Radio button is a circular, singular selector
 -- Our radio buttons come preloaded with Options!
 
@@ -33,51 +31,9 @@ data Radio = Radio {
   , _getRadioQualifier :: [OptionQualifier]
 } deriving (Generic, Show)
 
-data Option = Option {
-    _getOptionText :: T.Text
-  , _optionAttrib  :: [OptionAttributes]
-} deriving (Generic, Show)
 
-data OptionAttributes = OptionNull deriving (Show,Generic)
-
-
-instance AttributeClass OptionAttributes where
-	toAttribute (OptionNull) = Attribute "" ""
-	fromAttribute _ = Right OptionNull
-
-
-data OptionQualifier = OptionQualifier {
-    _getOptionQualifierText :: [QualifierChoices]
-  , _optionQualifierAttrib  :: [OptionQualifierAttributes]
-} deriving (Generic, Show )
-
-data OptionQualifierAttributes = OptionQualifierNull deriving (Show,Generic)
-
-instance AttributeClass OptionQualifierAttributes where
-	toAttribute (OptionQualifierNull) = Attribute "" ""
-	fromAttribute _ = Right OptionQualifierNull
-
-data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Show,Generic)
-
-
+instance ToJSON Radio where
+instance FromJSON Radio where
 defaultRadio :: Radio
 defaultRadio = Radio defaultLabel [defaultOption] [defaultOptionQualifier]
 
-defaultOption :: Option
-defaultOption = Option "Pit Water" []
-
-defaultOptionQualifier :: OptionQualifier
-defaultOptionQualifier = OptionQualifier defaultQualifierChoices []
-
-defaultQualifierChoices :: [QualifierChoices]
-defaultQualifierChoices = [ QualifierLabel ( Label "Amount" [])
-                          , QualifierInput defaultQualifierInput]
-
-defaultQualifierInput :: Input
-defaultQualifierInput = Input dit dia
- where
-   dit = InputTypeText . InputText $ ""
-   dia = [wAttr, tAttr, ixAttr]
-   wAttr = InputWidth $ WidthAttribute (12::Int)
-   ixAttr = InputIndexable $ IndexableAttribute True
-   tAttr = InputType $ InputTypeAttributeText
