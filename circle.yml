@@ -25,10 +25,10 @@ test:
     - cabal test --show-details=streaming -j2:
         timeout: 3000
 
- deployment:
-   staging:
-     branch: master
-     commands:
+deployment:
+  staging:
+    branch: master
+    commands:
        - sh plow-scripts/hackage.sh
 #       - cd ~/cobalt-kiosk-backend/dist/build/kiosk-backend/ && grsync -avz -e ssh kiosk-backend scott@54.69.197.241:/home/scott/node/cobalt-kiosk-backend/bin/:
 #          timeout: 3000
