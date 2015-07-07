@@ -25,9 +25,11 @@ import           GHC.Generics                           (Generic)
 import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          AttributeClass (..))
 import           Kiosk.Backend.Form.Attribute.Indexable
+import           Kiosk.Backend.Form.Attribute.Required
 import           Kiosk.Backend.Form.Attribute.Width
 import           Kiosk.Backend.Form.Element.Item.Input
 import           Kiosk.Backend.Form.Element.Item.Label  (Label (..))
+
 data Option = Option {
     _getOptionText :: T.Text
   , _optionAttrib  :: [OptionAttributes]
@@ -88,7 +90,8 @@ defaultQualifierInput :: Input
 defaultQualifierInput = Input dit dia
  where
    dit = InputTypeText . InputText $ ""
-   dia = [wAttr, tAttr, ixAttr]
+   dia = [wAttr, tAttr, ixAttr, rAttr]
    wAttr = InputWidth $ WidthAttribute (12::Int)
    ixAttr = InputIndexable $ IndexableAttribute True
+   rAttr  = InputRequired $ RequiredAttribute True
    tAttr = InputType $ InputTypeAttributeText

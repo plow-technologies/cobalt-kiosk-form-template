@@ -23,6 +23,7 @@ import           Kiosk.Backend.Form.Attribute           (Attribute (..),
 import           Kiosk.Backend.Form.Attribute.Indexable
 import           Kiosk.Backend.Form.Attribute.Max
 import           Kiosk.Backend.Form.Attribute.Min
+import           Kiosk.Backend.Form.Attribute.Required
 import           Kiosk.Backend.Form.Attribute.Width
 
 import           Control.Applicative
@@ -131,6 +132,7 @@ data InputAttribute = InputWidth WidthAttribute
                     | InputIndexable IndexableAttribute
                     | InputMaxDouble MaxAttributeDouble
                     | InputMinDouble MinAttributeDouble
+                    | InputRequired  RequiredAttribute
                    deriving (Generic, Show, Ord, Eq, Typeable)
 
 
@@ -142,6 +144,7 @@ instance AttributeClass InputAttribute where
   toAttribute (InputIndexable a) = toAttribute a
   toAttribute (InputMaxDouble d) = toAttribute d
   toAttribute (InputMinDouble d) = toAttribute d
+  toAttribute (InputRequired  a) = toAttribute a
   toAttribute (InputType i) = toAttribute i
 
 
@@ -165,6 +168,9 @@ instance AttributeClass InputAttribute where
                                       "indexable" -> case (readMaybe (T.unpack v)) of
                                                      (Just v') -> Right  $ InputIndexable $ IndexableAttribute v'
                                                      Nothing   -> Left $ T.concat ["IndexableAttribute value not parsing -->",t,v]
+                                      "required" -> case (readMaybe (T.unpack v)) of
+                                                     (Just v') -> Right  $ InputRequired $ RequiredAttribute v'
+                                                     Nothing   -> Left $ T.concat ["RequiredAttribute value not parsing -->",t,v]
                                       _ -> Left $ T.concat ["TypeAttribute value not parsing -->",t,v]
 
 -- Type Attribute
@@ -208,9 +214,10 @@ defaultInputType :: InputType
 defaultInputType = InputTypeText $ InputText ("" :: T.Text)
 
 defaultInputAttributesList :: [InputAttribute]
-defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr]
+defaultInputAttributesList = [wAttr, tAttr, ixAttr,maxAttr,minAttr,rAttr]
               where wAttr = InputWidth $ WidthAttribute (12::Int)
                     ixAttr = InputIndexable $ IndexableAttribute True
                     minAttr = InputMinDouble $ MinAttributeDouble (0.0   :: Double)
                     maxAttr = InputMaxDouble $ MaxAttributeDouble (150.0 :: Double)
+                    rAttr   = InputRequired $ RequiredAttribute True
                     tAttr = InputType $ InputTypeAttributeText

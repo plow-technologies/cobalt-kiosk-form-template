@@ -30,16 +30,16 @@ rockShoreFormBody = [ truckNumberRow
                  , driverNameRow
                  , signatureRow]
   where 
-    truckNumberRow  = generateInputRowText "Truck #"
-    permitNumberRow  = generateInputRowText "Water Hauling Permit #"
-    customerTicketNumberRow = generateInputRowText "Customer Ticket #"
+    truckNumberRow  = generateInputRowText "Truck #" True
+    permitNumberRow  = generateInputRowText "Water Hauling Permit #" False
+    customerTicketNumberRow = generateInputRowText "Customer Ticket #" False
     leaseInfoRow  = generateLabelRow "Lease or Well Information"
-    leaseOperatorRow = generateInputRowText "Name of Lease/Well Operator"
-    leaseNameRow = generateInputRowText "Name of Lease or Well"
+    leaseOperatorRow = generateInputRowText "Name of Lease/Well Operator" False
+    leaseNameRow = generateInputRowText "Name of Lease or Well" False
     waterTypeAndAmountRow  = waterTypeRadioRow
     dateRow  = generateInputRowDate "Date"
     timeInRow  = generateInputRowTime "Time In"
-    driverNameRow = generateInputRowText "Driver's Name"
+    driverNameRow = generateInputRowText "Driver's Name" False
     signatureRow  = generateInputRowSignature "Driver Signature"
 
 
@@ -48,7 +48,7 @@ waterTypeRadioRow = Row [waterTypeRadio] []
 
 
 waterTypeRadio :: Item
-waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []                     
+waterTypeRadio  = Item [ItemRadio $ generateRadio "Type of Water Hauled" True options ] []
    where
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
@@ -63,15 +63,15 @@ generateLabelItem labelText = Item [ItemLabel . generateLabel $ labelText ] []
 
 
 -- Input Text
-generateInputRowText :: T.Text -> Row
-generateInputRowText labelText = Row [generateInputItemText labelText] []
+generateInputRowText :: T.Text -> Bool -> Row
+generateInputRowText labelText required = Row [generateInputItemText labelText required] []
 
-generateInputItemText :: T.Text -> Item
-generateInputItemText  labelText = Item [ItemLabel . generateLabel $ labelText
-                                                    , ItemInput fullDefaultInputText] []
+generateInputItemText :: T.Text -> Bool -> Item
+generateInputItemText  labelText required = Item [ItemLabel . generateLabel $ labelText
+                                                    , ItemInput $ fullDefaultInputText required] []
 
-fullDefaultInputText :: Input
-fullDefaultInputText = Input fullDefaultInputTypeText fullDefaultInputAttributesList
+fullDefaultInputText :: Bool -> Input
+fullDefaultInputText required = Input fullDefaultInputTypeText (fullDefaultInputAttributesList ++ [InputRequired $ RequiredAttribute required])
 
 fullDefaultInputTypeText :: InputType
 fullDefaultInputTypeText = InputTypeText $ InputText ""
@@ -147,8 +147,8 @@ fullDefaultQualifierInput = Input dit dia
 generateLabel :: T.Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]
 
-generateRadio :: T.Text -> [Option] -> Radio
-generateRadio labelText options = Radio (generateLabel labelText) options [fullDefaultOptionQualifier]
+generateRadio :: T.Text -> Bool -> [Option] -> Radio
+generateRadio labelText required options = Radio (generateLabel labelText) [RadioRequired $ RequiredAttribute required] options [fullDefaultOptionQualifier]
 
 generateOption :: T.Text -> Option 
 generateOption optionText = Option optionText []

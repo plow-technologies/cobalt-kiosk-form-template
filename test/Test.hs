@@ -247,7 +247,7 @@ waterTypeRadioRow = Row [waterTypeRadio] []
 
 
 waterTypeRadio :: Item
-waterTypeRadio  = Item [ItemRadio . generateRadio "Type of Water Hauled" $ options ] []
+waterTypeRadio  = Item [ItemRadio $ generateRadio "Type of Water Hauled" True options ] []
    where
      options = [generateOption "Produced Water"
                ,generateOption "Pit Water"
@@ -346,8 +346,8 @@ fullDefaultQualifierInput = Input dit dia
 generateLabel :: T.Text -> Label
 generateLabel labelText = Label labelText [LabelWidth $ WidthAttribute (12::Int)]
 
-generateRadio :: T.Text -> [Option] -> Radio
-generateRadio labelText options = Radio (generateLabel labelText) options [fullDefaultOptionQualifier]
+generateRadio :: T.Text -> Bool -> [Option] -> Radio
+generateRadio labelText required options = Radio (generateLabel labelText) [RadioRequired $ RequiredAttribute required] options [fullDefaultOptionQualifier]
 
 generateOption :: T.Text -> Option
 generateOption optionText = Option optionText []

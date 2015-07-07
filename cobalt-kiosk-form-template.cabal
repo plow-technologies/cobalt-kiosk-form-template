@@ -36,6 +36,7 @@ library
                         Kiosk.Backend.Form.Attribute.Indexable
                         Kiosk.Backend.Form.Attribute.Action
                         Kiosk.Backend.Form.Attribute.Path
+                        Kiosk.Backend.Form.Attribute.Required
 
                         Kiosk.Backend.Form.Element.Address
                         Kiosk.Backend.Form.Element.Company
