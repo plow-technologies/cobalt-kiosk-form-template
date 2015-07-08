@@ -34,6 +34,7 @@ import           GHC.Generics                           (Generic)
 import           Data.Aeson                             (FromJSON, ToJSON)
 import qualified Data.Text                              as T
 import           Text.Read                              (readMaybe)
+
 -- Input Type
 data Input = Input {
   _getInput    :: InputType,

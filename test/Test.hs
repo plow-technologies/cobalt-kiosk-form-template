@@ -41,6 +41,10 @@ makePrisms ''InputType
 makePrisms ''InputAttribute
 makeLenses ''IndexableAttribute
 
+
+-- Required Lenses
+makeLenses ''RequiredAttribute
+
 -- Button Lenses
 makeLenses ''Button
 
@@ -57,6 +61,8 @@ makePrisms ''ItemType
 
 -- Radio Lenses
 makeLenses ''Radio
+makePrisms ''RadioAttribute
+
 -- Option Lenses
 makeLenses ''Option
 makeLenses ''OptionQualifier
@@ -98,6 +104,14 @@ main = hspec $ do
     testParser inputParser "<input type='int' indexable='True'>1234</input>"
                            (\i -> (i ^.. getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull) &&
                                   (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+
+  it "should parse various required types correctly" $ do
+    testParser inputParser "<input type='int' required='True'>1234</input>"
+                           (\i -> (i ^.. getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull) &&
+                                  (i ^.. inputAttrib. traverse . _InputRequired . getRequired  & andNotNull))
+    testParser radioParser "<radio required='True'><label width='12'>Choices</label><option>1</option></radio>"
+                           (\i -> (i ^.. getRadioAttribs.traverse._RadioRequired.getRequired  & andNotNull))
+    
   it "should parse various input types correctly" $ do
   -- without indexable
     testParser inputParser "<input type='double'>3.3</input>"

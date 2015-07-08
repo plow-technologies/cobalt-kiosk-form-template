@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -21,6 +22,8 @@ Portability :  portable
 module  Kiosk.Backend.Form.Element.Item.Option  where
 import           Data.Aeson                             (FromJSON, ToJSON)
 import qualified Data.Text                              as T
+import           Data.Typeable                          (Typeable)
+
 import           GHC.Generics                           (Generic)
 import           Kiosk.Backend.Form.Attribute           (Attribute (..),
                                                          AttributeClass (..))
@@ -33,13 +36,13 @@ import           Kiosk.Backend.Form.Element.Item.Label  (Label (..))
 data Option = Option {
     _getOptionText :: T.Text
   , _optionAttrib  :: [OptionAttributes]
-} deriving (Generic, Show)
+} deriving (Generic, Show, Typeable)
 
 
 instance ToJSON Option where
 instance FromJSON Option where
 
-data OptionAttributes = OptionNull deriving (Show,Generic)
+data OptionAttributes = OptionNull deriving (Generic, Show, Ord, Eq, Typeable)
 
 
 instance ToJSON OptionAttributes where
@@ -53,13 +56,13 @@ instance AttributeClass OptionAttributes where
 data OptionQualifier = OptionQualifier {
     _getOptionQualifierText :: [QualifierChoices]
   , _optionQualifierAttrib  :: [OptionQualifierAttributes]
-} deriving (Generic, Show )
+} deriving (Generic, Show, Typeable)
 
 
 instance ToJSON OptionQualifier where
 instance FromJSON OptionQualifier where
 
-data OptionQualifierAttributes = OptionQualifierNull deriving (Show,Generic)
+data OptionQualifierAttributes = OptionQualifierNull deriving (Generic, Show, Ord, Eq, Typeable)
 
 
 instance ToJSON OptionQualifierAttributes where
@@ -69,7 +72,7 @@ instance AttributeClass OptionQualifierAttributes where
         toAttribute (OptionQualifierNull) = Attribute "" ""
         fromAttribute _ = Right OptionQualifierNull
 
-data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Show,Generic)
+data QualifierChoices = QualifierInput Input | QualifierLabel Label deriving (Generic, Show, Typeable)
 
 
 instance ToJSON QualifierChoices where

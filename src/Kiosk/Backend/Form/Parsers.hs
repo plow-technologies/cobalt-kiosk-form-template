@@ -158,10 +158,17 @@ radioParser  = parseElement "radio" radioParserFromAttrs
      itemLabel <- labelParser
      options <- many1 optionParser <?> "missing at least 1 option"
      optionQualifiers <- many' optionQualifierParser
-     return $ Radio itemLabel (rights . fmap fromAttribute $ _attrs) options optionQualifiers
+     return $ Radio itemLabel (decodeAttributeList _attrs) options optionQualifiers
      --Option "Pit Water" []
      -- currently not using option attributes
 
+{-
+inputParser :: Parser Input
+inputParser = parseElement "input" inputFromAttrs
+     where
+       inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
+                              parseInputType (decodeAttributeList attrs)
+-}
 
 
 -- <option> Parser

@@ -7,11 +7,10 @@ import qualified Data.Text                    as T
 import           GHC.Generics                 (Generic)
 import           Kiosk.Backend.Form.Attribute
 import           Text.Read                    (readMaybe)
+
 data IndexableAttribute = IndexableAttribute {
 	_getIndexable :: Bool
 } deriving (Generic,Show,Eq,Ord)
-
-
 
 instance ToJSON IndexableAttribute where
 instance FromJSON IndexableAttribute where
