@@ -1,5 +1,5 @@
 name:                cobalt-kiosk-form-template
-version:             1.6.0
+version:             1.6.1
 synopsis:            Form Types for Cobal Kiosk Application Backend
 description:         Form Types for Cobal Kiosk Application Backend
 license:             MIT
@@ -65,7 +65,7 @@ library
                       , OverloadedStrings
 
   
-  build-depends:        base       >= 4.7  && <4.8
+  build-depends:        base       >= 4.7  && <5
                       , attoparsec >= 0.12 && <0.13
                       , aeson
                       , text       >= 1.2  && < 1.3
@@ -96,12 +96,12 @@ executable onping
   main-is:           Main.hs
   hs-source-dirs:    src
                    , meta
-  build-depends:     base       >= 4.7  && <4.8
-                   , attoparsec >= 0.12 && <0.13 
-                   , text       >= 1.2  && < 1.3
-                   , bytestring >= 0.10 && < 0.11
-                   , action-permutations >= 0.0.0.1
-                   , blaze-html >= 0.7.0.3 && < 0.9
+  build-depends:     base       
+                   , attoparsec 
+                   , text       
+                   , bytestring 
+                   , action-permutations 
+                   , blaze-html
                    , template-haskell
                    , cobalt-kiosk-form-template
                    , aeson
