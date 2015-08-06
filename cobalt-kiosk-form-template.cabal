@@ -53,6 +53,7 @@ library
                         Kiosk.Backend.Form.Element.Item.Label
                         Kiosk.Backend.Form.Element.Item.Radio
                         Kiosk.Backend.Form.Element.Item.Dropdown
+                        Kiosk.Backend.Form.Element.Item.Checkbox
                         Kiosk.Backend.Form.Element.Item.Option
                         Kiosk.Backend.Form.Element.Item.TableLeftHeader
                         Kiosk.Backend.Form.Element.Item.TableTopHeader

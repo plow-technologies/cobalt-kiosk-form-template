@@ -47,6 +47,7 @@ instance FromJSON Input where
 
 -- Input type can be Text input or Signature input
 data InputType =  InputTypeText InputText
+                | InputTypeTextMultiLine InputTextMultiLine
                 | InputTypeSignature Signature
                 | InputTypeInt InputInt
                 | InputTypeDate InputDate
@@ -63,6 +64,17 @@ newtype InputText = InputText {
 
 instance ToJSON InputText where
 instance FromJSON InputText where
+
+
+newtype InputTextMultiLine = InputTextMultiLine {
+    _getInputTextMultiLine :: T.Text
+} deriving (Generic, Show, Ord, Eq, Typeable)
+
+
+instance ToJSON InputTextMultiLine where
+instance FromJSON InputTextMultiLine where
+
+
 -- Date Type :Just Text
 newtype InputDate = InputDate {
     _getInputDate :: T.Text
@@ -178,6 +190,7 @@ instance AttributeClass InputAttribute where
 data InputTypeAttribute = InputTypeAttributeDouble
                         | InputTypeAttributeInt
                         | InputTypeAttributeText
+                        | InputTypeAttributeTextMultiLine
                         | InputTypeAttributeSignature
                         | InputTypeAttributeDate
                         | InputTypeAttributeTime
@@ -191,6 +204,7 @@ instance FromJSON InputTypeAttribute where
 
 instance AttributeClass InputTypeAttribute where
   toAttribute InputTypeAttributeText  = Attribute "type" "'text'"
+  toAttribute InputTypeAttributeTextMultiLine  = Attribute "type" "'text-multiline'"
   toAttribute InputTypeAttributeSignature  = Attribute "type" "'signature'"
   toAttribute InputTypeAttributeInt  = Attribute "type" "'int'"
   toAttribute InputTypeAttributeDouble  = Attribute "type" "'double'"
@@ -198,6 +212,7 @@ instance AttributeClass InputTypeAttribute where
   toAttribute InputTypeAttributeTime = Attribute "type" "'time'"
   fromAttribute (Attribute "type" v) = case v of
                                          "text"      -> Right $ InputTypeAttributeText
+                                         "text-multiline" -> Right $ InputTypeAttributeTextMultiLine
                                          "signature" -> Right $ InputTypeAttributeSignature
                                          "int"       -> Right $ InputTypeAttributeInt
                                          "double"    -> Right $ InputTypeAttributeDouble
