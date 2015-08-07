@@ -23,9 +23,10 @@ import           Data.Aeson                             (FromJSON, ToJSON)
 
 
 import           Kiosk.Backend.Form.Element.Item.Option (Option (..),
-                                                         OptionQualifier (..),
-                                                         defaultOption,
-                                                         defaultOptionQualifier)
+                                                         defaultOption)
+
+import           Kiosk.Backend.Form.Element.Item.Dropdown (Dropdown,
+                                                           defaultDropdown)
 -- A Checkbox button is a square, singular or multiple selector
 
 
@@ -34,7 +35,7 @@ data Checkbox = Checkbox {
     _getCheckboxLabel     :: Label
   , _getCheckboxAttribs   :: [CheckboxAttribute]
   , _getCheckboxOptions   :: [Option]
-  , _getCheckboxQualifier :: [OptionQualifier]
+  , _getCheckboxDropdown  :: Maybe Dropdown
 } deriving (Generic, Show, Typeable)
 
 -- Item Attributes
@@ -56,4 +57,4 @@ instance AttributeClass CheckboxAttribute where
                                       _ -> Left $ T.concat ["CheckboxRequired value not parsing -->",t,v]
 
 defaultCheckbox :: Checkbox
-defaultCheckbox = Checkbox defaultLabel [] [defaultOption] [defaultOptionQualifier]
+defaultCheckbox = Checkbox defaultLabel [] [defaultOption] (Just defaultDropdown)

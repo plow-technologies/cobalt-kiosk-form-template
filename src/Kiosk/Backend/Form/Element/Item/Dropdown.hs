@@ -44,11 +44,11 @@ defaultDropdown :: Dropdown
 defaultDropdown = Dropdown defaultLabel [defaultOption] Nothing
 
 
-data DropdownAttributes = DropdownWidth WidthAttribute
+data DropdownAttribute = DropdownWidth WidthAttribute
   deriving (Show,Generic)
 
 
-instance AttributeClass DropdownAttributes where
+instance AttributeClass DropdownAttribute where
    toAttribute (DropdownWidth w) = toAttribute w
    fromAttribute (Attribute "width" w) = case readMaybe (T.unpack w) of
                                               (Just w') -> Right (DropdownWidth $ WidthAttribute w')

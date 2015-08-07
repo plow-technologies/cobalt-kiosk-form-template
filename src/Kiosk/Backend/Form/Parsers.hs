@@ -79,11 +79,12 @@ parseRow = parseElement "row"  buildRow
 itemParser :: Parser Item
 itemParser = parseElement "item" itemFromAttrs
   where
-   itemFromAttrs attrs =  (parseItemInput attrs )<|>
+   itemFromAttrs attrs =  (parseItemInput attrs)     <|>
                           (parseItemAutoInput attrs) <|>
-                          (parseItemButton attrs) <|>
-                          (parseItemRadio attrs) <|>
-                          (parseItemDropdown attrs) <|>
+                          (parseItemButton attrs)    <|>
+                          (parseItemRadio attrs)     <|>
+                          (parseItemDropdown attrs)  <|>
+                          (parseItemCheckbox attrs)  <|>
                           (parseItemLabel attrs)
 
 
@@ -126,7 +127,29 @@ parseItemRadio attrs = makeItemRadio <$> radioParser
   where
      makeItemRadio itemRadio = Item [ItemRadio  itemRadio ] (rights . fmap fromAttribute $ attrs)
 
--- | <item><radio> Parser
+-- | <item><checkbox> Parser
+parseItemCheckbox :: [Attribute] -> Parser Item
+parseItemCheckbox attrs = makeItemCheckbox <$> checkboxParser
+  where
+    makeItemCheckbox itemCheckbox = Item [ItemCheckbox itemCheckbox ] (rights . fmap fromAttribute $ attrs)
+
+maybeHead :: [a] -> Maybe a
+maybeHead (x:_) = Just x
+maybeHead _     = Nothing
+
+checkboxParser :: Parser Checkbox
+checkboxParser = parseElement "checkbox" checkboxParserFromAttrs
+  where 
+    checkboxParserFromAttrs _attrs = do
+      itemLabel <- labelParser
+      options <- many1 optionParser <?> "missing at least 1 option"
+      -- change from nothing to parseItemDropdown
+      -- only should be at one most, so this is incorrect
+      -- since you can have multiple ones
+      d <- many' dropdownParser
+      return $ Checkbox itemLabel (decodeAttributeList _attrs) options (maybeHead d)
+      
+-- | <item><dropdown> Parser
 parseItemDropdown :: [Attribute] -> Parser Item
 parseItemDropdown attrs = makeItemDropdown <$> dropdownParser
   where
@@ -139,7 +162,6 @@ dropdownParser = parseElement "dropdown" dropdownParserFromAttrs
   where
      dropdownParserFromAttrs _attrs = do
        itemLabel <- labelParser
---       subins <- substituteInput
        options <- many1 optionParser <?> "missing at least 1 option"
        return $ Dropdown itemLabel options Nothing
 
@@ -148,7 +170,6 @@ substituteInput = (Just <$> parseElement "input" inputFromAttrs ) <|> (pure Noth
   where
    inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
                            parseInputType (decodeAttributeList attrs)
-
 
 -- <radio> Parser
 radioParser :: Parser Radio
@@ -161,15 +182,6 @@ radioParser  = parseElement "radio" radioParserFromAttrs
      return $ Radio itemLabel (decodeAttributeList _attrs) options optionQualifiers
      --Option "Pit Water" []
      -- currently not using option attributes
-
-{-
-inputParser :: Parser Input
-inputParser = parseElement "input" inputFromAttrs
-     where
-       inputFromAttrs attrs = flip Input  (decodeAttributeList attrs) <$>
-                              parseInputType (decodeAttributeList attrs)
--}
-
 
 -- <option> Parser
 optionParser :: Parser Option
@@ -226,13 +238,15 @@ inputParser = parseElement "input" inputFromAttrs
 
 
 parseInputType :: [InputAttribute]  -> Parser InputType
-parseInputType (InputType InputTypeAttributeInt:_)         = InputTypeInt       . InputInt    <$> signed decimal
-parseInputType (InputType InputTypeAttributeDouble:_)      = InputTypeDouble    . InputDouble <$> signed double
-parseInputType (InputType InputTypeAttributeText      :_)  = InputTypeText      . InputText   <$> parseElementBodyAsText
-parseInputType (InputType InputTypeAttributeSignature:_)   = InputTypeSignature . Signature   <$> parseElementBodyAsText
-parseInputType _                                                 = return $ InputTypeText . InputText $ ""
+parseInputType (InputType InputTypeAttributeInt          :_) = InputTypeInt       . InputInt    <$> signed decimal
+parseInputType (InputType InputTypeAttributeDouble       :_) = InputTypeDouble    . InputDouble <$> signed double
+parseInputType (InputType InputTypeAttributeText         :_) = InputTypeText      . InputText   <$> parseElementBodyAsText
+parseInputType (InputType InputTypeAttributeTextMultiLine:_) = InputTypeTextMultiLine . InputTextMultiLine <$> parseElementBodyAsText
+parseInputType (InputType InputTypeAttributeSignature    :_) = InputTypeSignature . Signature   <$> parseElementBodyAsText
+parseInputType _                                             = return $ InputTypeText . InputText $ ""
 
-
+-- InputTypeText InputText
+--                | InputTypeTextMultiLine InputTextMultiLine
 
 -- | Parse primitives
 

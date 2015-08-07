@@ -36,6 +36,7 @@ makeLenses ''Input
 makeLenses ''InputDouble
 makeLenses ''InputInt
 makeLenses ''InputText
+makeLenses ''InputTextMultiLine
 makeLenses ''Signature
 makePrisms ''InputType
 makePrisms ''InputAttribute
@@ -69,7 +70,11 @@ makeLenses ''OptionQualifier
 
 -- Dropdown Lenses
 makeLenses ''Dropdown
-makePrisms ''DropdownAttributes
+makePrisms ''DropdownAttribute
+
+-- Checkbox Lenses
+makeLenses ''Checkbox
+makePrisms ''CheckboxAttribute
 
 testParser  :: Show a => Parser a ->
                T.Text ->
@@ -87,6 +92,16 @@ andNotNull lst = and lst && (not.null $ lst)
 main :: IO ()
 main = hspec $ do
  describe "FormParser" $ do
+  it "should parse a checkbox with an embedded dropdown, read checkbox option and read embedded dropdown option" $ do
+    testParser checkboxParser "<checkbox required='True'><label width='12'>Operator</label><option>1</option><dropdown><label width='12'>Operator</label><option>1</option></dropdown></checkbox>"
+                           (\i -> (i ^.. getCheckboxAttribs.traverse._CheckboxRequired.getRequired & andNotNull) &&
+                                  (i ^.. getCheckboxOptions.traverse.getOptionText <&> (== "1") & andNotNull)    &&
+                                  (i ^.. getCheckboxDropdown.traverse.getDropdownOptions.traverse.getOptionText <&> (== "1") & andNotNull))
+
+  it "should parse a checkbox without an embedded dropdown" $ do
+    testParser checkboxParser "<checkbox required='True'><label width='12'>Operator</label><option>1</option></checkbox>"
+                           (\i -> (i ^.. getCheckboxAttribs.traverse._CheckboxRequired.getRequired & andNotNull))
+  
   it "should parse various indexable types correctly" $ do
   -- index forces the type to be InputTypeText, value is lost
     testParser inputParser "<input type='double' indexable='True'>3.3</input>"
@@ -98,6 +113,13 @@ main = hspec $ do
                            (\i -> (i ^.. getInput._InputTypeText & null & not) &&
                                   (i ^.. getInput._InputTypeText.getInputText <&> (== "Plowtech") & andNotNull ) &&
                                   (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+
+    -- parseInputType (InputType InputTypeAttributeTextMultiLine:_) = InputTypeTextMultiLine . InputTextMultiLine <$> parseElementBodyAsText
+    testParser inputParser "<input type='text-multiline' indexable='True'>Plowtech</input>"
+                           (\i -> (i ^.. getInput._InputTypeTextMultiLine & null & not) &&
+                                  (i ^.. getInput._InputTypeTextMultiLine.getInputTextMultiLine <&> (== "Plowtech") & andNotNull ) &&
+                                  (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
+
     testParser inputParser "<input type='signature' indexable='True'>as9d8j2l3kfaoiu1239h</input>"
                            (\i -> (i ^.. getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull) &&
                                   (i ^.. inputAttrib. traverse . _InputIndexable. getIndexable & andNotNull))
@@ -109,6 +131,7 @@ main = hspec $ do
     testParser inputParser "<input type='int' required='True'>1234</input>"
                            (\i -> (i ^.. getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull) &&
                                   (i ^.. inputAttrib. traverse . _InputRequired . getRequired  & andNotNull))
+
     testParser radioParser "<radio required='True'><label width='12'>Choices</label><option>1</option></radio>"
                            (\i -> (i ^.. getRadioAttribs.traverse._RadioRequired.getRequired  & andNotNull))
     
@@ -158,7 +181,7 @@ main = hspec $ do
                 (\i -> i ^.. getAutoInput.getInput._InputTypeSignature.signature <&> (== "as9d8j2l3kfaoiu1239h") & andNotNull )
     testParser autoInputParser "<auto-input type='int'>1234</auto-input>"
                 (\i -> i ^.. getAutoInput.getInput._InputTypeInt.getInputInt <&> (== 1234) & andNotNull)
---    print $ (renderOnpingForm . cobaltKioskForm $ "Black Watch")
+  
   it "should parse various form address logo company stuff" $ do
     testParser parseAddressElement "<address>Rockshore</address>"
       (\i -> i ^.. getAddressText <&> (== "Rockshore") & andNotNull)
@@ -166,8 +189,10 @@ main = hspec $ do
       (\i -> i ^.. getCompanyText <&> (== "Rockshore") & andNotNull )
     testParser parseLogoElement "<logo path='home'></logo>"
       (\i -> i ^.. logoAttrib . traverse. _LogoPath & not.null)
+
   it "should parse a row and entry correctly" $ do
     testParser parseRow "<row><item width='12'><label width='12'>Driver's Signature</label><input type='signature' width='12'></input></item></row>" (\i -> i ^.. rowItem . traverse. item & not.null)
+  
   it "should parse items of various kinds " $ do
     testParser itemParser "<item width='12'><label width='12'>Well Amount</label><input type='text' width='12'></input></item>"
       (\i -> i ^.. item. traverse._ItemLabel.getLabelText <&> (== "Well Amount")  & andNotNull)

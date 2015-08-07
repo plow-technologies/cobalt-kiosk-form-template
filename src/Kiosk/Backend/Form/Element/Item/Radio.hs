@@ -49,11 +49,6 @@ instance FromJSON RadioAttribute where
 
 instance AttributeClass RadioAttribute where
     toAttribute (RadioRequired a) = toAttribute a
-    {-
-    fromAttribute (Attribute "required" w) = case readMaybe (T.unpack w) of
-                                              (Just w') -> Right (RadioRequired $ RequiredAttribute w')
-                                              Nothing -> Left $ T.concat ["RadioRequired value of RequiredAttribute not parsing -->",w]
-    -}
     fromAttribute (Attribute t v) = case t of
                                       "required" -> case (readMaybe (T.unpack v)) of
                                                      (Just v') -> Right  $ RadioRequired $ RequiredAttribute v'

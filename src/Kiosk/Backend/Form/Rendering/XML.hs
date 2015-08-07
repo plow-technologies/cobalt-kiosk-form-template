@@ -43,6 +43,16 @@ renderRadio (Radio labl attrs opts qualifiers) = "<radio"
                                             <> renderOptionQualifierList qualifiers
                                             <> "</radio>"
 
+-- Render Checkbox Tag
+renderCheckbox :: Checkbox -> Text
+renderCheckbox (Checkbox lbl attrs opts mDropdown) = "<checkbox"
+                                                  <> renderAttrList attrs
+                                                  <> ">"
+                                                  <> renderLabel lbl
+                                                  <> renderOptionList opts
+                                                  <> maybe "" renderDropdown mDropdown
+                                                  <> "</checkbox>"
+
 -- Render Dropdown Tag
 renderDropdown :: Dropdown -> Text
 renderDropdown (Dropdown lbl opts maybeIn) = "<dropdown>"
@@ -92,12 +102,13 @@ renderAutoInput (AutoInput (Input inputType attrs)) = "<auto-input " <> renderAt
 
 -- Rendering Different Input Type
 renderInputType :: InputType -> Text
-renderInputType (InputTypeText (InputText t)) = t
-renderInputType (InputTypeSignature (Signature s)) = s
-renderInputType (InputTypeDate (InputDate d)) = d
-renderInputType (InputTypeTime (InputTime t)) = t
-renderInputType (InputTypeInt (InputInt i)) = pack . show $ i
-renderInputType (InputTypeDouble (InputDouble d)) = pack .show $ d
+renderInputType (InputTypeText (InputText t))                   = t
+renderInputType (InputTypeTextMultiLine (InputTextMultiLine t)) = t
+renderInputType (InputTypeSignature (Signature s))              = s
+renderInputType (InputTypeDate (InputDate d))                   = d
+renderInputType (InputTypeTime (InputTime t))                   = t
+renderInputType (InputTypeInt (InputInt i))                     = pack . show $ i
+renderInputType (InputTypeDouble (InputDouble d))               = pack . show $ d
 
 -- Rendering Button Tag
 renderButton :: Button -> Text
@@ -167,7 +178,8 @@ renderItemType it =
        (ItemButton b)           -> renderButton b
        (ItemEmptyBlock e)       -> renderEmptyBlock e
        (ItemRadio r)            -> renderRadio r
-       (ItemDropdown d)            -> renderDropdown d
+       (ItemCheckbox c)         -> renderCheckbox c
+       (ItemDropdown d)         -> renderDropdown d
        (ItemTableLeftHeader lh) -> renderTableLeftHeader lh
        (ItemTableTopHeader th)  -> renderTableTopHeader th
 

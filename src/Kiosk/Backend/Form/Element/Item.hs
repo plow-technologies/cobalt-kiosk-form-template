@@ -19,6 +19,7 @@ import qualified Data.Text                                       as T
 import           GHC.Generics                                    (Generic)
 import           Kiosk.Backend.Form.Element.Item.AutoInput
 import           Kiosk.Backend.Form.Element.Item.Button
+import           Kiosk.Backend.Form.Element.Item.Checkbox
 import           Kiosk.Backend.Form.Element.Item.Dropdown
 import           Kiosk.Backend.Form.Element.Item.EmptyBlock
 import           Kiosk.Backend.Form.Element.Item.Input
@@ -60,6 +61,7 @@ data ItemType = ItemLabel Label
               | ItemAutoInput AutoInput
               | ItemButton Button
               | ItemRadio Radio
+              | ItemCheckbox Checkbox
               | ItemDropdown Dropdown
               | ItemEmptyBlock EmptyBlock
               | ItemTableTopHeader TableTopHeader
