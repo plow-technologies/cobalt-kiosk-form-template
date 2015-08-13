@@ -35,7 +35,7 @@ renderLabel (Label txt attrs) = "<label " <> renderAttrList attrs
                                           <> "</label>"
 -- Render Radio Tag
 renderRadio :: Radio -> Text
-renderRadio (Radio labl attrs opts qualifiers) = "<radio"
+renderRadio (Radio labl attrs opts qualifiers) = "<radio "
                                             <> renderAttrList attrs
                                             <> ">"
                                             <> renderLabel labl
@@ -45,7 +45,7 @@ renderRadio (Radio labl attrs opts qualifiers) = "<radio"
 
 -- Render Checkbox Tag
 renderCheckbox :: Checkbox -> Text
-renderCheckbox (Checkbox lbl attrs opts mDropdown) = "<checkbox"
+renderCheckbox (Checkbox lbl attrs opts mDropdown) = "<checkbox "
                                                   <> renderAttrList attrs
                                                   <> ">"
                                                   <> renderLabel lbl
