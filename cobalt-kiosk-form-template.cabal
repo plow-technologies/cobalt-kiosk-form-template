@@ -61,6 +61,7 @@ library
                         Kiosk.Backend.Form.Rendering.XML
                         Kiosk.Backend.Form.Rendering.CStruct
 
+
   other-extensions:     ForeignFunctionInterface
                       , OverloadedStrings
 
@@ -94,6 +95,9 @@ executable onping
       Buildable: True
 
   main-is:           Main.hs
+  other-modules:     Kiosk.Backend.Form.Attribute
+                     Kiosk.Backend.Form.Rendering.Metaprogramming.CStruct
+
   hs-source-dirs:    src
                    , meta
   build-depends:     base       >= 4.8     && < 5

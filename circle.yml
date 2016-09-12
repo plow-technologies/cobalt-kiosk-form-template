@@ -24,7 +24,7 @@ dependencies:
 
 test:
   override:
-    - stack test cobalt-kiosk-form-template
+    - stack test cobalt-kiosk-form-template -j2
 
 deployment:
   staging:
