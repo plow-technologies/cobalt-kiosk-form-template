@@ -19,6 +19,7 @@ Flag preprocess
                         only for file generation. Library version should
                         not use Template Haskell.
     Default:            False
+
 library
   exposed-modules:      Kiosk.Backend.Form
                         Kiosk.Backend.Form.Attribute
@@ -38,12 +39,12 @@ library
 
                         Kiosk.Backend.Form.Element.Address
                         Kiosk.Backend.Form.Element.Company
-                        Kiosk.Backend.Form.Element.Constant 
-                        Kiosk.Backend.Form.Element.Form 
+                        Kiosk.Backend.Form.Element.Constant
+                        Kiosk.Backend.Form.Element.Form
                         Kiosk.Backend.Form.Element.Logo
                         Kiosk.Backend.Form.Element.Phone
 
-                        Kiosk.Backend.Form.Element.Item  
+                        Kiosk.Backend.Form.Element.Item
                         Kiosk.Backend.Form.Element.Item.Button
                         Kiosk.Backend.Form.Element.Item.EmptyBlock
                         Kiosk.Backend.Form.Element.Item.Input
@@ -60,18 +61,18 @@ library
                         Kiosk.Backend.Form.Rendering.XML
                         Kiosk.Backend.Form.Rendering.CStruct
 
-  other-extensions:     ForeignFunctionInterface 
+  other-extensions:     ForeignFunctionInterface
                       , OverloadedStrings
 
-  
+
   build-depends:        base                >= 4.8     && < 5
-                      , attoparsec          >= 0.13.0.1
-                      , aeson               == 0.8.0.2
-                      , text                >= 1.2     && < 1.3
-                      , bytestring          >= 0.10    && < 0.11
-                      , action-permutations >= 0.0.0.1
-                      , blaze-html          >= 0.7.0.3 && < 0.9
-  
+                      , attoparsec
+                      , aeson
+                      , text
+                      , bytestring
+                      , action-permutations
+                      , blaze-html
+
   if flag(preprocess) {
     other-modules:      Kiosk.Backend.Form.Rendering.Metaprogramming.CStruct
     build-depends:      template-haskell
@@ -95,38 +96,34 @@ executable onping
   main-is:           Main.hs
   hs-source-dirs:    src
                    , meta
-  build-depends:     base       >= 4.8     && < 5      
-                   , attoparsec >= 0.13.0.1 
-                   , text       
-                   , bytestring 
-                   , action-permutations 
+  build-depends:     base       >= 4.8     && < 5
+                   , attoparsec
+                   , text
+                   , bytestring
+                   , action-permutations
                    , blaze-html
                    , template-haskell
                    , cobalt-kiosk-form-template
-                   , aeson      == 0.8.0.2
+                   , aeson
 
-  default-language:     Haskell2010                      
+  default-language:     Haskell2010
   ghc-options:       -threaded -O2 -rtsopts -Wall
 
 test-suite test
   type:                exitcode-stdio-1.0
   default-language:    Haskell2010
 
-  hs-source-dirs:      src
-                     , test
-  
+  hs-source-dirs:      test
   ghc-options:         -Wall
-  
   main-is:             Test.hs
-
   build-depends:       base       >= 4.8   && < 5
-                     , hspec      >= 2.1.7 && < 2.2
-                     , QuickCheck >= 2.8.1 && < 2.9
-                     , attoparsec >= 0.13.0.1
-                     , text       >= 1.2   && <1.3
-                     , lens       >= 4.9
-                     , bytestring 
+                     , hspec
+                     , QuickCheck
+                     , attoparsec
+                     , text
+                     , lens
+                     , bytestring
                      , blaze-html
-                     , aeson      == 0.8.0.2
-                     , action-permutations >= 0.0.0.1 
-
+                     , aeson
+                     , action-permutations
+                     , cobalt-kiosk-form-template
