@@ -17,7 +17,7 @@ extractThird (_,_,c) = c
 
 getTypeAndRecords :: Name -> Q Exp
 getTypeAndRecords t = do
-  TyConI (DataD _ typeName _ constructors _) <- reify t
+  TyConI (DataD _ typeName _ _ constructors _) <- reify t
   let r = flatten $ map getTypeNameAndRecordName constructors
   return $ TupE [LitE $ StringL $ nameBase typeName, r]
 
